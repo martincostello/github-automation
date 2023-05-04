@@ -1,0 +1,59 @@
+name: update-dotnet-sdk
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "The branch to run the SDK updates for."
+        required: false
+        type: choice
+        options:
+          - "main"
+          - "dotnet-vnext"
+        default: "main"
+
+permissions: {}
+
+jobs:
+  update-dotnet-sdk:
+    runs-on: [ ubuntu-latest ]
+    steps:
+      - name: Update .NET SDKs
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        run: |
+          $repos = @(
+            <#
+            "justeattakeaway/ApplePayJSSample",
+            "justeattakeaway/httpclient-interception",
+            "justeattakeaway/JustEat.StatsD",
+            "justeattakeaway/JustSaying",
+            "martincostello/adventofcode",
+            "martincostello/adventofcode",
+            "martincostello/alexa-london-travel",
+            "martincostello/alexa-london-travel-site",
+            "martincostello/antiforgery-testing-application-part",
+            "martincostello/api",
+            "martincostello/apple-fitness-workout-mapper",
+            "martincostello/aspnet-core-pseudo-localization",
+            "martincostello/browserstack-automate",
+            "martincostello/costellobot",
+            "martincostello/dependabot-helper",
+            "martincostello/dotnet-minimal-api-integration-testing",
+            "martincostello/dotnet-playwright-tests",
+            "martincostello/dotnet-repo-template",
+            "martincostello/home",
+            "martincostello/lambda-test-server",
+            "martincostello/polly-rate-limiting",
+            "martincostello/project-euler",
+            "martincostello/Pseudolocalizer",
+            "martincostello/SignInWithAppleSample",
+            "martincostello/sqllocaldb",
+            "martincostello/website",
+            #>
+            "martincostello/xunit-logging"
+          )        
+          foreach ($repo in $repos) {
+            gh workflow run "update-dotnet-sdk.yml" --ref "${{ inputs.branch }}"" --repo $repo
+          }

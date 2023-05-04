@@ -1,2 +1,3 @@
-# github-automation
-GitHub automation
+# GitHub Automation
+
+GitHub automation for my repositories.
