@@ -55,5 +55,5 @@ jobs:
             "martincostello/xunit-logging"
           )        
           foreach ($repo in $repos) {
-            gh workflow run "update-dotnet-sdk.yml" --ref "${{ inputs.branch }}"" --repo $repo
+            gh workflow run "update-dotnet-sdk.yml" --ref "${{ inputs.branch }}" --repo $repo
           }
