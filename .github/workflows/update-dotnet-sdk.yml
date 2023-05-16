@@ -54,4 +54,5 @@ jobs:
           )        
           foreach ($repo in $repos) {
             gh workflow run "update-dotnet-sdk.yml" --ref "${{ inputs.branch }}" --repo $repo
+            Start-Sleep -Seconds 5 # Wait 5 seconds to prevent issues with GitHub secondary rate limits
           }
