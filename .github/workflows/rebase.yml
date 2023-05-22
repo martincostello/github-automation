@@ -87,11 +87,6 @@ jobs:
           ref: ${{ inputs.branch }}
           token: ${{ secrets.ACCESS_TOKEN }}
 
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: "7.0.x"
-
       - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
