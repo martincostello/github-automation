@@ -2,6 +2,8 @@
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using System.Text.Json;
 using System.Xml.Linq;
 using LibGit2Sharp;
 using NuGet.Versioning;
@@ -30,10 +32,8 @@ while (result.Status is not RebaseStatus.Complete)
 
         bool resolvedConflict = fileName switch
         {
-            "global.json" => false, // TODO Handle conflicts in global.json
-            "package.json" => false, // TODO Handle conflicts in package.json
             "package-lock.json" => await TryResolveNpmLockFileConflictsAsync(filePath),
-            _ => await TryResolveNuGetPackageConflictsAsync(filePath, conflict),
+            _ => await TryResolvePackageConflictsAsync(filePath, conflict),
         };
 
         if (resolvedConflict)
@@ -70,7 +70,7 @@ static async Task<bool> TryResolveNpmLockFileConflictsAsync(string fileName)
     return process.ExitCode == 0;
 }
 
-static bool TryParseNuGetPackageVersion(string value, [NotNullWhen(true)] out NuGetVersion? version)
+static bool TryParsePackageVersion(string value, [NotNullWhen(true)] out NuGetVersion? version)
 {
     if (TryParseXml(value, out var fragment) && IsPackageElement(fragment))
     {
@@ -82,9 +82,44 @@ static bool TryParseNuGetPackageVersion(string value, [NotNullWhen(true)] out Nu
             return true;
         }
     }
+    else if (TryParseJson(value, out var document))
+    {
+        try
+        {
+            foreach (var property in document.RootElement.EnumerateObject())
+            {
+                var versionString = property.Value.GetString();
+
+                if (versionString?.Length > 0 && versionString[0] == '^')
+                {
+                    versionString = versionString[1..];
+                }
+
+                if (NuGetVersion.TryParse(versionString, out var packageVersion))
+                {
+                    version = packageVersion;
+                    return true;
+                }
+            }
+        }
+        finally
+        {
+            document.Dispose();
+        }
+    }
 
     version = null;
     return false;
+
+    static bool TryParseJson(string value, [NotNullWhen(true)] out JsonDocument? document)
+    {
+        var jsonUtf8Bytes = Encoding.UTF8.GetBytes('{' + value + '}');
+        var options = new JsonReaderOptions() { AllowTrailingCommas = true };
+
+        var reader = new Utf8JsonReader(jsonUtf8Bytes, options);
+
+        return JsonDocument.TryParseValue(ref reader, out document);
+    }
 
     static bool TryParseXml(string value, [NotNullWhen(true)] out XElement? fragment)
     {
@@ -104,7 +139,7 @@ static bool TryParseNuGetPackageVersion(string value, [NotNullWhen(true)] out Nu
         => element.Name == "PackageReference" || element.Name == "PackageVersion";
 }
 
-static async Task<bool> TryResolveNuGetPackageConflictsAsync(string fileName, Conflict conflict)
+static async Task<bool> TryResolvePackageConflictsAsync(string fileName, Conflict conflict)
 {
     const string TheirsMarker = "<<<<<<<";
     const string MidpointMarker = "=======";
@@ -137,8 +172,8 @@ static async Task<bool> TryResolveNuGetPackageConflictsAsync(string fileName, Co
                 var theirLine = theirs[j];
                 var ourLine = ours[j];
 
-                if (TryParseNuGetPackageVersion(theirLine, out var theirPackageVersion) &&
-                    TryParseNuGetPackageVersion(ourLine, out var ourPackageVersion))
+                if (TryParsePackageVersion(theirLine, out var theirPackageVersion) &&
+                    TryParsePackageVersion(ourLine, out var ourPackageVersion))
                 {
                     // Take the package version with the highest version number
                     if (theirPackageVersion.CompareTo(ourPackageVersion) > 0)
