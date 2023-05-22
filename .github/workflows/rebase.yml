@@ -98,18 +98,24 @@ jobs:
       - name: Rebase ${{ inputs.branch }}
         shell: pwsh
         run: |
-          $success = $false
           chmod +x ./artifacts/Rebaser
           & ./artifacts/Rebaser "${{ github.workspace }}"
+
           if ($LASTEXITCODE -eq 0) {
-            # git push --force-with-lease origin "${{ inputs.branch }}"
+            git diff --quiet "${{ inputs.branch }}..origin/${{ inputs.branch }}"
             if ($LASTEXITCODE -eq 0) {
-              $success = $true
+              Write-Host "::notice::The ${{ inputs.branch }} branch of ${{ matrix.repo }} is up-to-date."
+            }
+            else {
+              git push --force-with-lease origin "${{ inputs.branch }}"
+              if ($LASTEXITCODE -eq 0) {
+                Write-Host "::notice::Rebased the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
+              }
+              else {
+                Write-Host "::warning::Could not push changes to the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
+              }
             }
           }
-          if ($success) {
-            Write-Host "::notice::Rebased the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
-          } else {
-            Write-Host "::error::Could not rebase the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
-            throw "Failed to rebase Git repository."
+          else {
+            Write-Host "::warning::Could not rebase the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
           }
