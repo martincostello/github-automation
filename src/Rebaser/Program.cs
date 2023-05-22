@@ -54,7 +54,7 @@ while (result.Status is not RebaseStatus.Complete)
         else
         {
             Console.Error.WriteLine($"Unable to resolve merge conflict in {conflict.Ours.Path}.");
-            return -1;
+            return 1;
         }
     }
 

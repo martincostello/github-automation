@@ -116,7 +116,7 @@ jobs:
               }
             }
           }
-          elseif ($LASTEXITCODE -eq -1) {
+          elseif ($LASTEXITCODE -eq 1) {
             Write-Host "::warning::Could not resolve conflicts for the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
             exit 0
           }
