@@ -21,51 +21,44 @@ var result = repo.Rebase.Start(branch, target, onto, identity, options);
 
 var repoPath = Path.Combine(repo.Info.Path, "..");
 
-try
+while (result.Status is not RebaseStatus.Complete)
 {
-    while (result.Status is not RebaseStatus.Complete)
+    foreach (var conflict in repo.Index.Conflicts)
     {
-        foreach (var conflict in repo.Index.Conflicts)
+        var filePath = Path.GetFullPath(Path.Combine(repoPath, conflict.Ours.Path));
+        var fileName = Path.GetFileName(filePath);
+
+        bool resolvedConflict = false;
+
+        if (string.Equals(fileName, "global.json", StringComparison.Ordinal))
         {
-            var filePath = Path.GetFullPath(Path.Combine(repoPath, conflict.Ours.Path));
-            var fileName = Path.GetFileName(filePath);
-
-            bool resolvedConflict = false;
-
-            if (string.Equals(fileName, "global.json", StringComparison.Ordinal))
-            {
-                // TODO Handle conflicts in global.json
-            }
-            else if (string.Equals(fileName, "package.json", StringComparison.Ordinal))
-            {
-                // TODO Handle conflicts in package.json
-            }
-            else if (string.Equals(fileName, "package-lock.json", StringComparison.Ordinal))
-            {
-                resolvedConflict = await TryResolveNpmLockFileConflictsAsync(filePath);
-            }
-            else if (await TryResolveNuGetPackageConflictsAsync(filePath, conflict))
-            {
-                resolvedConflict = true;
-            }
-
-            if (resolvedConflict)
-            {
-                repo.Index.Add(conflict.Ours.Path);
-            }
-            else
-            {
-                Console.Error.WriteLine($"Unable to resolve merge conflict in {filePath}.");
-                return;
-            }
+            // TODO Handle conflicts in global.json
+        }
+        else if (string.Equals(fileName, "package.json", StringComparison.Ordinal))
+        {
+            // TODO Handle conflicts in package.json
+        }
+        else if (string.Equals(fileName, "package-lock.json", StringComparison.Ordinal))
+        {
+            resolvedConflict = await TryResolveNpmLockFileConflictsAsync(filePath);
+        }
+        else if (await TryResolveNuGetPackageConflictsAsync(filePath, conflict))
+        {
+            resolvedConflict = true;
         }
 
-        result = repo.Rebase.Continue(identity, options);
+        if (resolvedConflict)
+        {
+            repo.Index.Add(conflict.Ours.Path);
+        }
+        else
+        {
+            Console.Error.WriteLine($"Unable to resolve merge conflict in {filePath}.");
+            return;
+        }
     }
-}
-finally
-{
-    repo.Rebase.Abort();
+
+    result = repo.Rebase.Continue(identity, options);
 }
 
 static async Task<bool> TryResolveNpmLockFileConflictsAsync(string fileName)
