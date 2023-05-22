@@ -25,7 +25,8 @@ var repoPath = Path.Combine(repo.Info.Path, "..");
 
 while (result.Status is not RebaseStatus.Complete)
 {
-    foreach (var conflict in repo.Index.Conflicts)
+    // Resolve in reverse so package-lock.json is fixed after package.json
+    foreach (var conflict in repo.Index.Conflicts.Reverse())
     {
         var filePath = Path.GetFullPath(Path.Combine(repoPath, conflict.Ours.Path));
         var fileName = Path.GetFileName(filePath);
