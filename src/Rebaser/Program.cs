@@ -28,24 +28,13 @@ while (result.Status is not RebaseStatus.Complete)
         var filePath = Path.GetFullPath(Path.Combine(repoPath, conflict.Ours.Path));
         var fileName = Path.GetFileName(filePath);
 
-        bool resolvedConflict = false;
-
-        if (string.Equals(fileName, "global.json", StringComparison.Ordinal))
+        bool resolvedConflict = fileName switch
         {
-            // TODO Handle conflicts in global.json
-        }
-        else if (string.Equals(fileName, "package.json", StringComparison.Ordinal))
-        {
-            // TODO Handle conflicts in package.json
-        }
-        else if (string.Equals(fileName, "package-lock.json", StringComparison.Ordinal))
-        {
-            resolvedConflict = await TryResolveNpmLockFileConflictsAsync(filePath);
-        }
-        else if (await TryResolveNuGetPackageConflictsAsync(filePath, conflict))
-        {
-            resolvedConflict = true;
-        }
+            "global.json" => false, // TODO Handle conflicts in global.json
+            "package.json" => false, // TODO Handle conflicts in package.json
+            "package-lock.json" => await TryResolveNpmLockFileConflictsAsync(filePath),
+            _ => await TryResolveNuGetPackageConflictsAsync(filePath, conflict),
+        };
 
         if (resolvedConflict)
         {
