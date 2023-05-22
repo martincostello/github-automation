@@ -12,7 +12,7 @@ var author = repo.Head.Commits.First().Author;
 var identity = new Identity(author.Name, author.Email);
 
 var branch = repo.Head;
-var target = repo.Branches["main"];
+var target = repo.Branches["main"] ?? repo.Branches["origin/main"];
 
 var options = new RebaseOptions();
 Branch? onto = null;
