@@ -61,7 +61,7 @@ jobs:
           - "martincostello/alexa-london-travel-site"
           #- "martincostello/antiforgery-testing-application-part"
           #- "martincostello/api"
-          #- "martincostello/apple-fitness-workout-mapper"
+          - "martincostello/apple-fitness-workout-mapper"
           #- "martincostello/aspnet-core-pseudo-localization"
           #- "martincostello/browserstack-automate"
           #- "martincostello/costellobot"
