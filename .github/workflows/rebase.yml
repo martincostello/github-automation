@@ -1,0 +1,110 @@
+name: rebase
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "The branch to rebase."
+        required: false
+        type: choice
+        options:
+          - "dotnet-vnext"
+        default: "dotnet-vnext"
+
+permissions: {}
+
+jobs:
+  build:
+    name: build
+    runs-on: [ ubuntu-latest ]
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+
+      - name: Build rebaser
+        shell: pwsh
+        run: dotnet publish ./src/Rebaser/Rebaser.csproj --configuration Release --output ./artifacts --runtime linux-x64 --self-contained false /p:PublishSingleFile=true
+
+      - name: Publish artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: rebaser
+          path: ./artifacts
+          if-no-files-found: error
+
+  rebase:
+    name: "rebase-${{ matrix.repo }}"
+    needs: [ build ]
+    runs-on: [ ubuntu-latest ]
+
+    strategy:
+      fail-fast: false
+      matrix:
+        repo:
+          #- "justeattakeaway/ApplePayJSSample"
+          #- "justeattakeaway/httpclient-interception"
+          #- "justeattakeaway/JustEat.StatsD"
+          #- "justeattakeaway/JustSaying"
+          #- "martincostello/adventofcode"
+          #- "martincostello/adventofcode"
+          #- "martincostello/alexa-london-travel"
+          - "martincostello/alexa-london-travel-site"
+          #- "martincostello/antiforgery-testing-application-part"
+          #- "martincostello/api"
+          #- "martincostello/apple-fitness-workout-mapper"
+          #- "martincostello/aspnet-core-pseudo-localization"
+          #- "martincostello/browserstack-automate"
+          #- "martincostello/costellobot"
+          #- "martincostello/dependabot-helper"
+          #- "martincostello/dotnet-minimal-api-integration-testing"
+          #- "martincostello/dotnet-playwright-tests"
+          #- "martincostello/dotnet-repo-template"
+          #- "martincostello/home"
+          #- "martincostello/lambda-test-server"
+          #- "martincostello/polly-rate-limiting"
+          #- "martincostello/project-euler"
+          #- "martincostello/Pseudolocalizer"
+          #- "martincostello/SignInWithAppleSample"
+          #- "martincostello/sqllocaldb"
+          #- "martincostello/website"
+          #- "martincostello/xunit-logging"
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ matrix.repo }}
+          ref: ${{ inputs.branch }}
+          token: ${{ secrets.ACCESS_TOKEN }}
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: rebaser
+
+      - name: Rebase ${{ inputs.branch }}
+        shell: pwsh
+        run: |
+          $success = $false
+          ./artifacts/Rebaser "${{ github.workspace }}"
+          if ($LASTEXITCODE -eq 0) {
+            # git push --force-with-lease origin "${{ inputs.branch }}"
+            if ($LASTEXITCODE -eq 0) {
+              $success = $true
+            }
+          }
+          if ($success) {
+            Write-Host "::notice::Rebased the ${{ inputs.branch }} branch of ${{ matrix.repo }}"
+          } else {
+            Write-Host "::error::Could not rebase the ${{ inputs.branch }} branch of ${{ matrix.repo }}"
+            exit $LASTEXITCODE
+          }
