@@ -29,7 +29,6 @@ jobs:
             "justeattakeaway/JustEat.StatsD",
             "justeattakeaway/JustSaying",
             "martincostello/adventofcode",
-            "martincostello/adventofcode",
             "martincostello/alexa-london-travel",
             "martincostello/alexa-london-travel-site",
             "martincostello/antiforgery-testing-application-part",
@@ -51,7 +50,7 @@ jobs:
             "martincostello/sqllocaldb",
             "martincostello/website",
             "martincostello/xunit-logging"
-          )        
+          )
           foreach ($repo in $repos) {
             gh workflow run "update-dotnet-sdk.yml" --ref "${{ inputs.branch }}" --repo $repo
             Start-Sleep -Seconds 5 # Wait 5 seconds to prevent issues with GitHub secondary rate limits

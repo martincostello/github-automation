@@ -56,7 +56,6 @@ jobs:
           - "justeattakeaway/JustEat.StatsD"
           - "justeattakeaway/JustSaying"
           - "martincostello/adventofcode"
-          - "martincostello/adventofcode"
           - "martincostello/alexa-london-travel"
           - "martincostello/alexa-london-travel-site"
           - "martincostello/antiforgery-testing-application-part"
