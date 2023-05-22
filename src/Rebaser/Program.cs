@@ -17,35 +17,27 @@ var branch = repo.Head;
 var target = repo.Branches["main"] ?? repo.Branches["origin/main"];
 
 var options = new RebaseOptions();
-Branch? onto = null;
-
-var result = repo.Rebase.Start(branch, target, onto, identity, options);
-
-var repoPath = Path.Combine(repo.Info.Path, "..");
+var result = repo.Rebase.Start(branch, target, null, identity, new());
 
 while (result.Status is not RebaseStatus.Complete)
 {
     // Resolve in reverse so package-lock.json is fixed after package.json
     foreach (var conflict in repo.Index.Conflicts.Reverse())
     {
-        var filePath = Path.GetFullPath(Path.Combine(repoPath, conflict.Ours.Path));
-        var fileName = Path.GetFileName(filePath);
-
-        bool resolvedConflict = fileName switch
+        var fileName = Path.GetFullPath(Path.Combine(repo.Info.Path, "..", conflict.Ours.Path));
+        var resolvedConflict = Path.GetFileName(fileName) switch
         {
-            "package-lock.json" => await TryResolveNpmLockFileConflictsAsync(filePath),
-            _ => await TryResolvePackageConflictsAsync(filePath, conflict),
+            "package-lock.json" => await TryResolveNpmLockFileConflictsAsync(fileName),
+            _ => await TryResolvePackageConflictsAsync(fileName, conflict),
         };
 
-        if (resolvedConflict)
-        {
-            repo.Index.Add(conflict.Ours.Path);
-        }
-        else
+        if (!resolvedConflict)
         {
             Console.Error.WriteLine($"Unable to resolve merge conflict in {conflict.Ours.Path}.");
             return 1;
         }
+
+        repo.Index.Add(conflict.Ours.Path);
     }
 
     result = repo.Rebase.Continue(identity, options);
