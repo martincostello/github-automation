@@ -108,8 +108,8 @@ jobs:
             }
           }
           if ($success) {
-            Write-Host "::notice::Rebased the ${{ inputs.branch }} branch of ${{ matrix.repo }}"
+            Write-Host "::notice::Rebased the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
           } else {
-            Write-Host "::error::Could not rebase the ${{ inputs.branch }} branch of ${{ matrix.repo }}"
+            Write-Host "::error::Could not rebase the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
             exit $LASTEXITCODE
           }
