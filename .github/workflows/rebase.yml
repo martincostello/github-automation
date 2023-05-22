@@ -111,7 +111,7 @@ jobs:
                 Write-Host "::notice::Rebased the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
               }
               else {
-                Write-Host "::warning::Could not push changes to the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
+                Write-Host "::error::Could not push changes to the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
               }
             }
           }
