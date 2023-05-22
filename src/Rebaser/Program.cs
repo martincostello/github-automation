@@ -54,12 +54,14 @@ while (result.Status is not RebaseStatus.Complete)
         else
         {
             Console.Error.WriteLine($"Unable to resolve merge conflict in {filePath}.");
-            return;
+            return -1;
         }
     }
 
     result = repo.Rebase.Continue(identity, options);
 }
+
+return 0;
 
 static async Task<bool> TryResolveNpmLockFileConflictsAsync(string fileName)
 {
