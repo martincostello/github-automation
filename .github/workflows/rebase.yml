@@ -116,6 +116,10 @@ jobs:
               }
             }
           }
+          elseif ($LASTEXITCODE -eq -1)) {
+            Write-Host "::warning::Could not resolve conflicts for the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
+            exit 0
+          }
           else {
-            Write-Host "::warning::Could not rebase the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
+            Write-Host "::warning::Failed to rebase the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
           }
