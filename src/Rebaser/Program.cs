@@ -8,7 +8,7 @@ using NuGet.Versioning;
 
 using var repo = new Repository(args[0]);
 
-var author = repo.Config.BuildSignature(DateTimeOffset.Now);
+var author = repo.Head.Commits.First().Author;
 var identity = new Identity(author.Name, author.Email);
 
 var branch = repo.Head;
