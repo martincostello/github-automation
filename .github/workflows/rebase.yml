@@ -121,5 +121,5 @@ jobs:
             exit 0
           }
           else {
-            Write-Host "::warning::Failed to rebase the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
+            Write-Host "::error::Failed to rebase the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
           }
