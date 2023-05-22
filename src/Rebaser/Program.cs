@@ -77,9 +77,8 @@ static bool TryParsePackageVersion(string value, [NotNullWhen(true)] out NuGetVe
     {
         var versionString = fragment.Attribute("Version")?.Value;
 
-        if (NuGetVersion.TryParse(versionString, out var packageVersion))
+        if (NuGetVersion.TryParse(versionString, out version))
         {
-            version = packageVersion;
             return true;
         }
     }
@@ -96,9 +95,8 @@ static bool TryParsePackageVersion(string value, [NotNullWhen(true)] out NuGetVe
                     versionString = versionString[1..];
                 }
 
-                if (NuGetVersion.TryParse(versionString, out var packageVersion))
+                if (NuGetVersion.TryParse(versionString, out version))
                 {
-                    version = packageVersion;
                     return true;
                 }
             }
@@ -150,7 +148,7 @@ static async Task<bool> TryResolvePackageConflictsAsync(string fileName, Conflic
 
     int conflicts = lines.Count((p) => p.StartsWith(TheirsMarker));
 
-    var merged = new List<string>();
+    var merged = new List<string>(lines.Length);
     int line = 0;
 
     for (int i = 0; i < conflicts; i++)
@@ -173,11 +171,11 @@ static async Task<bool> TryResolvePackageConflictsAsync(string fileName, Conflic
                 var theirLine = theirs[j];
                 var ourLine = ours[j];
 
-                if (TryParsePackageVersion(theirLine, out var theirPackageVersion) &&
-                    TryParsePackageVersion(ourLine, out var ourPackageVersion))
+                if (TryParsePackageVersion(theirLine, out var theirVersion) &&
+                    TryParsePackageVersion(ourLine, out var ourVersion))
                 {
                     // Take the package version with the highest version number
-                    if (theirPackageVersion.CompareTo(ourPackageVersion) > 0)
+                    if (theirVersion.CompareTo(ourVersion) > 0)
                     {
                         merged.Add(theirLine);
                     }
