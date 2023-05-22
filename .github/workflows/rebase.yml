@@ -97,6 +97,7 @@ jobs:
         shell: pwsh
         run: |
           $success = $false
+          chmod +x ./artifacts/Rebaser
           & ./artifacts/Rebaser "${{ github.workspace }}"
           if ($LASTEXITCODE -eq 0) {
             # git push --force-with-lease origin "${{ inputs.branch }}"
