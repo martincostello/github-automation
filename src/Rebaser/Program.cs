@@ -109,7 +109,15 @@ static bool TryParsePackageVersion(string value, [NotNullWhen(true)] out NuGetVe
 
         var reader = new Utf8JsonReader(jsonUtf8Bytes, options);
 
-        return JsonDocument.TryParseValue(ref reader, out document);
+        try
+        {
+            return JsonDocument.TryParseValue(ref reader, out document);
+        }
+        catch (JsonReaderException)
+        {
+            document = null;
+            return false;
+        }
     }
 
     static bool TryParseXml(string value, [NotNullWhen(true)] out XElement? fragment)
