@@ -104,6 +104,12 @@ static bool TryParsePackageVersion(string value, [NotNullWhen(true)] out NuGetVe
 
     static bool TryParseJson(string value, [NotNullWhen(true)] out JsonDocument? document)
     {
+        if (value.StartsWith('<'))
+        {
+            document = null;
+            return false;
+        }
+
         var jsonUtf8Bytes = Encoding.UTF8.GetBytes('{' + value + '}');
         var options = new JsonReaderOptions() { AllowTrailingCommas = true };
 
