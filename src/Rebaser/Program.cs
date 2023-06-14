@@ -113,7 +113,7 @@ static bool TryParsePackageVersion(string value, [NotNullWhen(true)] out NuGetVe
         {
             return JsonDocument.TryParseValue(ref reader, out document);
         }
-        catch (JsonReaderException)
+        catch (JsonException)
         {
             document = null;
             return false;
