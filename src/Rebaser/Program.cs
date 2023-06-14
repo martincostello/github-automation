@@ -9,6 +9,7 @@ using LibGit2Sharp;
 using NuGet.Versioning;
 
 using var repo = new Repository(args[0]);
+var interactive = args.Contains("--interactive", StringComparer.OrdinalIgnoreCase);
 
 var author = repo.Head.Commits.First().Author;
 var identity = new Identity(author.Name, author.Email);
@@ -33,8 +34,30 @@ while (result.Status is not RebaseStatus.Complete)
 
         if (!resolvedConflict)
         {
-            Console.Error.WriteLine($"Unable to resolve merge conflict in {conflict.Ours.Path}.");
-            return 1;
+            if (interactive)
+            {
+                var startInfo = new ProcessStartInfo("code")
+                {
+                    ArgumentList = { fileName, "--wait" },
+                    UseShellExecute = true,
+                };
+
+                using var process = Process.Start(startInfo)!;
+                await process.WaitForExitAsync();
+
+                if (process.ExitCode != 0)
+                {
+                    Console.Error.WriteLine($"Unable to resolve merge conflict in {conflict.Ours.Path} with Visual Studio Code.");
+                    return 1;
+                }
+
+                resolvedConflict = true;
+            }
+            else
+            {
+                Console.Error.WriteLine($"Unable to resolve merge conflict in {conflict.Ours.Path}.");
+                return 1;
+            }
         }
 
         repo.Index.Add(conflict.Ours.Path);
