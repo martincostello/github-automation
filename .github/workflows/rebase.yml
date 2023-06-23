@@ -97,15 +97,16 @@ jobs:
       - name: Rebase ${{ inputs.branch }}
         shell: pwsh
         run: |
-          chmod +x ./artifacts/Rebaser
-          & ./artifacts/Rebaser "${{ github.workspace }}"
+          git format-patch ${{ inputs.branch }}..origin/main --stdout | git apply --check --allow-empty --quiet -
 
           if ($LASTEXITCODE -eq 0) {
-            git diff --quiet "${{ inputs.branch }}..origin/${{ inputs.branch }}"
+            Write-Host "::notice::The ${{ inputs.branch }} branch of ${{ matrix.repo }} has no conflicts so does not need to be rebased."
+          }
+          else {
+            chmod +x ./artifacts/Rebaser
+            & ./artifacts/Rebaser "${{ github.workspace }}"
+
             if ($LASTEXITCODE -eq 0) {
-              Write-Host "::notice::The ${{ inputs.branch }} branch of ${{ matrix.repo }} is up-to-date."
-            }
-            else {
               git push --force-with-lease origin "${{ inputs.branch }}"
               if ($LASTEXITCODE -eq 0) {
                 Write-Host "::notice::Rebased the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
@@ -114,11 +115,11 @@ jobs:
                 Write-Host "::error::Could not push changes to the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
               }
             }
-          }
-          elseif ($LASTEXITCODE -eq 1) {
-            Write-Host "::warning::Could not resolve conflicts for the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
-            exit 0
-          }
-          else {
-            Write-Host "::error::Failed to rebase the ${{ inputs.branch }} branch of ${{ matrix.repo }}. Error code: $LASTEXITCODE."
+            elseif ($LASTEXITCODE -eq 1) {
+              Write-Host "::warning::Could not resolve conflicts for the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
+              exit 0
+            }
+            else {
+              Write-Host "::error::Failed to rebase the ${{ inputs.branch }} branch of ${{ matrix.repo }}. Error code: $LASTEXITCODE."
+            }
           }
