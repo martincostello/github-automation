@@ -3,16 +3,16 @@ updates:
 - package-ecosystem: "github-actions"
   directory: "/"
   schedule:
-    interval: "monthly"
-    day: "thursday"
+    interval: daily
+    time: "05:30"
     timezone: Europe/London
   reviewers:
     - "martincostello"
 - package-ecosystem: nuget
   directory: "/"
   schedule:
-    interval: "monthly"
-    day: "thursday"
+    interval: daily
+    time: "05:30"
     timezone: Europe/London
   reviewers:
     - "martincostello"
