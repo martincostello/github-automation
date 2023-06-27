@@ -9,6 +9,12 @@ using System.Xml.Linq;
 using LibGit2Sharp;
 using NuGet.Versioning;
 
+if (args.Length < 1)
+{
+    Console.Error.WriteLine("No Git repository path specified.");
+    return 1;
+}
+
 using var repo = new Repository(args[0]);
 var interactive = string.Equals(args.LastOrDefault(), "--interactive", StringComparison.OrdinalIgnoreCase);
 
