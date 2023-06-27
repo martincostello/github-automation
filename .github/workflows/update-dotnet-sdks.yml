@@ -39,6 +39,7 @@ jobs:
             "martincostello/costellobot",
             "martincostello/dependabot-helper",
             "martincostello/dotnet-minimal-api-integration-testing",
+            "martincostello/dotnet-patch-automation-sample",
             "martincostello/dotnet-playwright-tests",
             "martincostello/dotnet-repo-template",
             "martincostello/github-automation",
