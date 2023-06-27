@@ -10,13 +10,15 @@ using LibGit2Sharp;
 using NuGet.Versioning;
 
 using var repo = new Repository(args[0]);
-var interactive = args.Contains("--interactive", StringComparer.OrdinalIgnoreCase);
+var interactive = string.Equals(args.LastOrDefault(), "--interactive", StringComparison.OrdinalIgnoreCase);
 
 var author = repo.Head.Commits.First().Author;
 var identity = new Identity(author.Name, author.Email);
 
+var defaultBranch = args.Skip(1).Where((p) => !p.StartsWith("--", StringComparison.Ordinal)).FirstOrDefault() ?? "main";
+
 var branch = repo.Head;
-var target = repo.Branches["main"] ?? repo.Branches["origin/main"];
+var target = repo.Branches[defaultBranch] ?? repo.Branches[$"origin/{defaultBranch}"];
 
 var options = new RebaseOptions();
 var result = repo.Rebase.Start(branch, target, null, identity, new());
