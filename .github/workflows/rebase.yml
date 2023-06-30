@@ -101,6 +101,7 @@ jobs:
           gh api "repos/${{ matrix.repo }}/branches/${{ inputs.branch }}" | Out-Null
           $exists = $LASTEXITCODE -eq 0
           "branch-exists=${exists}" >> $env:GITHUB_OUTPUT
+          exit 0
 
       - name: Checkout code
         uses: actions/checkout@v3
