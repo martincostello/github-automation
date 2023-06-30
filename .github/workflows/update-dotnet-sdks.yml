@@ -24,8 +24,6 @@ jobs:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
           $repos = @(
-            "martincostello/blog"
-            <#
             "justeattakeaway/ApplePayJSSample",
             "justeattakeaway/httpclient-interception",
             "justeattakeaway/JustEat.StatsD",
@@ -54,7 +52,6 @@ jobs:
             "martincostello/sqllocaldb",
             "martincostello/website",
             "martincostello/xunit-logging"
-            #>
           )
           foreach ($repo in $repos) {
             gh api "repos/${repo}/branches/${{ inputs.branch }}" | Out-Null
