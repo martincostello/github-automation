@@ -101,7 +101,7 @@ jobs:
 
             if ($LASTEXITCODE -ne 0) {
               Write-Host "::debug::The ${branch} branch of ${repo} does not exist or does not have an open pull request."
-              exit 0
+              continue
             }
 
             $branchPR = gh api "repos/${repo}/commits/${head}/pulls" --jq '.[0] | .number '
