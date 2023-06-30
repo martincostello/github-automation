@@ -40,6 +40,7 @@ jobs:
             "martincostello/api",
             "martincostello/apple-fitness-workout-mapper",
             "martincostello/aspnet-core-pseudo-localization",
+            "martincostello/blog",
             "martincostello/browserstack-automate",
             "martincostello/costellobot",
             "martincostello/dependabot-helper",
@@ -97,6 +98,12 @@ jobs:
 
           foreach ($repo in $repos) {
             $head = gh api "repos/${repo}/commits/${branch}" --jq '.sha'
+
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "::debug::The ${branch} branch of ${repo} does not exist or does not have an open pull request."
+              exit 0
+            }
+
             $branchPR = gh api "repos/${repo}/commits/${head}/pulls" --jq '.[0] | .number '
             $pr = gh api "repos/${repo}/pulls/${branchPR}" --jq '{ number: .number, url: .html_url, mergeable_state: .mergeable_state }' | ConvertFrom-Json
 
