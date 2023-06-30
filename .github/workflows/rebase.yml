@@ -62,39 +62,47 @@ jobs:
       max-parallel: 2
       matrix:
         repo:
-          - "justeattakeaway/ApplePayJSSample"
-          - "justeattakeaway/httpclient-interception"
-          - "justeattakeaway/JustEat.StatsD"
-          - "justeattakeaway/JustSaying"
-          - "martincostello/adventofcode"
-          - "martincostello/alexa-london-travel"
-          - "martincostello/alexa-london-travel-site"
-          - "martincostello/antiforgery-testing-application-part"
-          - "martincostello/api"
-          - "martincostello/apple-fitness-workout-mapper"
-          - "martincostello/aspnet-core-pseudo-localization"
+          #- "justeattakeaway/ApplePayJSSample"
+          #- "justeattakeaway/httpclient-interception"
+          #- "justeattakeaway/JustEat.StatsD"
+          #- "justeattakeaway/JustSaying"
+          #- "martincostello/adventofcode"
+          #- "martincostello/alexa-london-travel"
+          #- "martincostello/alexa-london-travel-site"
+          #- "martincostello/antiforgery-testing-application-part"
+          #- "martincostello/api"
+          #- "martincostello/apple-fitness-workout-mapper"
+          #- "martincostello/aspnet-core-pseudo-localization"
           - "martincostello/blog"
-          - "martincostello/browserstack-automate"
-          - "martincostello/costellobot"
-          - "martincostello/dependabot-helper"
-          - "martincostello/dotnet-minimal-api-integration-testing"
-          - "martincostello/dotnet-patch-automation-sample"
-          - "martincostello/dotnet-playwright-tests"
-          - "martincostello/dotnet-repo-template"
-          - "martincostello/home"
-          - "martincostello/lambda-test-server"
-          - "martincostello/polly-rate-limiting"
-          - "martincostello/project-euler"
-          - "martincostello/Pseudolocalizer"
-          - "martincostello/SignInWithAppleSample"
-          - "martincostello/sqllocaldb"
-          - "martincostello/website"
-          - "martincostello/xunit-logging"
+          #- "martincostello/browserstack-automate"
+          #- "martincostello/costellobot"
+          #- "martincostello/dependabot-helper"
+          #- "martincostello/dotnet-minimal-api-integration-testing"
+          #- "martincostello/dotnet-patch-automation-sample"
+          #- "martincostello/dotnet-playwright-tests"
+          #- "martincostello/dotnet-repo-template"
+          #- "martincostello/home"
+          #- "martincostello/lambda-test-server"
+          #- "martincostello/polly-rate-limiting"
+          #- "martincostello/project-euler"
+          #- "martincostello/Pseudolocalizer"
+          #- "martincostello/SignInWithAppleSample"
+          #- "martincostello/sqllocaldb"
+          #- "martincostello/website"
+          #- "martincostello/xunit-logging"
 
     steps:
+      - name: Check branch exists
+        id: branch-exists
+        shell: pwsh
+        run:
+          gh api "repos/${{ matrix.repo }}/branches/${{ inputs.branch }}" | Out-Null
+          $exists = $LASTEXITCODE -eq 0
+          "branch-exists=${exists}" >> $env:GITHUB_OUTPUT
 
       - name: Checkout code
         uses: actions/checkout@v3
+        if: ${{ steps.branch-exists.outputs.branch-exists }}
         with:
           repository: ${{ matrix.repo }}
           ref: ${{ inputs.branch }}
@@ -103,22 +111,18 @@ jobs:
 
       - name: Download artifacts
         uses: actions/download-artifact@v3
+        if: ${{ steps.branch-exists.outputs.branch-exists }}
         with:
           name: rebaser
           path: ./artifacts
 
       - name: Rebase ${{ inputs.branch }}
         shell: pwsh
+        if: ${{ steps.branch-exists.outputs.branch-exists }}
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
           $prNumber = gh api "repos/${{ matrix.repo }}/commits/${{ inputs.branch }}/pulls" --jq '.[0] | .number '
-
-          if ($LASTEXITCODE -ne 0) {
-            Write-Host "::debug::The ${{ inputs.branch }} branch of ${{ matrix.repo }} does not exist or does not have an open pull request."
-            exit 0
-          }
-
           $mergeState = gh api "repos/${{ matrix.repo }}/pulls/${prNumber}" --jq '.mergeable_state'
 
           if ($mergeState -ne "dirty") {
