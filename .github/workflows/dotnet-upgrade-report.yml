@@ -138,7 +138,7 @@ jobs:
 
             $sdkColor = "512BD4"
             $sdkBadge = Get-Badge -Label "SDK" -Message $sdkVersion -Color $sdkColor -Logo "dotnet"
-            $sdkUrl = "https://github.com/${repo}/blob/${branch}/global.json#L${lineNumber}"
+            $sdkUrl = "$($env:GITHUB_SERVER_URL)/${repo}/blob/${branch}/global.json#L${lineNumber}"
 
             $hasConflicts = $pr.mergeable_state -eq "dirty"
             $conflictsColor = $hasConflicts ? "red" : "brightgreen"
