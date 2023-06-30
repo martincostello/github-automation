@@ -40,7 +40,6 @@ jobs:
             "martincostello/api",
             "martincostello/apple-fitness-workout-mapper",
             "martincostello/aspnet-core-pseudo-localization",
-            "martincostello/blog",
             "martincostello/browserstack-automate",
             "martincostello/costellobot",
             "martincostello/dependabot-helper",
