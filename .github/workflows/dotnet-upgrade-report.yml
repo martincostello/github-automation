@@ -11,7 +11,7 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     steps:
-      - name: Update .NET SDKs
+      - name: Generate report
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
