@@ -25,6 +25,8 @@ number.
 If the conflicts in a rebase cannot be automatically resolved,
 then it will be aborted and it will need to be manually dealt with.
 
+#### Manually Rebasing
+
 To manually resolve the conflicts, you can checkout this repository
 locally and run the following commands to interatively rebase the
 branch using Rebaser and Visual Studio Code.
