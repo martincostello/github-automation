@@ -100,12 +100,12 @@ jobs:
         run: |
           gh api "repos/${{ matrix.repo }}/branches/${{ inputs.branch }}" | Out-Null
           $exists = $LASTEXITCODE -eq 0
-          "branch-exists=${exists}" >> $env:GITHUB_OUTPUT
+          "branch-exists=$($exists.ToString().ToLower())" >> $env:GITHUB_OUTPUT
           exit 0
 
       - name: Checkout code
         uses: actions/checkout@v3
-        if: ${{ steps.branch-exists.outputs.branch-exists }}
+        if: ${{ steps.branch-exists.outputs.branch-exists == 'true' }}
         with:
           repository: ${{ matrix.repo }}
           ref: ${{ inputs.branch }}
@@ -114,14 +114,14 @@ jobs:
 
       - name: Download artifacts
         uses: actions/download-artifact@v3
-        if: ${{ steps.branch-exists.outputs.branch-exists }}
+        if: ${{ steps.branch-exists.outputs.branch-exists == 'true' }}
         with:
           name: rebaser
           path: ./artifacts
 
       - name: Rebase ${{ inputs.branch }}
         shell: pwsh
-        if: ${{ steps.branch-exists.outputs.branch-exists }}
+        if: ${{ steps.branch-exists.outputs.branch-exists == 'true' }}
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
