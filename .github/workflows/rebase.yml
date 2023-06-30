@@ -97,7 +97,7 @@ jobs:
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        run:
+        run: |
           gh api "repos/${{ matrix.repo }}/branches/${{ inputs.branch }}" | Out-Null
           $exists = $LASTEXITCODE -eq 0
           "branch-exists=${exists}" >> $env:GITHUB_OUTPUT
