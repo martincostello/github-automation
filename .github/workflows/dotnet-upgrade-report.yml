@@ -1,0 +1,151 @@
+name: dotnet-upgrade-report
+
+on:
+  schedule:
+    - cron: '00 00 * * MON'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update .NET SDKs
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        run: |
+          $branch = "dotnet-vnext"
+          $checksOfInterest = @(
+            "code-ql",
+            "code-ql (csharp)",
+            "code-ql (javascript)",
+            "dependency-review",
+            "lighthouse",
+            "macos-latest",
+            "ubuntu-latest",
+            "validate-packages",
+            "windows-latest"
+          )
+          $repos = @(
+            "justeattakeaway/ApplePayJSSample",
+            "justeattakeaway/httpclient-interception",
+            "justeattakeaway/JustEat.StatsD",
+            "justeattakeaway/JustSaying",
+            "martincostello/adventofcode",
+            "martincostello/alexa-london-travel",
+            "martincostello/alexa-london-travel-site",
+            "martincostello/antiforgery-testing-application-part",
+            "martincostello/api",
+            "martincostello/apple-fitness-workout-mapper",
+            "martincostello/aspnet-core-pseudo-localization",
+            "martincostello/browserstack-automate",
+            "martincostello/costellobot",
+            "martincostello/dependabot-helper",
+            "martincostello/dotnet-minimal-api-integration-testing",
+            "martincostello/dotnet-patch-automation-sample",
+            "martincostello/dotnet-playwright-tests",
+            "martincostello/dotnet-repo-template",
+            "martincostello/github-automation",
+            "martincostello/home",
+            "martincostello/lambda-test-server",
+            "martincostello/polly-rate-limiting",
+            "martincostello/project-euler",
+            "martincostello/Pseudolocalizer",
+            "martincostello/SignInWithAppleSample",
+            "martincostello/sqllocaldb",
+            "martincostello/website",
+            "martincostello/xunit-logging"
+          )
+
+          function Format-Slug() {
+            param(
+              [Parameter(Mandatory = $true)]
+              [string]$Value
+            )
+            return $Value.Replace("-", "--").Replace("_", "__").Replace(" ", "_")
+          }
+
+          function Get-Badge() {
+            param(
+              [Parameter(Mandatory = $true)]
+              [string]$Label,
+
+              [Parameter(Mandatory = $true)]
+              [string]$Message,
+
+              [Parameter(Mandatory = $true)]
+              [string]$Color,
+
+              [Parameter(Mandatory = $true)]
+              [string]$Logo
+            )
+
+            $Label = Format-Slug -Value $Label
+            $Message = Format-Slug -Value $Message
+
+            return "https://img.shields.io/badge/${Label}-${Message}-${Color}?logo=${Logo}"
+          }
+
+          $report = @(
+            "# .NET vNext Upgrade Report",
+            "",
+            "| Pull Request | SDK Version | Build Status | Conflicts? |"
+            "| :----------- | :---------- | :----------- | :--------: |"
+          )
+
+          foreach ($repo in $repos) {
+            $head = gh api "repos/${repo}/commits/${branch}" --jq '.sha'
+            $branchPR = gh api "repos/${repo}/commits/${head}/pulls" --jq '.[0] | .number '
+            $pr = gh api "repos/${repo}/pulls/${branchPR}" --jq '{ number: .number, url: .html_url, mergeable_state: .mergeable_state }' | ConvertFrom-Json
+
+            $checkStatuses = `
+              gh api "repos/${repo}/commits/$head/check-runs" --jq '.check_runs[] | { name: .name, conclusion: .conclusion }' `
+              | ConvertFrom-Json `
+              | Where-Object -Property name -In -Value $checksOfInterest `
+              | Select-Object -ExpandProperty conclusion
+
+            $status = "success"
+
+            foreach ($status in $checkStatuses) {
+              if ($status -eq "failure") {
+                $status = "failure"
+                break
+              }
+              elseif ($status -eq "neutral") {
+                $status = "pending"
+              }
+            }
+
+            $globalJsonContent = gh api "repos/${repo}/contents/global.json?ref=${branch}" --jq '.content'
+            $globalJson = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($globalJsonContent))
+            $sdkVersion = $globalJson | ConvertFrom-Json | Select-Object -ExpandProperty sdk | Select-Object -ExpandProperty version
+
+            $lineNumber = -1
+            $globalJsonLines = $globalJson -split "`n"
+            for ($i = 0; $i -lt $globalJsonLines.Length; $i++) {
+              $line = $globalJsonLines[$i]
+              if ($line.Contains($sdkVersion)) {
+                $lineNumber = $i + 1
+                break
+              }
+            }
+
+            $buildColor = $status -eq "success" ? "brightgreen" : $status -eq "pending" ? "yellow" : "red"
+            $buildBadge = Get-Badge -Label "build" -Message $status -Color $buildColor -Logo "github"
+            $buildUrl = "$($pr.url)"
+
+            $sdkColor = "512BD4"
+            $sdkBadge = Get-Badge -Label "SDK" -Message $sdkVersion -Color $sdkColor -Logo "dotnet"
+            $sdkUrl = "https://github.com/${repo}/blob/${branch}/global.json#L${lineNumber}"
+
+            $hasConflicts = $pr.mergeable_state -eq "dirty"
+            $conflictsColor = $hasConflicts ? "red" : "brightgreen"
+            $conflictsBadge = Get-Badge -Label "Conflicts" -Message ($hasConflicts ? "Yes" : "No") -Color $conflictsColor -Logo "git"
+            $conflictsUrl = "$($pr.url)"
+
+            $report += "| [${repo}#$($pr.number)]($($pr.url)) | [![.NET SDK version](${sdkBadge})](${sdkUrl}) | [![Build: ${status}](${buildBadge})](${buildUrl}) | [![Merge conflicts?](${conflictsBadge})](${conflictsUrl}) |"
+          }
+
+          $report >> $env:GITHUB_STEP_SUMMARY
