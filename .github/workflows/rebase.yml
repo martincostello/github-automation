@@ -115,7 +115,7 @@ jobs:
           $mergeState = gh api "repos/${{ matrix.repo }}/pulls/${prNumber}" --jq '.mergeable_state'
 
           if ($mergeState -ne "dirty") {
-            Write-Host "::notice::The ${{ inputs.branch }} branch of ${{ matrix.repo }} has no conflicts so does not need to be rebased."
+            Write-Host "::debug::The ${{ inputs.branch }} branch of ${{ matrix.repo }} has no conflicts so does not need to be rebased."
           }
           else {
             chmod +x ./artifacts/Rebaser
