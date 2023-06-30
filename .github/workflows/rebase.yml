@@ -108,10 +108,13 @@ jobs:
 
       - name: Rebase ${{ inputs.branch }}
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
-          git format-patch ${{ inputs.branch }}..origin/main --stdout | git apply --check --allow-empty --quiet -
+          $prNumber = gh api "repos/${{ matrix.repo }}/commits/${{ inputs.branch }}/pulls" --jq '.[0] | .number '
+          $mergeState = gh api "repos/${{ matrix.repo }}/pulls/${prNumber}" --jq '.mergeable_state'
 
-          if ($LASTEXITCODE -eq 0) {
+          if ($mergeState -ne "dirty") {
             Write-Host "::notice::The ${{ inputs.branch }} branch of ${{ matrix.repo }} has no conflicts so does not need to be rebased."
           }
           else {
