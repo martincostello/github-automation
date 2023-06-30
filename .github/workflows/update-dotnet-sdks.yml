@@ -15,7 +15,7 @@ on:
 permissions: {}
 
 jobs:
-  update-dotnet-sdk:
+  update-dotnet-sdks:
     runs-on: [ ubuntu-latest ]
     steps:
       - name: Update .NET SDKs
@@ -54,6 +54,12 @@ jobs:
             "martincostello/xunit-logging"
           )
           foreach ($repo in $repos) {
+            gh api "repos/${repo}/branches/${{ inputs.branch }}" | Out-Null
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "::Debug::Skipping ${repo} as the ${{ inputs.branch }} branch does not exist."
+              continue
+            }
             gh workflow run "update-dotnet-sdk.yml" --ref "${{ inputs.branch }}" --repo $repo
             Start-Sleep -Seconds 10 # Wait 10 seconds to prevent issues with GitHub secondary rate limits
           }
+          exit 0
