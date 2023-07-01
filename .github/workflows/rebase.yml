@@ -10,6 +10,11 @@ on:
         options:
           - "dotnet-vnext"
         default: "dotnet-vnext"
+      repository:
+        description: "An optional single repository to rebase."
+        required: false
+        type: string
+        default: ""
 
 permissions: {}
 
@@ -27,6 +32,9 @@ env:
 jobs:
   build:
     name: build
+
+    outputs:
+      repos: ${{ steps.get-repos.outputs.repos }}
 
     permissions:
       contents: read
@@ -52,6 +60,48 @@ jobs:
           path: ./artifacts
           if-no-files-found: error
 
+      - name: Get repositories to rebase
+        id: get-repos
+        shell: pwsh
+        run: |
+          if (-Not [string]::IsNullOrEmpty("${{ inputs.repository }}")) {
+            $repos = @("${{ inputs.repository }}")
+          }
+          else {
+            $repos = @(
+              "justeattakeaway/ApplePayJSSample",
+              "justeattakeaway/httpclient-interception",
+              "justeattakeaway/JustEat.StatsD",
+              "justeattakeaway/JustSaying",
+              "martincostello/adventofcode",
+              "martincostello/alexa-london-travel",
+              "martincostello/alexa-london-travel-site",
+              "martincostello/antiforgery-testing-application-part",
+              "martincostello/api",
+              "martincostello/apple-fitness-workout-mapper",
+              "martincostello/aspnet-core-pseudo-localization",
+              "martincostello/browserstack-automate",
+              "martincostello/costellobot",
+              "martincostello/dependabot-helper",
+              "martincostello/dotnet-minimal-api-integration-testing",
+              "martincostello/dotnet-patch-automation-sample",
+              "martincostello/dotnet-playwright-tests",
+              "martincostello/dotnet-repo-template",
+              "martincostello/github-automation",
+              "martincostello/home",
+              "martincostello/lambda-test-server",
+              "martincostello/polly-rate-limiting",
+              "martincostello/project-euler",
+              "martincostello/Pseudolocalizer",
+              "martincostello/SignInWithAppleSample",
+              "martincostello/sqllocaldb",
+              "martincostello/website",
+              "martincostello/xunit-logging"
+            )
+          }
+          $reposJson = ConvertTo-Json $repos
+          "repos=${reposJson}" >> $env:GITHUB_OUTPUT
+
   rebase:
     name: "rebase-${{ matrix.repo }}"
     needs: [ build ]
@@ -61,50 +111,46 @@ jobs:
       fail-fast: false
       max-parallel: 2
       matrix:
-        repo:
-          - "justeattakeaway/ApplePayJSSample"
-          - "justeattakeaway/httpclient-interception"
-          - "justeattakeaway/JustEat.StatsD"
-          - "justeattakeaway/JustSaying"
-          - "martincostello/adventofcode"
-          - "martincostello/alexa-london-travel"
-          - "martincostello/alexa-london-travel-site"
-          - "martincostello/antiforgery-testing-application-part"
-          - "martincostello/api"
-          - "martincostello/apple-fitness-workout-mapper"
-          - "martincostello/aspnet-core-pseudo-localization"
-          - "martincostello/browserstack-automate"
-          - "martincostello/costellobot"
-          - "martincostello/dependabot-helper"
-          - "martincostello/dotnet-minimal-api-integration-testing"
-          - "martincostello/dotnet-patch-automation-sample"
-          - "martincostello/dotnet-playwright-tests"
-          - "martincostello/dotnet-repo-template"
-          - "martincostello/home"
-          - "martincostello/lambda-test-server"
-          - "martincostello/polly-rate-limiting"
-          - "martincostello/project-euler"
-          - "martincostello/Pseudolocalizer"
-          - "martincostello/SignInWithAppleSample"
-          - "martincostello/sqllocaldb"
-          - "martincostello/website"
-          - "martincostello/xunit-logging"
+        repo: ${{ fromJSON(needs.build.outputs.repos) }}
 
     steps:
-      - name: Check branch exists
-        id: branch-exists
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        run: |
-          gh api "repos/${{ matrix.repo }}/branches/${{ inputs.branch }}" | Out-Null
-          $exists = $LASTEXITCODE -eq 0
-          "branch-exists=$($exists.ToString().ToLower())" >> $env:GITHUB_OUTPUT
-          exit 0
+      - name: Check if branch needs rebasing
+        uses: actions/github-script@v6
+        id: needs-rebase
+        with:
+          github-token: ${{ secrets.ACCESS_TOKEN }}
+          result-encoding: string
+          script: |
+            const { owner, repo } = '${{ matrix.repo }}'.Split('/');
+            let commit_sha;
+            try {
+              const branch = await github.rest.repos.getBranch({
+                owner,
+                repo,
+                branch: '${{ inputs.branch }}',
+              });
+              commit_sha = branch.data.commit.sha;
+            } catch (err) {
+              return false;
+            }
+            const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner,
+              repo,
+              commit_sha,
+            });
+            if (prs.data.length < 1) {
+              return false;
+            }
+            const pr = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: prs.data[0].number,
+            });
+            return pr.data.mergeable_state === 'dirty';
 
       - name: Checkout code
         uses: actions/checkout@v3
-        if: ${{ steps.branch-exists.outputs.branch-exists == 'true' }}
+        if: ${{ steps.needs-rebase.outputs.result == 'true' }}
         with:
           repository: ${{ matrix.repo }}
           ref: ${{ inputs.branch }}
@@ -113,41 +159,33 @@ jobs:
 
       - name: Download artifacts
         uses: actions/download-artifact@v3
-        if: ${{ steps.branch-exists.outputs.branch-exists == 'true' }}
+        if: ${{ steps.needs-rebase.outputs.result == 'true' }}
         with:
           name: rebaser
           path: ./artifacts
 
       - name: Rebase ${{ inputs.branch }}
         shell: pwsh
-        if: ${{ steps.branch-exists.outputs.branch-exists == 'true' }}
+        if: ${{ steps.needs-rebase.outputs.result == 'true' }}
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
-          $prNumber = gh api "repos/${{ matrix.repo }}/commits/${{ inputs.branch }}/pulls" --jq '.[0] | .number '
-          $mergeState = gh api "repos/${{ matrix.repo }}/pulls/${prNumber}" --jq '.mergeable_state'
+          chmod +x ./artifacts/Rebaser
+          & ./artifacts/Rebaser "${{ github.workspace }}"
 
-          if ($mergeState -ne "dirty") {
-            Write-Host "::debug::The ${{ inputs.branch }} branch of ${{ matrix.repo }} has no conflicts so does not need to be rebased."
-          }
-          else {
-            chmod +x ./artifacts/Rebaser
-            & ./artifacts/Rebaser "${{ github.workspace }}"
-
+          if ($LASTEXITCODE -eq 0) {
+            git push --force-with-lease origin "${{ inputs.branch }}"
             if ($LASTEXITCODE -eq 0) {
-              git push --force-with-lease origin "${{ inputs.branch }}"
-              if ($LASTEXITCODE -eq 0) {
-                Write-Host "::notice::Rebased the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
-              }
-              else {
-                Write-Host "::error::Could not push changes to the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
-              }
-            }
-            elseif ($LASTEXITCODE -eq 1) {
-              Write-Host "::warning::Could not resolve conflicts for the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
-              exit 0
+              Write-Host "::notice::Rebased the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
             }
             else {
-              Write-Host "::error::Failed to rebase the ${{ inputs.branch }} branch of ${{ matrix.repo }}. Error code: $LASTEXITCODE."
+              Write-Host "::error::Could not push changes to the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
             }
+          }
+          elseif ($LASTEXITCODE -eq 1) {
+            Write-Host "::warning::Could not resolve conflicts for the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
+            exit 0
+          }
+          else {
+            Write-Host "::error::Failed to rebase the ${{ inputs.branch }} branch of ${{ matrix.repo }}. Error code: $LASTEXITCODE."
           }
