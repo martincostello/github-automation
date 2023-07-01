@@ -1,0 +1,14 @@
+name: dotnet-dependencies-updated
+
+on:
+  repository_dispatch:
+    types: [ dotnet_dependencies_updated ]
+
+permissions: {}
+
+jobs:
+  rebase:
+    uses: ./.github/workflows/rebase.yml
+    secrets: inherit
+    with:
+      repository: ${{ github.event.client_payload.repository }}
