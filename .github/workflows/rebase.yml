@@ -118,6 +118,10 @@ jobs:
     needs: [ build ]
     runs-on: [ ubuntu-latest ]
 
+    concurrency:
+      group: "rebase-${{ matrix.repo }}"
+      cancel-in-progress: false
+
     strategy:
       fail-fast: false
       max-parallel: 2
