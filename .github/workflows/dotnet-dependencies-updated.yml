@@ -9,6 +9,8 @@ permissions: {}
 jobs:
   rebase:
     uses: ./.github/workflows/rebase.yml
+    permissions:
+      contents: read
     secrets: inherit
     with:
       repository: ${{ github.event.client_payload.repository }}
