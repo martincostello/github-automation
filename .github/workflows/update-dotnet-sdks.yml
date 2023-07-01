@@ -17,6 +17,9 @@ permissions: {}
 jobs:
   update-dotnet-sdks:
     runs-on: [ ubuntu-latest ]
+    concurrency:
+      group: ${{ github.workflow }}
+      cancel-in-progress: false
     steps:
       - name: Update .NET SDKs
         shell: pwsh
