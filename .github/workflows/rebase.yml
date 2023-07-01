@@ -99,7 +99,7 @@ jobs:
               "martincostello/xunit-logging"
             )
           }
-          $reposJson = ConvertTo-Json $repos
+          $reposJson = ConvertTo-Json $repos -Compress
           "repos=${reposJson}" >> $env:GITHUB_OUTPUT
 
   rebase:
