@@ -1,6 +1,17 @@
 name: rebase
 
 on:
+  workflow_call:
+    inputs:
+      branch:
+        description: "The branch to rebase."
+        required: false
+        type: string
+        default: "dotnet-vnext"
+      repository:
+        description: "The repository to rebase."
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       branch:
