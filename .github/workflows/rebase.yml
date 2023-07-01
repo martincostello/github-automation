@@ -121,7 +121,7 @@ jobs:
           github-token: ${{ secrets.ACCESS_TOKEN }}
           result-encoding: string
           script: |
-            const { owner, repo } = '${{ matrix.repo }}'.Split('/');
+            const { owner, repo } = '${{ matrix.repo }}'.split('/');
             let commit_sha;
             try {
               const branch = await github.rest.repos.getBranch({
