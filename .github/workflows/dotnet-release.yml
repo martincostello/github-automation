@@ -11,9 +11,7 @@ on:
         type: string
         default: ""
 
-permissions:
-  actions: none
-  contents: read
+permissions: {}
 
 jobs:
   check-for-release:
@@ -71,15 +69,13 @@ jobs:
       group: "update-sha"
       cancel-in-progress: false
 
-    permissions:
-      actions: write
-
     runs-on: [ ubuntu-latest ]
 
     steps:
       - name: "Update DOTNET_CORE_SHA"
       #  uses: actions/github-script@v6
       #  with:
+      #    github-token: ${{ secrets.ACCESS_TOKEN }}
       #    script: |
       #      await github.rest.actions.updateRepoVariable({
       #        owner: context.repo.owner,
@@ -89,7 +85,7 @@ jobs:
       #      });
         shell: pwsh
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
           gh api --method PATCH "/repos/${{ github.repository }}/actions/variables/DOTNET_CORE_SHA" -f value='${{ needs.check-for-release.outputs.dotnet-core-updated-sha }}'
 
