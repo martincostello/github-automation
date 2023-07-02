@@ -54,7 +54,7 @@ sequenceDiagram
   participant update-one as martincostello/*<br>update-dotnet-sdk.yml
   participant repo as martincostello/*
   participant build as martincostello/*<br>build.yml
-  participant bot as codeflowbot
+  participant bot as costellobot
   participant rebase as martincostello/github-automation<br>rebase.yml
 
   note over repo: .NET SDK<br>7.0.100<br>@main
