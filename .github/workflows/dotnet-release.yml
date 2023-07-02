@@ -78,15 +78,20 @@ jobs:
 
     steps:
       - name: "Update DOTNET_CORE_SHA"
-        uses: actions/github-script@v6
-        with:
-          script: |
-            await github.rest.actions.updateRepoVariable({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              name: 'DOTNET_CORE_SHA',
-              value: '${{ needs.check-for-release.outputs.dotnet-core-updated-sha }}'
-            });
+      #  uses: actions/github-script@v6
+      #  with:
+      #    script: |
+      #      await github.rest.actions.updateRepoVariable({
+      #        owner: context.repo.owner,
+      #        repo: context.repo.repo,
+      #        name: 'DOTNET_CORE_SHA',
+      #        value: '${{ needs.check-for-release.outputs.dotnet-core-updated-sha }}'
+      #      });
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api --method PATCH "/repos/${{ github.repository }}/actions/variables/DOTNET_CORE_SHA" -f value='${{ needs.check-for-release.outputs.dotnet-core-updated-sha }}'
 
   create-dispatch:
     name: create-dispatch
