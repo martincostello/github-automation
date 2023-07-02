@@ -39,7 +39,7 @@ in the workflow. This will show a link to the upgrade pull requests, the SDK
 version used in the `dotnet-vnext` branch, the status of the build and whether there
 are any conflicts that need resolving in order to merge to the default branch.
 
-## Sequence Diagranm
+## Sequence Diagram
 
 ```mermaid
 sequenceDiagram
@@ -49,10 +49,16 @@ sequenceDiagram
   actor user as .NET team
   participant dotnet as dotnet/core
   participant release as martincostello/github-automation<br>dotnet-release.yml
-  participant update as martincostello/github-automation<br>update-dotnet-sdks.yml
-  participant repo as martincostello/*<br>update-dotnet-sdk.yml
+  participant automation as martincostello/github-automation
+  participant update-all as martincostello/github-automation<br>update-dotnet-sdks.yml
+  participant update-one as martincostello/*<br>update-dotnet-sdk.yml
+  participant repo as martincostello/*
   participant build as martincostello/*<br>build.yml
   participant bot as codeflowbot
+  participant rebase as martincostello/github-automation<br>rebase.yml
+
+  note over repo: .NET SDK<br>7.0.100<br>@main
+  note over repo: .NET SDK<br>8.0.100-preview.n<br>@dotnet-vnext
 
   user -) dotnet: Push release-notes/**/releases.json
 
@@ -70,11 +76,11 @@ sequenceDiagram
       release ->>+ dotnet: Compare DOTNET_CORE_SHA...git_sha
       dotnet -->>- release: diff
 
-      release -) release: Update DOTNET_CORE_SHA
+      release ->> repo: Update DOTNET_CORE_SHA
 
       alt diff contains changes to<br>release-notes/**/releases.json
 
-      release -) update: repository_dispatch:dotnet_release
+      release -) automation: repository_dispatch:dotnet_release
 
       end
 
@@ -84,38 +90,41 @@ sequenceDiagram
 
   end
 
-  note over update: Run update-dotnet-sdk<br>in configured repositories
+  automation -) update-all: repository_dispatch:dotnet_release
 
-  activate update
+  note over update-all: Run update-dotnet-sdk<br>in configured repositories
+
+  activate update-all
 
   loop repository
 
-    update -) repo: workflow_dispatch
+    update-all -) update-one: workflow_dispatch
 
   end
 
-  deactivate update
+  deactivate update-all
 
   par In each GitHub repository
 
-  note over repo: Check for .NET SDK update
+  note over update-one: Check for .NET SDK update
 
-  activate repo
+  activate update-one
 
-  note over repo: Checkout repo
-
-  repo ->>+ dotnet: Get release-notes/x.x/releases.json
-  dotnet -->>- repo: Release notes
+  update-one ->>+ dotnet: Get release-notes/x.x/releases.json
+  dotnet -->>- update-one: Release notes
 
   alt New version of .NET SDK<br>compared to global.json?
 
-    note over repo: Update global.json
-    repo -) repo: Push branch
-    repo -) build: Open pull request
+    update-one ->> repo: Update global.json and push branch
+    update-one ->> repo: Open pull request
 
   end
 
-  deactivate repo
+  deactivate update-one
+
+  note over repo: .NET SDK<br>7.0.101<br>@update-dotnet-sdk
+
+  repo -) build: pull_request
 
   activate build
 
@@ -123,12 +132,38 @@ sequenceDiagram
 
     alt CI successful?
 
-      build -) build: Merge pull request
-      build -) bot: push
+      build ->> repo: Merge pull request
 
     end
 
   deactivate build
+
+  note over repo: .NET SDK<br>7.0.101<br>@main
+  note over repo: Merge conflict<br>in global.json
+
+  repo -) bot: push
+
+  activate bot
+
+  alt Was global.json updated?
+
+    bot -) automation: repository_dispatch:dotnet_dependencies_updated
+
+  end
+
+  deactivate bot
+
+  automation -) rebase: repository_dispatch:dotnet_dependencies_updated
+
+  activate rebase
+
+  note over rebase: Rebase dotnet-vnext
+
+    rebase ->>+ repo: Force push dotnet-vnext branch
+
+  deactivate rebase
+
+  note over repo: .NET SDK<br>8.0.100-preview.n<br>@dotnet-vnext
 
   end
 ```
