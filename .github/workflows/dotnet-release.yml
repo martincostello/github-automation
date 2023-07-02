@@ -103,7 +103,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            await github.repos.createDispatchEvent({
+            await github.rest.repos.createDispatchEvent({
               owner: context.repo.owner,
               repo: context.repo.repo,
               event_type: 'dotnet_release',
