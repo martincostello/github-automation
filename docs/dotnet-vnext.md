@@ -39,6 +39,100 @@ in the workflow. This will show a link to the upgrade pull requests, the SDK
 version used in the `dotnet-vnext` branch, the status of the build and whether there
 are any conflicts that need resolving in order to merge to the default branch.
 
+## Sequence Diagranm
+
+```mermaid
+sequenceDiagram
+  autonumber
+  title Update .NET vNext to latest preview
+
+  actor user as .NET team
+  participant dotnet as dotnet/core
+  participant release as martincostello/github-automation<br>dotnet-release.yml
+  participant update as martincostello/github-automation<br>update-dotnet-sdks.yml
+  participant repo as martincostello/*<br>update-dotnet-sdk.yml
+  participant build as martincostello/*<br>build.yml
+  participant bot as codeflowbot
+
+  user -) dotnet: Push release-notes/**/releases.json
+
+  note over release: Poll for changes to<br>dotnet/core@main
+
+  loop */15 08-22 * * MON-FRI
+
+    activate release
+
+    release ->>+ dotnet: Get main branch
+    dotnet -->>- release: git_sha
+
+    alt git_sha != DOTNET_CORE_SHA
+
+      release ->>+ dotnet: Compare DOTNET_CORE_SHA...git_sha
+      dotnet -->>- release: diff
+
+      release -) release: Update DOTNET_CORE_SHA
+
+      alt diff contains changes to<br>release-notes/**/releases.json
+
+      release -) update: repository_dispatch:dotnet_release
+
+      end
+
+    end
+
+    deactivate release
+
+  end
+
+  note over update: Run update-dotnet-sdk<br>in configured repositories
+
+  activate update
+
+  loop repository
+
+    update -) repo: workflow_dispatch
+
+  end
+
+  deactivate update
+
+  par In each GitHub repository
+
+  note over repo: Check for .NET SDK update
+
+  activate repo
+
+  note over repo: Checkout repo
+
+  repo ->>+ dotnet: Get release-notes/x.x/releases.json
+  dotnet -->>- repo: Release notes
+
+  alt New version of .NET SDK<br>compared to global.json?
+
+    note over repo: Update global.json
+    repo -) repo: Push branch
+    repo -) build: Open pull request
+
+  end
+
+  deactivate repo
+
+  activate build
+
+  note over build: Run CI for pull request
+
+    alt CI successful?
+
+      build -) build: Merge pull request
+      build -) bot: push
+
+    end
+
+  deactivate build
+
+  end
+```
+
 [dotnet-upgrade-report]: https://github.com/martincostello/github-automation/actions/workflows/dotnet-upgrade-report.yml
 [rebase]: https://github.com/martincostello/github-automation/actions/workflows/rebase.yml
 [rebaser]: ./../README.md#manually-rebasing
