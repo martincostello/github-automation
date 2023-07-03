@@ -185,22 +185,25 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
+          $repo = "${{ matrix.repo }}"
+          $branch = "${{ inputs.branch }}"
+          
           chmod +x ./artifacts/Rebaser
           & ./artifacts/Rebaser "${{ github.workspace }}"
 
           if ($LASTEXITCODE -eq 0) {
-            git push --force-with-lease origin "${{ inputs.branch }}"
+            git push --force-with-lease origin $branch
             if ($LASTEXITCODE -eq 0) {
-              Write-Host "::notice::Rebased the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
+              Write-Host "::notice::Rebased the ${branch} branch of ${repo}."
             }
             else {
-              Write-Host "::error::Could not push changes to the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
+              Write-Host "::error::Could not push changes to the ${branch} branch of ${repo}."
             }
           }
           elseif ($LASTEXITCODE -eq 1) {
-            Write-Host "::warning::Could not resolve conflicts for the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
+            Write-Host "::warning::Could not resolve conflicts for the ${branch} branch of ${repo}."
             exit 0
           }
           else {
-            Write-Host "::error::Failed to rebase the ${{ inputs.branch }} branch of ${{ matrix.repo }}. Error code: $LASTEXITCODE."
+            Write-Host "::error::Failed to rebase the ${branch} branch of ${repo}. Error code: $LASTEXITCODE."
           }
