@@ -136,7 +136,7 @@ jobs:
           github-token: ${{ secrets.ACCESS_TOKEN }}
           result-encoding: string
           script: |
-            const { owner, repo } = '${{ matrix.repo }}'.split('/');
+            const [ owner, repo ] = '${{ matrix.repo }}'.split('/');
             let commit_sha;
             try {
               const branch = await github.rest.repos.getBranch({
@@ -146,6 +146,7 @@ jobs:
               });
               commit_sha = branch.data.commit.sha;
             } catch (err) {
+              core.debug(`Could not get branch: ${err}`);
               return false;
             }
             const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
