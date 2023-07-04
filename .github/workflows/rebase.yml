@@ -164,10 +164,6 @@ jobs:
             });
             return pr.data.mergeable_state === 'dirty';
 
-      - name: Echo output
-        shell: pwsh
-        run: echo "${{ steps.needs-rebase.outputs.result }}"
-
       - name: Checkout code
         uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
         if: ${{ steps.needs-rebase.outputs.result == 'true' }}
