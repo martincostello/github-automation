@@ -136,7 +136,7 @@ jobs:
           github-token: ${{ secrets.ACCESS_TOKEN }}
           result-encoding: string
           script: |
-            const { owner, repo } = '${{ matrix.repo }}'.split('/');
+            const [ owner, repo ] = '${{ matrix.repo }}'.split('/');
             let commit_sha;
             try {
               const branchName = '${{ inputs.branch }}';
