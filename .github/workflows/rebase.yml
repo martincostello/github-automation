@@ -139,10 +139,14 @@ jobs:
             const { owner, repo } = '${{ matrix.repo }}'.split('/');
             let commit_sha;
             try {
+              const branchName = '${{ inputs.branch }}';
+              core.info(`owner: ${owner}`);
+              core.info(`repo: ${repo}`);
+              core.info(`branchName: ${branchName}`);
               const branch = await github.rest.repos.getBranch({
                 owner,
                 repo,
-                branch: '${{ inputs.branch }}',
+                branch: branchName,
               });
               commit_sha = branch.data.commit.sha;
             } catch (err) {
