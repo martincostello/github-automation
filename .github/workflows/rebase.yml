@@ -139,18 +139,14 @@ jobs:
             const [ owner, repo ] = '${{ matrix.repo }}'.split('/');
             let commit_sha;
             try {
-              const branchName = '${{ inputs.branch }}';
-              core.info(`owner: ${owner}`);
-              core.info(`repo: ${repo}`);
-              core.info(`branchName: ${branchName}`);
               const branch = await github.rest.repos.getBranch({
                 owner,
                 repo,
-                branch: branchName,
+                branch: '${{ inputs.branch }}',
               });
               commit_sha = branch.data.commit.sha;
             } catch (err) {
-              core.info(`Could not get branch: ${err}`);
+              core.debug(`Could not get branch: ${err}`);
               return false;
             }
             const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
@@ -159,7 +155,6 @@ jobs:
               commit_sha,
             });
             if (prs.data.length < 1) {
-              core.info(`No pull requests associated with commit ${commit_sha}.`);
               return false;
             }
             const pr = await github.rest.pulls.get({
@@ -167,7 +162,6 @@ jobs:
               repo,
               pull_number: prs.data[0].number,
             });
-            core.info(`#${prs.data[0].number} mergeable_state is ${pr.data.mergeable_state}`);
             return pr.data.mergeable_state === 'dirty';
 
       - name: Echo output
