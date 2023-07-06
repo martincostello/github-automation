@@ -195,16 +195,16 @@ jobs:
           if ($LASTEXITCODE -eq 0) {
             git push --force-with-lease origin $branch
             if ($LASTEXITCODE -eq 0) {
-              Write-Host "::notice::Rebased the ${branch} branch of ${repo}."
+              Write-Output "::notice::Rebased the ${branch} branch of ${repo}."
             }
             else {
-              Write-Host "::error::Could not push changes to the ${branch} branch of ${repo}."
+              Write-Output "::error::Could not push changes to the ${branch} branch of ${repo}."
             }
           }
           elseif ($LASTEXITCODE -eq 1) {
-            Write-Host "::warning::Could not resolve conflicts for the ${branch} branch of ${repo}."
+            Write-Output "::warning::Could not resolve conflicts for the ${branch} branch of ${repo}."
             exit 0
           }
           else {
-            Write-Host "::error::Failed to rebase the ${branch} branch of ${repo}. Error code: $LASTEXITCODE."
+            Write-Output "::error::Failed to rebase the ${branch} branch of ${repo}. Error code: $LASTEXITCODE."
           }
