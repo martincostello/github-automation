@@ -16,6 +16,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
+          $ErrorActionPreference = "Stop"
+          $ProgressPreference = "SilentlyContinue"
+
           $branch = "dotnet-vnext"
           $checksOfInterest = @(
             "code-ql",
@@ -88,6 +91,9 @@ jobs:
             return "https://img.shields.io/badge/${Label}-${Message}-${Color}?logo=${Logo}"
           }
 
+          $releases = (Invoke-WebRequest https://raw.githubusercontent.com/dotnet/core/main/release-notes/releases-index.json).Content | ConvertFrom-Json
+          $latestVersion = $releases."releases-index"[0]."latest-sdk"
+
           $report = @(
             "# .NET vNext Upgrade Report",
             "",
@@ -142,7 +148,7 @@ jobs:
             $buildBadge = Get-Badge -Label "build" -Message $status -Color $buildColor -Logo "github"
             $buildUrl = "$($pr.url)"
 
-            $sdkColor = "512BD4"
+            $sdkColor = $sdkVersion -eq $latestVersion ? "512BD4" : "yellow"
             $sdkBadge = Get-Badge -Label "SDK" -Message $sdkVersion -Color $sdkColor -Logo "dotnet"
             $sdkUrl = "$($env:GITHUB_SERVER_URL)/${repo}/blob/${branch}/global.json#L${lineNumber}"
 
