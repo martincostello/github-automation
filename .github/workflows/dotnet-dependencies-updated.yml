@@ -1,4 +1,5 @@
 name: dotnet-dependencies-updated
+run-name: ${{ github.event.client_payload.repository }}
 
 on:
   repository_dispatch:
