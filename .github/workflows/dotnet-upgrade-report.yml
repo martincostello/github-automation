@@ -46,6 +46,7 @@ jobs:
             "martincostello/browserstack-automate",
             "martincostello/costellobot",
             "martincostello/dependabot-helper",
+            "martincostello/dotnet-macos-notarization-example",
             "martincostello/dotnet-minimal-api-integration-testing",
             "martincostello/dotnet-patch-automation-sample",
             "martincostello/dotnet-playwright-tests",
