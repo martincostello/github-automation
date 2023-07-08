@@ -102,7 +102,7 @@ jobs:
           )
 
           foreach ($repo in $repos) {
-            $head = gh api "repos/${repo}/commits/${branch}" --jq '.sha'
+            $head = gh api "repos/${repo}/commits/${branch}" --jq '.sha' 2> $null
 
             if ($LASTEXITCODE -ne 0) {
               Write-Host "::debug::The ${branch} branch of ${repo} does not exist or does not have an open pull request."
@@ -161,3 +161,4 @@ jobs:
           }
 
           $report >> $env:GITHUB_STEP_SUMMARY
+          return 0
