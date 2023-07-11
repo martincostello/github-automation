@@ -78,7 +78,13 @@ jobs:
                 } else {
                   throw new Error(`Unexpected encoding for ${path}: ${content.data.encoding}`);
                 }
-                releaseNotes.push(JSON.parse(release));
+
+                // Remove the releases array from the release notes
+                // otherwise the JSON is too large to use as an output.
+                const notes = JSON.parse(release);
+                delete notes.releases;
+
+                releaseNotes.push(notes);
               }
             }
 
