@@ -61,7 +61,7 @@ jobs:
             const releaseNotes = [];
 
             if (releaseNotesUpdated) {
-              foreach (const path in releaseNotesFiles) {
+              foreach (let path in releaseNotesFiles) {
                 const content = await github.rest.repos.getContent({
                   owner,
                   repo,
@@ -143,7 +143,7 @@ jobs:
               branchesToDispatch.push('main');
             }
 
-            foreach (const branch in branchesToDispatch) {
+            foreach (let branch in branchesToDispatch) {
               await github.rest.repos.createDispatchEvent({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
