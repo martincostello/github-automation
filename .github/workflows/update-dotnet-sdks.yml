@@ -28,7 +28,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
-          $branch = "${{ inputs.branch || 'main' }}"
+          $branch = "${{ (github.event.client_payload && github.event.client_payload.branch) || inputs.branch || 'main' }}"
           $repos = @(
             "justeattakeaway/ApplePayJSSample",
             "justeattakeaway/httpclient-interception",
