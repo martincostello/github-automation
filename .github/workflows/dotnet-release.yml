@@ -57,6 +57,8 @@ jobs:
                 .filter(file => file.startsWith('release-notes/') && file.endsWith('/releases.json'));
             }
 
+            console.log(JSON.stringify(releaseNotesFiles));
+
             const releaseNotesUpdated = releaseNotesFiles.length > 0;
             const releaseNotes = [];
 
