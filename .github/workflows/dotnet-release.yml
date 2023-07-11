@@ -69,9 +69,9 @@ jobs:
                   ref: currentSha,
                 });
                 let release;
-                if (content.data.content === 'base64') {
+                if (content.data.encoding === 'base64') {
                   release = Buffer.from(content.data.content, 'base64').toString();
-                } else if (content.data.content === 'none') {
+                } else if (content.data.encoding === 'none') {
                   const response = await fetch(content.data.download_url);
                   release = await response.text();
                 } else {
