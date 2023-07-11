@@ -42,7 +42,7 @@ jobs:
             const currentSha = branch.data.commit.sha;
             const previousSha = '${{ inputs.ref || vars.DOTNET_CORE_SHA }}';
 
-            let releaseNotesUpdated = false;
+            let releaseNotesFiles = [];
             let updatedSha = '';
 
             if (currentSha !== previousSha) {
@@ -52,12 +52,32 @@ jobs:
                 basehead: `${previousSha}...${currentSha}`,
               });
               updatedSha = currentSha;
-              releaseNotesUpdated = diff.data.files
+              releaseNotesFiles = diff.data.files
                 .map(file => file.filename)
-                .some(file => file.startsWith('release-notes/') && file.endsWith('/releases.json'));
+                .filter(file => file.startsWith('release-notes/') && file.endsWith('/releases.json'));
+            }
+
+            const releaseNotesUpdated = releaseNotesFiles.length > 0;
+            const releaseNotes = [];
+
+            if (releaseNotesUpdated) {
+              foreach (const path in releaseNotesFiles) {
+                const content = await github.rest.repos.getContent({
+                  owner,
+                  repo,
+                  path,
+                  ref: currentSha,
+                });
+                releaseNotes.push(
+                  JSON.parse(
+                    Buffer.from(content.data.content, 'base64').toString()
+                  )
+                );
+              }
             }
 
             core.setOutput('dotnet-core-updated-sha', updatedSha);
+            core.setOutput('dotnet-release-notes', JSON.stringify(releaseNotes));
             core.setOutput('dotnet-releases-updated', releaseNotesUpdated);
 
   update-sha:
@@ -104,9 +124,32 @@ jobs:
         uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
         with:
           script: |
-            await github.rest.repos.createDispatchEvent({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              event_type: 'dotnet_release',
-              client_payload: {}
-            });
+            const releaseNotes = JSON.parse(`${{ needs.check-for-release.outputs.dotnet-release-notes }}`);
+            const isPreview = (release) => {
+              switch (release['support-phase']) {
+                case 'go-live':
+                case 'preview':
+                  return true;
+                default:
+                  return false;
+              }
+            };
+
+            const branchesToDispatch = [];
+            if (releaseNotes.some(release => isPreview(release)) {
+              branchesToDispatch.push('dotnet-vnext');
+            }
+            if (releaseNotes.some(release => !isPreview(release)) {
+              branchesToDispatch.push('main');
+            }
+
+            foreach (const branch in branchesToDispatch) {
+              await github.rest.repos.createDispatchEvent({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                event_type: 'dotnet_release',
+                client_payload: {
+                  branch
+                }
+              });
+            }
