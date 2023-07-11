@@ -68,15 +68,9 @@ jobs:
                   path,
                   ref: currentSha,
                 });
-                const data = content.data.content;
-                console.log(console.log(JSON.stringify(data)));
-                const decoded = Buffer.from(data, 'base64');
-                console.log(console.log(JSON.stringify(decoded)));
-                const stringified = decoded.toString();
-                console.log(console.log(JSON.stringify(stringified)));
-                const asJson = JSON.parse(stringified);
-                console.log(console.log(JSON.stringify(asJson)));
-                releaseNotes.push(asJson);
+                const release = Buffer.from(content.data.content, 'base64').toString();
+                console.log(`Release notes for ${path}: ${release}`);
+                releaseNotes.push(release);
               }
             }
 
