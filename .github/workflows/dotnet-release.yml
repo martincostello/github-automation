@@ -68,9 +68,16 @@ jobs:
                   path,
                   ref: currentSha,
                 });
-                const release = Buffer.from(content.data.content, 'base64').toString();
-                console.log(`Release notes for ${path}: ${release}`);
-                releaseNotes.push(release);
+                let release;
+                if (content.data.content === 'base64') {
+                  release = Buffer.from(content.data.content, 'base64').toString();
+                } else if (content.data.content === 'none') {
+                  const response = await fetch(content.data.download_url);
+                  release = await response.text();
+                } else {
+                  throw new Error(`Unexpected encoding for ${path}: ${content.data.encoding}`);
+                }
+                releaseNotes.push(JSON.parse(release));
               }
             }
 
@@ -134,10 +141,10 @@ jobs:
             };
 
             const branchesToDispatch = [];
-            if (releaseNotes.some(release => isPreview(release)) {
+            if (releaseNotes.some(release => isPreview(release))) {
               branchesToDispatch.push('dotnet-vnext');
             }
-            if (releaseNotes.some(release => !isPreview(release)) {
+            if (releaseNotes.some(release => !isPreview(release))) {
               branchesToDispatch.push('main');
             }
 
