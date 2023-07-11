@@ -19,6 +19,7 @@ jobs:
 
     outputs:
       dotnet-core-updated-sha: ${{ steps.check-for-release.outputs.dotnet-core-updated-sha }}
+      dotnet-release-notes: ${{ steps.check-for-release.outputs.dotnet-release-notes }}
       dotnet-releases-updated: ${{ steps.check-for-release.outputs.dotnet-releases-updated }}
 
     runs-on: [ ubuntu-latest ]
