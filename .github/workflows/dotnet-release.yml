@@ -148,11 +148,11 @@ jobs:
             };
 
             const branchesToDispatch = [];
-            if (releaseNotes.some(release => isPreview(release))) {
-              branchesToDispatch.push('dotnet-vnext');
-            }
             if (releaseNotes.some(release => !isPreview(release))) {
               branchesToDispatch.push('main');
+            }
+            if (releaseNotes.some(release => isPreview(release))) {
+              branchesToDispatch.push('dotnet-vnext');
             }
 
             for (let branch of branchesToDispatch) {
