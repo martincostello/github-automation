@@ -44,7 +44,7 @@ jobs:
   get-repos:
 
     outputs:
-      repos: ${{ steps.get-repos.outputs.repos }}
+      repos: ${{ steps.needs-rebase.outputs.result }}
 
     permissions: {}
 
@@ -95,6 +95,56 @@ jobs:
           $reposJson = ConvertTo-Json $repos -Compress
           "repos=${reposJson}" >> $env:GITHUB_OUTPUT
 
+      - name: Check if branches need rebasing
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
+        id: needs-rebase
+        with:
+          github-token: ${{ secrets.ACCESS_TOKEN }}
+          result-encoding: string
+          script: |
+            const repos = JSON.parse(`${{ steps.get-repos.outputs.repos }}`);
+            const dirtyRepos = [];
+            for (let i = 0; i < repos.length; i++) {
+              const [ owner, repo ] = repos[i].split('/');
+              let commit_sha;
+              try {
+                const branch = await github.rest.repos.getBranch({
+                  owner,
+                  repo,
+                  branch: '${{ inputs.branch }}',
+                });
+                commit_sha = branch.data.commit.sha;
+              } catch (err) {
+                core.debug(`Could not get branch: ${err}`);
+                return false;
+              }
+              const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                owner,
+                repo,
+                commit_sha,
+              });
+              if (prs.data.length < 1) {
+                return false;
+              }
+              const repository = await github.rest.repos.get({
+                owner,
+                repo,
+              });
+              const default_branch = repository.data.default_branch;
+              const pull_number = prs.data.find((pull) => pull.base.ref === default_branch).number;
+              const pr = await github.rest.pulls.get({
+                owner,
+                repo,
+                pull_number,
+              });
+              const isDirty = pr.data.mergeable_state === 'dirty';
+              if (isDirty) {
+                core.notice(`${repos[i]} needs rebasing.`);
+                dirtyRepos.push(repos[i]);
+              }
+            }
+            return JSON.stringify(dirtyRepos);
+
   build:
     needs: get-repos
     if: ${{ fromJson(needs.get-repos.outputs.repos).length > 0 }}
@@ -139,50 +189,8 @@ jobs:
         repo: ${{ fromJSON(needs.get-repos.outputs.repos) }}
 
     steps:
-      - name: Check if branch needs rebasing
-        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
-        id: needs-rebase
-        with:
-          github-token: ${{ secrets.ACCESS_TOKEN }}
-          result-encoding: string
-          script: |
-            const [ owner, repo ] = '${{ matrix.repo }}'.split('/');
-            let commit_sha;
-            try {
-              const branch = await github.rest.repos.getBranch({
-                owner,
-                repo,
-                branch: '${{ inputs.branch }}',
-              });
-              commit_sha = branch.data.commit.sha;
-            } catch (err) {
-              core.debug(`Could not get branch: ${err}`);
-              return false;
-            }
-            const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
-              owner,
-              repo,
-              commit_sha,
-            });
-            if (prs.data.length < 1) {
-              return false;
-            }
-            const repository = await github.rest.repos.get({
-              owner,
-              repo,
-            });
-            const default_branch = repository.data.default_branch;
-            const pull_number = prs.data.find((pull) => pull.base.ref === default_branch).number;
-            const pr = await github.rest.pulls.get({
-              owner,
-              repo,
-              pull_number,
-            });
-            return pr.data.mergeable_state === 'dirty';
-
       - name: Checkout code
         uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
-        if: ${{ steps.needs-rebase.outputs.result == 'true' }}
         with:
           repository: ${{ matrix.repo }}
           ref: ${{ inputs.branch }}
@@ -191,14 +199,12 @@ jobs:
 
       - name: Download artifacts
         uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
-        if: ${{ steps.needs-rebase.outputs.result == 'true' }}
         with:
           name: rebaser
           path: ./artifacts
 
       - name: Rebase ${{ inputs.branch }}
         shell: pwsh
-        if: ${{ steps.needs-rebase.outputs.result == 'true' }}
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
