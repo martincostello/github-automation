@@ -163,5 +163,22 @@ jobs:
           }
 
           $report >> $env:GITHUB_STEP_SUMMARY
-          $report | gh gist edit $env:GIST_ID --filename "summary.md" | Out-Null
+
+          $headers = @{
+            "Accept" = "application/vnd.github+json";
+            "Authorization" = "Bearer $($env:GH_TOKEN)";
+            "X-GitHub-Api-Version" = "2022-11-28";
+          }
+          $gist = @{
+            files = @{
+              "summary.md" = @{
+                content = $report
+              }
+            }
+          } | ConvertTo-Json
+
+          Invoke-WebRequest -Method Patch -Headers $headers -Uri "https://api.github.com/gists/$($env:GIST_ID)" -Body $gist
+
+          Write-Output "::notice::https://gist.github.com/${{ github.repository_owner }}/$($env:GIST_ID)"
+
           return 0
