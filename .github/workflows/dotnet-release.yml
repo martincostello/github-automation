@@ -43,6 +43,9 @@ jobs:
             const currentSha = branch.data.commit.sha;
             const previousSha = '${{ inputs.ref || vars.DOTNET_CORE_SHA }}';
 
+            console.log(` Current SHA: ${currentSha}`);
+            console.log(`Previous SHA: ${previousSha}`);
+
             let releaseNotesFiles = [];
             let updatedSha = '';
 
@@ -56,6 +59,8 @@ jobs:
               releaseNotesFiles = diff.data.files
                 .map(file => file.filename)
                 .filter(file => file.startsWith('release-notes/') && file.endsWith('/releases.json'));
+
+              console.log(`${releaseNotesFiles} release notes file(s) were updated.`);
             }
 
             const releaseNotesUpdated = releaseNotesFiles.length > 0;
@@ -84,6 +89,8 @@ jobs:
                 const notes = JSON.parse(release);
                 delete notes.releases;
 
+                console.log(`Release notes for ${path}:\n${JSON.stringify(notes, null, 2)}`);
+
                 releaseNotes.push(notes);
               }
             }
@@ -109,22 +116,30 @@ jobs:
       #  with:
       #    github-token: ${{ secrets.ACCESS_TOKEN }}
       #    script: |
+      #      const sha = '${{ needs.check-for-release.outputs.dotnet-core-updated-sha }}';
       #      await github.rest.actions.updateRepoVariable({
       #        owner: context.repo.owner,
       #        repo: context.repo.repo,
       #        name: 'DOTNET_CORE_SHA',
-      #        value: '${{ needs.check-for-release.outputs.dotnet-core-updated-sha }}'
+      #        value: sha,
       #      });
+      #      core.notice(`dotnet/core SHA updated to ${sha}`);
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
+          $sha = "${{ needs.check-for-release.outputs.dotnet-core-updated-sha }}"
           gh api --method PATCH "/repos/${{ github.repository }}/actions/variables/DOTNET_CORE_SHA" -f value='${{ needs.check-for-release.outputs.dotnet-core-updated-sha }}'
+          Write-Output "::notice::dotnet/core SHA updated to ${sha}"
 
   create-dispatch:
     name: create-dispatch
     needs: check-for-release
     if: ${{ needs.check-for-release.outputs.dotnet-releases-updated == 'true' }}
+
+    concurrency:
+      group: "create-dispatch"
+      cancel-in-progress: false
 
     permissions:
       contents: write
@@ -155,13 +170,16 @@ jobs:
               branchesToDispatch.push('dotnet-vnext');
             }
 
+            const event_type = 'dotnet_release';
+
             for (let branch of branchesToDispatch) {
               await github.rest.repos.createDispatchEvent({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                event_type: 'dotnet_release',
+                event_type,
                 client_payload: {
                   branch
                 }
               });
+              core.notice(`Dispatched ${event_type} for branch ${branch}`);
             }
