@@ -100,7 +100,7 @@ jobs:
         id: needs-rebase
         with:
           github-token: ${{ secrets.ACCESS_TOKEN }}
-          result-encoding: string
+          result-encoding: json
           script: |
             const repos = JSON.parse(`${{ steps.get-repos.outputs.repos }}`);
             const dirtyRepos = [];
@@ -143,11 +143,11 @@ jobs:
                 dirtyRepos.push(repos[i]);
               }
             }
-            return JSON.stringify(dirtyRepos);
+            return dirtyRepos;
 
   build:
     needs: get-repos
-    if: ${{ fromJson(needs.get-repos.outputs.repos).length > 0 }}
+    if: ${{ needs.get-repos.outputs.repos != '[]' }}
 
     permissions:
       contents: read
