@@ -41,35 +41,16 @@ env:
   TERM: xterm
 
 jobs:
-  build:
-    name: build
+  get-repos:
 
     outputs:
       repos: ${{ steps.get-repos.outputs.repos }}
 
-    permissions:
-      contents: read
+    permissions: {}
 
     runs-on: [ ubuntu-latest ]
 
     steps:
-
-      - name: Checkout code
-        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
-
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@3447fd6a9f9e57506b15f895c5b76d3b197dc7c2 # v3.2.0
-
-      - name: Build rebaser
-        shell: pwsh
-        run: dotnet publish ./src/Rebaser/Rebaser.csproj --configuration Release --output ./artifacts --runtime linux-x64 --self-contained true
-
-      - name: Publish artifacts
-        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
-        with:
-          name: rebaser
-          path: ./artifacts
-          if-no-files-found: error
 
       - name: Get repositories to rebase
         id: get-repos
@@ -114,9 +95,37 @@ jobs:
           $reposJson = ConvertTo-Json $repos -Compress
           "repos=${reposJson}" >> $env:GITHUB_OUTPUT
 
+  build:
+    needs: get-repos
+    if: ${{ fromJson(needs.get-repos.outputs.repos).length > 0 }}
+
+    permissions:
+      contents: read
+
+    runs-on: [ ubuntu-latest ]
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@3447fd6a9f9e57506b15f895c5b76d3b197dc7c2 # v3.2.0
+
+      - name: Build rebaser
+        shell: pwsh
+        run: dotnet publish ./src/Rebaser/Rebaser.csproj --configuration Release --output ./artifacts --runtime linux-x64 --self-contained true
+
+      - name: Publish artifacts
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+        with:
+          name: rebaser
+          path: ./artifacts
+          if-no-files-found: error
+
   rebase:
     name: "rebase-${{ matrix.repo }}"
-    needs: [ build ]
+    needs: [ get-repos, build ]
     runs-on: [ ubuntu-latest ]
 
     concurrency:
@@ -127,7 +136,7 @@ jobs:
       fail-fast: false
       max-parallel: 2
       matrix:
-        repo: ${{ fromJSON(needs.build.outputs.repos) }}
+        repo: ${{ fromJSON(needs.get-repos.outputs.repos) }}
 
     steps:
       - name: Check if branch needs rebasing
