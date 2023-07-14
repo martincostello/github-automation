@@ -180,7 +180,7 @@ jobs:
             }
           } | ConvertTo-Json -Depth 5
 
-          Invoke-WebRequest -Method Patch -Headers $headers -Uri "${{ env.GITHUB_API_URL }}/gists/$($env:GIST_ID)" -Body $gist | Out-Null
+          Invoke-WebRequest -Method Patch -Headers $headers -Uri "$($env:GITHUB_API_URL)/gists/$($env:GIST_ID)" -Body $gist | Out-Null
 
           Write-Output "::notice::https://gist.github.com/${{ github.repository_owner }}/$($env:GIST_ID)"
 
