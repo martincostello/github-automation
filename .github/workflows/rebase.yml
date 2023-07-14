@@ -158,10 +158,16 @@ jobs:
             if (prs.data.length < 1) {
               return false;
             }
+            const repository = await github.rest.repos.get({
+              owner,
+              repo,
+            });
+            const default_branch = repository.data.default_branch;
+            const pull_number = prs.data.find((pull) => pull.base.ref === default_branch).number;
             const pr = await github.rest.pulls.get({
               owner,
               repo,
-              pull_number: prs.data[0].number,
+              pull_number,
             });
             return pr.data.mergeable_state === 'dirty';
 
