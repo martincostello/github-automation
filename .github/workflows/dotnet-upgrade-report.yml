@@ -10,6 +10,9 @@ permissions: {}
 jobs:
   generate:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}
+      cancel-in-progress: false
     steps:
       - name: Generate report
         shell: pwsh
