@@ -15,6 +15,7 @@ jobs:
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          GIST_ID: "2083bcc83f30a5038175e4f31e0fc59f"
         run: |
           $ErrorActionPreference = "Stop"
           $ProgressPreference = "SilentlyContinue"
@@ -162,4 +163,5 @@ jobs:
           }
 
           $report >> $env:GITHUB_STEP_SUMMARY
+          $report | gh gist edit $env:GIST_ID --filename "summary.md" | Out-Null
           return 0
