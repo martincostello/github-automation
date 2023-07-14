@@ -16,6 +16,7 @@ of the next major version of .NET.
   - Require a pull request
   - Require the same status checks to pass as the default branch
   - Allow force pushes to that branch from the users/apps that are used to update the branch
+  - If the account used to force push the changes is not an owner of the repositories being updated, then you will need to assign the app/user (or a the team it belongs to) a custom repository role that has the _Bypass branch protections_ permission in addition to write access.
 - The `dotnext-vnext` branch contains a GitHub Actions workflow named `update-dotnet-sdk`
 - The only files in the repository containing versions that need updating regularly are:
   - `global.json`
