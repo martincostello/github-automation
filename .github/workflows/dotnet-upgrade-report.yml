@@ -172,7 +172,7 @@ jobs:
           $gist = @{
             files = @{
               "summary.md" = @{
-                content = $report
+                content = $report -join "`n"
               }
             }
           } | ConvertTo-Json -Depth 5
