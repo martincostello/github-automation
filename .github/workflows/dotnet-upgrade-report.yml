@@ -112,7 +112,7 @@ jobs:
             }
 
             $defaultBranch = gh api "repos/${repo}" --jq '.default_branch'
-            $branchPR = gh api "repos/${repo}/commits/${head}/pulls" --jq ".[] | select(.base.ref == `"${defaultBranch}`") | .number"
+            $branchPR = gh api "repos/${repo}/commits/${head}/pulls" --jq ('.[] | select(.base.ref == "' + ${defaultBranch} + '") | .number')
             $pr = gh api "repos/${repo}/pulls/${branchPR}" --jq '{ number: .number, url: .html_url, mergeable_state: .mergeable_state }' | ConvertFrom-Json
 
             $checkStatuses = `
