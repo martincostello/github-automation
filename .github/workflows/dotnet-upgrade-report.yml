@@ -175,7 +175,7 @@ jobs:
                 content = $report
               }
             }
-          } | ConvertTo-Json
+          } | ConvertTo-Json -Depth 5
 
           Invoke-WebRequest -Method Patch -Headers $headers -Uri "https://api.github.com/gists/$($env:GIST_ID)" -Body $gist
 
