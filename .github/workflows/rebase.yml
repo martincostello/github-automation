@@ -30,6 +30,7 @@ on:
         type: choice
         options:
           - "dotnet-vnext"
+          - "dotnet-nightly"
         default: "dotnet-vnext"
       repository:
         description: "An optional single repository to rebase."
