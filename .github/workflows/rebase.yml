@@ -45,8 +45,11 @@ on:
       base:
         description: "The branch to rebase against."
         required: false
-        type: string
-        default: ""
+        type: choice
+        options:
+          - "main"
+          - "dotnet-vnext"
+        default: "main"
 
 permissions: {}
 
