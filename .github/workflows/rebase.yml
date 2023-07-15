@@ -17,6 +17,11 @@ on:
         required: false
         type: boolean
         default: false
+      base:
+        description: "The branch to rebase against."
+        required: false
+        type: string
+        default: ""
   workflow_dispatch:
     inputs:
       branch:
@@ -36,6 +41,11 @@ on:
         required: false
         type: boolean
         default: false
+      base:
+        description: "The branch to rebase against."
+        required: false
+        type: string
+        default: ""
 
 permissions: {}
 
@@ -223,9 +233,14 @@ jobs:
         run: |
           $repo = "${{ matrix.repo }}"
           $branch = "${{ inputs.branch }}"
+          $base = "${{ inputs.base }}"
+
+          if ([string]::IsNullOrEmpty($base)) {
+            $base = "main"
+          }
 
           chmod +x ./artifacts/Rebaser
-          & ./artifacts/Rebaser "${{ github.workspace }}"
+          & ./artifacts/Rebaser "${{ github.workspace }}" $base
 
           if ($LASTEXITCODE -eq 0) {
             git push --force-with-lease origin $branch
