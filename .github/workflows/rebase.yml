@@ -12,6 +12,11 @@ on:
         description: "The repository to rebase."
         required: true
         type: string
+      force:
+        description: "Whether to rebase even if the branch has no conflicts."
+        required: false
+        type: boolean
+        default: false
   workflow_dispatch:
     inputs:
       branch:
@@ -26,6 +31,11 @@ on:
         required: false
         type: string
         default: ""
+      force:
+        description: "Whether to rebase even if the branch has no conflicts."
+        required: false
+        type: boolean
+        default: false
 
 permissions: {}
 
@@ -103,6 +113,9 @@ jobs:
           result-encoding: json
           script: |
             const repos = JSON.parse(`${{ steps.get-repos.outputs.repos }}`);
+            if (${{ inputs.force }}) {
+              return repos;
+            }
             const dirtyRepos = [];
             for (let i = 0; i < repos.length; i++) {
               const [ owner, repo ] = repos[i].split('/');
