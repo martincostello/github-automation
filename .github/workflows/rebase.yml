@@ -124,7 +124,7 @@ jobs:
           result-encoding: json
           script: |
             const repos = JSON.parse(`${{ steps.get-repos.outputs.repos }}`);
-            if (${{ inputs.force }}) {
+            if ('${{ inputs.force }}' === 'true') {
               return repos;
             }
             const dirtyRepos = [];
