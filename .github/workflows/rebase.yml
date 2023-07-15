@@ -150,12 +150,20 @@ jobs:
               if (prs.data.length < 1) {
                 continue;
               }
-              const repository = await github.rest.repos.get({
-                owner,
-                repo,
-              });
-              const default_branch = repository.data.default_branch;
-              const pull_number = prs.data.find((pull) => pull.base.ref === default_branch).number;
+              let base_ref = '${{ inputs.base }}';
+              if (base_ref === '') {
+                const repository = await github.rest.repos.get({
+                  owner,
+                  repo,
+                });
+                base_ref = repository.data.default_branch;
+              }
+              const pull_for_ref = prs.data.find((pull) => pull.base.ref === base_ref);
+              if (!pull_for_ref) {
+                core.debug(`No pull request found targeting ${base_ref}.`);
+                continue;
+              }
+              const pull_number = pull_for_ref.number;
               const pr = await github.rest.pulls.get({
                 owner,
                 repo,
