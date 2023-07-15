@@ -124,7 +124,7 @@ jobs:
           result-encoding: json
           script: |
             const repos = JSON.parse(`${{ steps.get-repos.outputs.repos }}`);
-            if ('${{ inputs.force }}' === 'true') {
+            if (${{ inputs.force }}) {
               return repos;
             }
             const dirtyRepos = [];
@@ -140,7 +140,7 @@ jobs:
                 commit_sha = branch.data.commit.sha;
               } catch (err) {
                 core.debug(`Could not get branch: ${err}`);
-                return false;
+                continue;
               }
               const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
                 owner,
@@ -148,7 +148,7 @@ jobs:
                 commit_sha,
               });
               if (prs.data.length < 1) {
-                return false;
+                continue;
               }
               const repository = await github.rest.repos.get({
                 owner,
