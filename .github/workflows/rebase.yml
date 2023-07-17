@@ -172,6 +172,7 @@ jobs:
                 repo,
                 pull_number,
               });
+              core.debug(`${owner}/${repo}#${pull_number} mergeable_state: ${pr.data.mergeable_state}.`);
               const isDirty = pr.data.mergeable_state === 'dirty';
               if (isDirty) {
                 core.notice(`${repos[i]} needs rebasing.`);
