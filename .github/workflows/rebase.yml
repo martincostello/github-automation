@@ -182,7 +182,7 @@ jobs:
               const pollDelay = 5000;
               const timeout = 60000;
               const maxPollCount = 60000 / pollDelay;
-              while (pr.data.mergeable_state === null && pollCount < maxPollCount) {
+              while ((pr.data.mergeable_state === null || pr.data.mergeable_state === 'unknown') && pollCount < maxPollCount) {
                 await new Promise((resolve) => setTimeout(resolve, pollDelay));
                 pr = await github.rest.pulls.get({
                   owner,
