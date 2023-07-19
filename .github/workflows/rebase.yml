@@ -174,8 +174,8 @@ jobs:
               });
               core.debug(`${owner}/${repo}#${pull_number} mergeable_state: ${pr.data.mergeable_state}.`);
 
-              // Poll for changes for up to 1 minute with a 5 second delay between polls if pr.data.mergeable_state is null.
-              // The first read will start a background job to re-calcuate the mergeability, but it may not be ready immediately.
+              // Poll for changes if the mergeable state is not yet known if a push just occurred.
+              // The first read above will start a background job to re-calcuate the mergeability, but it may not be ready immediately.
               // See https://docs.github.com/en/rest/guides/using-the-rest-api-to-interact-with-your-git-database?apiVersion=2022-11-28#checking-mergeability-of-pull-requests
               // and https://github.com/pullreminders/backlog/issues/42#issuecomment-436412823.
               let pollCount = 0;
