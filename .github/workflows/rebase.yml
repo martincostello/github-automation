@@ -172,7 +172,7 @@ jobs:
                 repo,
                 pull_number,
               });
-              core.info(`${owner}/${repo}#${pull_number} mergeable_state: ${pr.data.mergeable_state}.`);
+              core.debug(`${owner}/${repo}#${pull_number} mergeable_state: ${pr.data.mergeable_state}.`);
 
               // Poll for changes for up to 1 minute with a 5 second delay between polls if pr.data.mergeable_state is null.
               // The first read will start a background job to re-calcuate the mergeability, but it may not be ready immediately.
@@ -195,7 +195,7 @@ jobs:
                     'If-None-Match': pr.headers['Etag'],
                   },
                 });
-                core.info(`${owner}/${repo}#${pull_number} mergeable_state: ${pr.data.mergeable_state}.`);
+                core.debug(`${owner}/${repo}#${pull_number} mergeable_state: ${pr.data.mergeable_state}.`);
                 pollCount++;
               }
 
