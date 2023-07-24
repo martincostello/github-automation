@@ -46,4 +46,4 @@ jobs:
 
     - name: Output the report
       shell: bash
-      run: cat ./issue_metrics.md >> $GITHUB_STEP_SUMMARY
+      run: cat ./issue_metrics.md >> "$GITHUB_STEP_SUMMARY"
