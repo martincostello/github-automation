@@ -1,0 +1,49 @@
+name: issue-metrics
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+
+  metrics:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}
+      cancel-in-progress: false
+
+    steps:
+
+    - name: Get dates for last month
+      id: last-month
+      shell: bash
+      run: |
+        # Get the current date
+        current_date=$(date +'%Y-%m-%d')
+
+        # Calculate the previous month
+        previous_date=$(date -d "$current_date -1 month" +'%Y-%m-%d')
+
+        # Extract the year and month from the previous date
+        previous_year=$(date -d "$previous_date" +'%Y')
+        previous_month=$(date -d "$previous_date" +'%m')
+
+        # Calculate the first day of the previous month
+        first_day=$(date -d "$previous_year-$previous_month-01" +'%Y-%m-%d')
+
+        # Calculate the last day of the previous month
+        last_day=$(date -d "$first_day +1 month -1 day" +'%Y-%m-%d')
+
+        echo "$first_day..$last_day"
+        echo "last-month=$first_day..$last_day" >> "$GITHUB_OUTPUT"
+
+    - name: Run issue-metrics tool
+      uses: github/issue-metrics@88570fc89e9c8861d2b7b9be9f56a5785c282f05 # v2.2.2
+      env:
+        GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        SEARCH_QUERY: 'owner:${{ github.repository_owner }} is:issue created:${{ steps.last-month.outputs.last-month }} -reason:"not planned"'
+
+    - name: Output the report
+      shell: bash
+      run: cat ./issue_metrics.md >> $GITHUB_STEP_SUMMARY
