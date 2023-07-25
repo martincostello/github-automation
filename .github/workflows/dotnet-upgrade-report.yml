@@ -2,7 +2,7 @@ name: dotnet-upgrade-report
 
 on:
   schedule:
-    - cron: '00 10 * * MON-FRI'
+    - cron: '30 08 * * MON-FRI'
   workflow_dispatch:
 
 permissions: {}
