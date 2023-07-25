@@ -30,7 +30,7 @@ jobs:
       uses: github/issue-metrics@cf3dda21393dcaf2bbb50f9bac0505f897339122 # v2.3.0
       env:
         GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        SEARCH_QUERY: 'owner:${{ github.repository_owner }} is:issue created:${{ steps.last-month.outputs.last-month }} -reason:"not planned"'
+        SEARCH_QUERY: 'owner:${{ github.repository_owner }} created:${{ steps.last-month.outputs.last-month }} -reason:"not planned" -author:app/dependabot'
 
     - name: Output the report
       shell: bash
