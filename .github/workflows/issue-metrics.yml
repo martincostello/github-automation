@@ -1,6 +1,8 @@
 name: issue-metrics
 
 on:
+  schedule:
+    - cron: '30 02 1 * *'
   workflow_dispatch:
 
 permissions: {}
