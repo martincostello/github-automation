@@ -12,6 +12,7 @@ on:
         options:
           - "main"
           - "dotnet-vnext"
+          - "dotnet-nightly"
         default: "main"
 
 permissions: {}
