@@ -110,7 +110,7 @@ jobs:
             $head = gh api "repos/${repo}/commits/${branch}" --jq '.sha' 2> $null
 
             if ($LASTEXITCODE -ne 0) {
-              Write-Host "::debug::The ${branch} branch of ${repo} does not exist or does not have an open pull request."
+              Write-Output "::debug::The ${branch} branch of ${repo} does not exist or does not have an open pull request."
               continue
             }
 
