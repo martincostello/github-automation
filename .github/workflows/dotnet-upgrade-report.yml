@@ -129,8 +129,14 @@ jobs:
               continue
             }
 
-            $env:repo_default_branch = gh api "repos/${repo}" --jq '.default_branch'
-            $branchPR = gh api "repos/${repo}/commits/${head}/pulls" --jq '.[] | select(.base.ref == env.repo_default_branch) | .number'
+            if ($branch -eq $defaultBranch) {
+              $base = gh api "repos/${repo}" --jq '.default_branch'
+            } else {
+              $base = "dotnet-vnext"
+            }
+
+            $env:base_branch = $base
+            $branchPR = gh api "repos/${repo}/commits/${head}/pulls" --jq '.[] | select(.base.ref == env.base_branch) | .number'
             $pr = gh api "repos/${repo}/pulls/${branchPR}" --jq '{ number: .number, url: .html_url, mergeable_state: .mergeable_state }' | ConvertFrom-Json
 
             $checkStatuses = `
