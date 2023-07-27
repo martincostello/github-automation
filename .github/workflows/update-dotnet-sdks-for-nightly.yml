@@ -1,0 +1,15 @@
+name: update-dotnet-sdks-for-nightly
+
+on:
+  schedule:
+    - cron:  '00 10 * * MON-FRI'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  update-from-nightly:
+    uses: ./.github/workflows/update-dotnet-sdks.yml
+    secrets: inherit
+    with:
+      branch: 'dotnet-nightly'
