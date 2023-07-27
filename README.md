@@ -19,7 +19,7 @@ The following workflows are available.
 
 ### .NET Dependencies Updated
 
-The [`dotnet-dependencies-updated`][dotnet-dependencies-updated] workflow
+The [dotnet-dependencies-updated][dotnet-dependencies-updated] workflow
 is triggered when a `repository_dispatch` event is received for the `dotnet_dependencies_updated`
 event type. The workflow then runs the [rebase][rebase] workflow for the
 repository specified in the payload.
@@ -39,7 +39,7 @@ The `repository_dispatch` events are created by [Costellobot][costellobot].
 
 ### .NET Release
 
-The [`dotnet-release`][dotnet-release] workflow runs every 15 minutes to
+The [dotnet-release][dotnet-release] workflow runs every 15 minutes to
 check if any changes have been made to the `release-notes/**/*.json` files
 in the [dotnet/core][dotnet-core] repository.
 
@@ -51,7 +51,7 @@ event type.
 {
   "event_type": "dotnet_release",
   "client_payload": {
-    "branch": "{main|dotnet-vnext}"
+    "branch": "(main|dotnet-vnext)"
   }
 }
 ```
@@ -61,7 +61,7 @@ any new SDK released for a given release channel is either `preview` or `go-live
 
 ### .NET Upgrade Report
 
-The [`dotnet-upgrade-report`][dotnet-upgrade-report] workflow runs daily and generates
+The [dotnet-upgrade-report][dotnet-upgrade-report] workflow runs daily and generates
 a markdown report that finds all of the open pull requests against a given branch,
 by default the `dotnet-vnext` branch, and then checks if the pull request is using the
 latest version of the .NET SDK for the relevant .NET release, whether the CI is passing
@@ -71,20 +71,20 @@ For the `dotnet-vnext` branch, the report content will also be updated [in this 
 
 ### .NET Version Report
 
-The [`dotnet-version-report`][dotnet-version-report] workflow runs on-demand and
+The [dotnet-version-report][dotnet-version-report] workflow runs on-demand and
 generates a markdown report that finds all of the repositories in the configured
 owner and shows which .NET SDK versions are used by the default branch of each of
 the repositories and whether that version is the latest official release.
 
 ### Issue Metrics
 
-The [`issue-metrics`][issue-metrics] workflow runs monthly and generates a markdown
+The [issue-metrics][issue-metrics] workflow runs monthly and generates a markdown
 report about the issues and pull requests for the repositories for the configured
 owner using the [github/issue-metrics][issue-metrics-action] action.
 
 ### Rebase
 
-The [`rebase`][rebase] workflow rebases a branch of the
+The [rebase][rebase] workflow rebases a branch of the
 configured repositories onto the default branch of the repository.
 
 The [Rebaser][rebaser] tool is used to rebase the branch with
@@ -129,14 +129,14 @@ dotnet run --project ./src/Rebaser/Rebaser.csproj -- $repositoryPath $defaultBra
 
 ### Update .NET SDKs
 
-The [`update-dotnet-sdks`][update-dotnet-sdks] workflow creates
+The [update-dotnet-sdks][update-dotnet-sdks] workflow creates
 a manual workflow dispatch for the `update-dotnet-sdk` workflow
 on the specified branch for each of the configured respositories.
 
 ### Update .NET SDKs for Nightly
 
-The [`update-dotnet-sdks-for-nightly`][update-dotnet-sdks-for-nightly]
-workflow runs the `update-dotnet-sdks` workflow daily for the `dotnet-nightly` branch.
+The [update-dotnet-sdks-for-nightly][update-dotnet-sdks-for-nightly]
+workflow runs the update-dotnet-sdks workflow daily for the `dotnet-nightly` branch.
 
 ## Onboarding
 
