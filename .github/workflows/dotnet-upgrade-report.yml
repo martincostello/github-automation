@@ -111,8 +111,15 @@ jobs:
             return "https://img.shields.io/badge/${Label}-${Message}-${Color}?logo=${Logo}"
           }
 
-          $releases = (Invoke-WebRequest https://raw.githubusercontent.com/dotnet/core/main/release-notes/releases-index.json).Content | ConvertFrom-Json
-          $latestVersion = $releases."releases-index"[0]."latest-sdk"
+          if ($branch -eq $defaultBranch) {
+            $releases = (Invoke-WebRequest https://raw.githubusercontent.com/dotnet/core/main/release-notes/releases-index.json).Content | ConvertFrom-Json
+            $latestVersion = $releases."releases-index"[0]."latest-sdk"
+          } else {
+            $channel = "8.0.1xx-preview7"
+            $quality = "daily"
+            $versionContent = (Invoke-WebRequest "https://aka.ms/dotnet/${channel}/${quality}/sdk-productVersion.txt").Content
+            $latestVersion = [System.Text.Encoding]::ASCII.GetString($versionContent).Trim()
+          }
 
           $report = @(
             "# .NET vNext Upgrade Report",
@@ -175,7 +182,8 @@ jobs:
             $buildBadge = Get-Badge -Label "build" -Message $status -Color $buildColor -Logo "github"
             $buildUrl = "$($pr.url)"
 
-            $sdkColor = $sdkVersion -eq $latestVersion ? "512BD4" : "yellow"
+            $purple = "512BD4"
+            $sdkColor = $sdkVersion -eq $latestVersion ? $purple : "yellow" : $purple
             $sdkBadge = Get-Badge -Label "SDK" -Message $sdkVersion -Color $sdkColor -Logo "dotnet"
             $sdkUrl = "$($env:GITHUB_SERVER_URL)/${repo}/blob/${branch}/global.json#L${lineNumber}"
 
