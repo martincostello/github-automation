@@ -183,7 +183,7 @@ jobs:
             $buildUrl = "$($pr.url)"
 
             $purple = "512BD4"
-            $sdkColor = $sdkVersion -eq $latestVersion ? $purple : "yellow" : $purple
+            $sdkColor = $sdkVersion -eq $latestVersion ? $purple : "yellow"
             $sdkBadge = Get-Badge -Label "SDK" -Message $sdkVersion -Color $sdkColor -Logo "dotnet"
             $sdkUrl = "$($env:GITHUB_SERVER_URL)/${repo}/blob/${branch}/global.json#L${lineNumber}"
 
