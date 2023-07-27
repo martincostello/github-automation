@@ -2,7 +2,7 @@ name: update-dotnet-sdks-for-nightly
 
 on:
   schedule:
-    - cron:  '00 10 * * MON-FRI'
+    - cron:  '00 10 * * *'
   workflow_dispatch:
 
 permissions: {}
