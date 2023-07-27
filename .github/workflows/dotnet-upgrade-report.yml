@@ -4,6 +4,15 @@ on:
   schedule:
     - cron: '30 08 * * MON-FRI'
   workflow_dispatch:
+    inputs:
+      branch:
+        description: "The branch to run the report for."
+        required: false
+        type: choice
+        options:
+          - "dotnet-vnext"
+          - "dotnet-nightly"
+        default: "dotnet-vnext"
 
 permissions: {}
 
@@ -23,7 +32,13 @@ jobs:
           $ErrorActionPreference = "Stop"
           $ProgressPreference = "SilentlyContinue"
 
-          $branch = "dotnet-vnext"
+          $branch = "${{ inputs.branch }}"
+          $defaultBranch = "dotnet-vnext"
+
+          if ([string]::IsNullOrEmpty($branch)) {
+            $branch = $defaultBranch
+          }
+
           $checksOfInterest = @(
             "code-ql",
             "code-ql (csharp)",
@@ -96,8 +111,15 @@ jobs:
             return "https://img.shields.io/badge/${Label}-${Message}-${Color}?logo=${Logo}"
           }
 
-          $releases = (Invoke-WebRequest https://raw.githubusercontent.com/dotnet/core/main/release-notes/releases-index.json).Content | ConvertFrom-Json
-          $latestVersion = $releases."releases-index"[0]."latest-sdk"
+          if ($branch -eq $defaultBranch) {
+            $releases = (Invoke-WebRequest https://raw.githubusercontent.com/dotnet/core/main/release-notes/releases-index.json).Content | ConvertFrom-Json
+            $latestVersion = $releases."releases-index"[0]."latest-sdk"
+          } else {
+            $channel = "8.0.1xx-preview7"
+            $quality = "daily"
+            $versionContent = (Invoke-WebRequest "https://aka.ms/dotnet/${channel}/${quality}/sdk-productVersion.txt").Content
+            $latestVersion = [System.Text.Encoding]::ASCII.GetString($versionContent).Trim()
+          }
 
           $report = @(
             "# .NET vNext Upgrade Report",
@@ -114,8 +136,14 @@ jobs:
               continue
             }
 
-            $env:repo_default_branch = gh api "repos/${repo}" --jq '.default_branch'
-            $branchPR = gh api "repos/${repo}/commits/${head}/pulls" --jq '.[] | select(.base.ref == env.repo_default_branch) | .number'
+            if ($branch -eq $defaultBranch) {
+              $base = gh api "repos/${repo}" --jq '.default_branch'
+            } else {
+              $base = "dotnet-vnext"
+            }
+
+            $env:base_branch = $base
+            $branchPR = gh api "repos/${repo}/commits/${head}/pulls" --jq '.[] | select(.base.ref == env.base_branch) | .number'
             $pr = gh api "repos/${repo}/pulls/${branchPR}" --jq '{ number: .number, url: .html_url, mergeable_state: .mergeable_state }' | ConvertFrom-Json
 
             $checkStatuses = `
@@ -154,7 +182,8 @@ jobs:
             $buildBadge = Get-Badge -Label "build" -Message $status -Color $buildColor -Logo "github"
             $buildUrl = "$($pr.url)"
 
-            $sdkColor = $sdkVersion -eq $latestVersion ? "512BD4" : "yellow"
+            $purple = "512BD4"
+            $sdkColor = $sdkVersion -eq $latestVersion ? $purple : "yellow"
             $sdkBadge = Get-Badge -Label "SDK" -Message $sdkVersion -Color $sdkColor -Logo "dotnet"
             $sdkUrl = "$($env:GITHUB_SERVER_URL)/${repo}/blob/${branch}/global.json#L${lineNumber}"
 
@@ -171,21 +200,23 @@ jobs:
 
           $report >> $env:GITHUB_STEP_SUMMARY
 
-          $headers = @{
-            "Accept" = "application/vnd.github+json";
-            "Authorization" = "Bearer $($env:GH_TOKEN)";
-            "X-GitHub-Api-Version" = "2022-11-28";
-          }
-          $gist = @{
-            files = @{
-              "summary.md" = @{
-                content = $report -join "`n"
-              }
+          if ($branch -eq $defaultBranch) {
+            $headers = @{
+              "Accept" = "application/vnd.github+json";
+              "Authorization" = "Bearer $($env:GH_TOKEN)";
+              "X-GitHub-Api-Version" = "2022-11-28";
             }
-          } | ConvertTo-Json -Depth 5
+            $gist = @{
+              files = @{
+                "summary.md" = @{
+                  content = $report -join "`n"
+                }
+              }
+            } | ConvertTo-Json -Depth 5
 
-          Invoke-WebRequest -Method Patch -Headers $headers -Uri "$($env:GITHUB_API_URL)/gists/$($env:GIST_ID)" -Body $gist | Out-Null
+            Invoke-WebRequest -Method Patch -Headers $headers -Uri "$($env:GITHUB_API_URL)/gists/$($env:GIST_ID)" -Body $gist | Out-Null
 
-          Write-Output "::notice::https://gist.github.com/${{ github.repository_owner }}/$($env:GIST_ID)"
+            Write-Output "::notice::https://gist.github.com/${{ github.repository_owner }}/$($env:GIST_ID)"
+          }
 
           return 0
