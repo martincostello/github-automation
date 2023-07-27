@@ -17,6 +17,71 @@ The following workflows are available.
 | [update-dotnet-sdks][update-dotnet-sdks]                         | Runs the `update-dotnet-sdk` workflow for the configured repositories for a specified branch.     |
 | [update-dotnet-sdks-for-nightly][update-dotnet-sdks-for-nightly] | Runs the `update-dotnet-sdks` workflow daily for the `dotnet-nightly` branch.                     |
 
+### .NET Dependencies Updated
+
+The [`dotnet-dependencies-updated`][dotnet-dependencies-updated] workflow
+is triggered when a `repository_dispatch` event is received for the `dotnet_dependencies_updated`
+event type. The workflow then runs the [rebase][rebase] workflow for the
+repository specified in the payload.
+
+```json
+{
+  "event_type": "dotnet_dependencies_updated",
+  "client_payload": {
+    "repository": "owner/repository",
+    "ref": "main",
+    "sha": "{git commit sha}"
+  }
+}
+```
+
+The `repository_dispatch` events are created by [Costellobot][costellobot].
+
+### .NET Release
+
+The [`dotnet-release`][dotnet-release] workflow runs every 15 minutes to
+check if any changes have been made to the `release-notes/**/*.json` files
+in the [dotnet/core][dotnet-core] repository.
+
+If changes are detected that may signify a new release of the .NET SDK is available,
+then the workflow will create a `repository_dispatch` event for the `dotnet_release`
+event type.
+
+```json
+{
+  "event_type": "dotnet_release",
+  "client_payload": {
+    "branch": "{main|dotnet-vnext}"
+  }
+}
+```
+
+The event is only dispatched for the `dotnet-vnext` branch if the `support-phase` of
+any new SDK released for a given release channel is either `preview` or `go-live`.
+
+### .NET Upgrade Report
+
+The [`dotnet-upgrade-report`][dotnet-upgrade-report] workflow runs daily and generates
+a markdown report that finds all of the open pull requests against a given branch,
+by default the `dotnet-vnext` branch, and then checks if the pull request is using the
+latest version of the .NET SDK for the relevant .NET release, whether the CI is passing
+and whether the pull request has any merge conflicts.
+
+For the `dotnet-vnext` branch, the report content will also be updated [in this Gist][upgrade-report-gist].
+
+### .NET Version Report
+
+The [`dotnet-version-report`][dotnet-version-report] workflow runs on-demand and
+generates a markdown report that finds all of the repositories in the configured
+owner and shows which .NET SDK versions are used by the default branch of each of
+the repositories and whether that version is the latest official release.
+
+### Issue Metrics
+
+The [`issue-metrics`][issue-metrics] workflow runs monthly and generates a markdown
+report about the issues and pull requests for the repositories for the configured
+owner using the [github/issue-metrics][issue-metrics-action] action.
+
 ### Rebase
 
 The [`rebase`][rebase] workflow rebases a branch of the
@@ -62,11 +127,16 @@ dotnet run --project ./src/Rebaser/Rebaser.csproj -- $repositoryPath $defaultBra
 # If you don't like the results, then you can reset the branch.
 ```
 
-### Update .NET SDK
+### Update .NET SDKs
 
 The [`update-dotnet-sdks`][update-dotnet-sdks] workflow creates
 a manual workflow dispatch for the `update-dotnet-sdk` workflow
 on the specified branch for each of the configured respositories.
+
+### Update .NET SDKs for Nightly
+
+The [`update-dotnet-sdks-for-nightly`][update-dotnet-sdks-for-nightly]
+workflow runs the `update-dotnet-sdks` workflow daily for the `dotnet-nightly` branch.
 
 ## Onboarding
 
@@ -88,11 +158,14 @@ The repository is hosted in [GitHub][repository]: <https://github.com/martincost
 
 This project is licensed under the [Apache 2.0][license] license.
 
+[costellobot]: https://github.com/martincostello/costellobot
+[dotnet-core]: https://github.com/dotnet/core
 [dotnet-dependencies-updated]: https://github.com/martincostello/github-automation/blob/main/.github/workflows/dotnet-dependencies-updated.yml
 [dotnet-release]: https://github.com/martincostello/github-automation/blob/main/.github/workflows/dotnet-release.yml
 [dotnet-upgrade-report]: https://github.com/martincostello/github-automation/blob/main/.github/workflows/dotnet-upgrade-report.yml
 [dotnet-version-report]: https://github.com/martincostello/github-automation/blob/main/.github/workflows/dotnet-version-report.yml
 [issue-metrics]: https://github.com/martincostello/github-automation/blob/main/.github/workflows/issue-metrics.yml
+[issue-metrics-action]: https://github.com/github/issue-metrics#readme
 [issues]: https://github.com/martincostello/github-automation/issues "Issues for this project on GitHub.com"
 [libgit2sharp]: https://github.com/libgit2/libgit2sharp#readme
 [license]: http://www.apache.org/licenses/LICENSE-2.0.txt "The Apache 2.0 license"
@@ -102,3 +175,4 @@ This project is licensed under the [Apache 2.0][license] license.
 [repository]: https://github.com/martincostello/github-automation "This project on GitHub.com"
 [update-dotnet-sdks]: .github/workflows/update-dotnet-sdks.yml
 [update-dotnet-sdks-for-nightly]: https://github.com/martincostello/github-automation/blob/main/.github/workflows/update-dotnet-sdks-for-nightly.yml
+[upgrade-report-gist]: https://gist.github.com/martincostello/2083bcc83f30a5038175e4f31e0fc59f
