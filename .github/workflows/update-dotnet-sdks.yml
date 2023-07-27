@@ -3,6 +3,12 @@ name: update-dotnet-sdks
 on:
   repository_dispatch:
     types: [ dotnet_release ]
+  workflow_call:
+    inputs:
+      branch:
+        description: "The branch to run the SDK updates for."
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       branch:
