@@ -6,14 +6,20 @@ GitHub automation for my repositories.
 
 The following workflows are available.
 
-| **Workflow**                           | **Description**                                                        |
-| :------------------------------------- | :--------------------------------------------------------------------- |
-| [Rebase Branch][rebase-branch]         | Rebases a branch of the configured repositories onto `main`.           |
-| [Update .NET SDKs][update-dotnet-sdks] | Runs the `update-dotnet-sdk` workflow for the configured repositories. |
+| **Workflow**                                                     | **Description**                                                                                   |
+| :--------------------------------------------------------------- | :------------------------------------------------------------------------------------------------ |
+| [dotnet-dependencies-updated][dotnet-dependencies-updated]       | Runs the `rebase` workflow for a repository when its dependencies are determined to have changed. |
+| [dotnet-release][dotnet-release]                                 | Runs every 15 minutes to check for new official releases of the .NET SDK.                         |
+| [dotnet-upgrade-report][dotnet-upgrade-report]                   | Runs daily to produce a report for a specified branch used for testing .NET vNext.                |
+| [dotnet-version-report][dotnet-version-report]                   | Generates a report of the .NET SDK versions used by the default branch of my repositories.        |
+| [issue-metrics][issue-metrics]                                   | Runs monthly to generate a report of metrics for issues and pull requests for my repositories.    |
+| [rebase][rebase]                                                 | Rebases a branch of one or more repositories onto a specified base branch.                        |
+| [update-dotnet-sdks][update-dotnet-sdks]                         | Runs the `update-dotnet-sdk` workflow for the configured repositories for a specified branch.     |
+| [update-dotnet-sdks-for-nightly][update-dotnet-sdks-for-nightly] | Runs the `update-dotnet-sdks` workflow daily for the `dotnet-nightly` branch.                     |
 
-### Rebase Branch
+### Rebase
 
-The [`rebase-branch`][rebase-branch] workflow rebases a branch of the
+The [`rebase`][rebase] workflow rebases a branch of the
 configured repositories onto the default branch of the repository.
 
 The [Rebaser][rebaser] tool is used to rebase the branch with
@@ -82,11 +88,17 @@ The repository is hosted in [GitHub][repository]: <https://github.com/martincost
 
 This project is licensed under the [Apache 2.0][license] license.
 
+[dotnet-dependencies-updated]: https://github.com/martincostello/github-automation/blob/main/.github/workflows/dotnet-dependencies-updated.yml
+[dotnet-release]: https://github.com/martincostello/github-automation/blob/main/.github/workflows/dotnet-release.yml
+[dotnet-upgrade-report]: https://github.com/martincostello/github-automation/blob/main/.github/workflows/dotnet-upgrade-report.yml
+[dotnet-version-report]: https://github.com/martincostello/github-automation/blob/main/.github/workflows/dotnet-version-report.yml
+[issue-metrics]: https://github.com/martincostello/github-automation/blob/main/.github/workflows/issue-metrics.yml
 [issues]: https://github.com/martincostello/github-automation/issues "Issues for this project on GitHub.com"
 [libgit2sharp]: https://github.com/libgit2/libgit2sharp#readme
 [license]: http://www.apache.org/licenses/LICENSE-2.0.txt "The Apache 2.0 license"
 [onboarding]: ./docs/onboarding.md
-[rebase-branch]: ./.github/workflows/rebase.yml
+[rebase]: ./.github/workflows/rebase.yml
 [rebaser]: ./src/Rebaser/Program.cs
 [repository]: https://github.com/martincostello/github-automation "This project on GitHub.com"
 [update-dotnet-sdks]: .github/workflows/update-dotnet-sdks.yml
+[update-dotnet-sdks-for-nightly]: https://github.com/martincostello/github-automation/blob/main/.github/workflows/update-dotnet-sdks-for-nightly.yml
