@@ -20,7 +20,7 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     concurrency:
-      group: ${{ github.workflow }}
+      group: "${{ github.workflow }}-${{ inputs.branch }}"
       cancel-in-progress: false
     steps:
       - name: Generate report
