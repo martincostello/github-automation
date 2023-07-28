@@ -45,6 +45,7 @@ jobs:
             "code-ql (javascript)",
             "dependency-review",
             "lighthouse",
+            "lint",
             "macos-latest",
             "ubuntu-latest",
             "validate-packages",
