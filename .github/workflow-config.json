@@ -1,0 +1,33 @@
+{
+  "repositories": [
+    "justeattakeaway/ApplePayJSSample",
+    "justeattakeaway/httpclient-interception",
+    "justeattakeaway/JustEat.StatsD",
+    "justeattakeaway/JustSaying",
+    "martincostello/adventofcode",
+    "martincostello/alexa-london-travel",
+    "martincostello/alexa-london-travel-site",
+    "martincostello/antiforgery-testing-application-part",
+    "martincostello/api",
+    "martincostello/apple-fitness-workout-mapper",
+    "martincostello/aspnet-core-pseudo-localization",
+    "martincostello/browserstack-automate",
+    "martincostello/costellobot",
+    "martincostello/dependabot-helper",
+    "martincostello/dotnet-macos-notarization-example",
+    "martincostello/dotnet-minimal-api-integration-testing",
+    "martincostello/dotnet-patch-automation-sample",
+    "martincostello/dotnet-playwright-tests",
+    "martincostello/dotnet-repo-template",
+    "martincostello/github-automation",
+    "martincostello/home",
+    "martincostello/lambda-test-server",
+    "martincostello/polly-rate-limiting",
+    "martincostello/project-euler",
+    "martincostello/Pseudolocalizer",
+    "martincostello/SignInWithAppleSample",
+    "martincostello/sqllocaldb",
+    "martincostello/website",
+    "martincostello/xunit-logging"
+  ]
+}
