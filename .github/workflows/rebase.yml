@@ -178,37 +178,10 @@ jobs:
             }
             return dirtyRepos;
 
-  build:
-    needs: get-repos
-    if: ${{ needs.get-repos.outputs.repos != '[]' }}
-
-    permissions:
-      contents: read
-
-    runs-on: [ ubuntu-latest ]
-
-    steps:
-
-      - name: Checkout code
-        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
-
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@3447fd6a9f9e57506b15f895c5b76d3b197dc7c2 # v3.2.0
-
-      - name: Build rebaser
-        shell: pwsh
-        run: dotnet publish ./src/Rebaser/Rebaser.csproj --configuration Release --output ./artifacts --runtime linux-x64 --self-contained true
-
-      - name: Publish artifacts
-        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
-        with:
-          name: rebaser
-          path: ./artifacts
-          if-no-files-found: error
-
   rebase:
     name: "rebase-${{ matrix.repo }}"
-    needs: [ get-repos, build ]
+    needs: get-repos
+    if: ${{ needs.get-repos.outputs.repos != '[]' }}
     runs-on: [ ubuntu-latest ]
 
     concurrency:
@@ -225,46 +198,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
         with:
-          repository: ${{ matrix.repo }}
-          ref: ${{ inputs.branch }}
           fetch-depth: 0
+          ref: ${{ inputs.branch }}
+          repository: ${{ matrix.repo }}
           token: ${{ secrets.ACCESS_TOKEN }}
 
-      - name: Download artifacts
-        uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
-        with:
-          name: rebaser
-          path: ./artifacts
-
       - name: Rebase ${{ inputs.branch }}
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        uses: martincostello/rebaser@main
+        id: rebase
+        with:
+          branch: ${{ inputs.base || 'main' }}
+
+      - name: Push changes
+        if : ${{ steps.rebase.outputs.rebased == 'true' }}
         run: |
-          $repo = "${{ matrix.repo }}"
-          $branch = "${{ inputs.branch }}"
-          $base = "${{ inputs.base }}"
-
-          if ([string]::IsNullOrEmpty($base)) {
-            $base = "main"
-          }
-
-          chmod +x ./artifacts/Rebaser
-          & ./artifacts/Rebaser "${{ github.workspace }}" $base
-
+          git push --force-with-lease origin "${{ inputs.branch }}"
           if ($LASTEXITCODE -eq 0) {
-            git push --force-with-lease origin $branch
-            if ($LASTEXITCODE -eq 0) {
-              Write-Output "::notice::Rebased the ${branch} branch of ${repo}."
-            }
-            else {
-              Write-Output "::error::Could not push changes to the ${branch} branch of ${repo}."
-            }
-          }
-          elseif ($LASTEXITCODE -eq 1) {
-            Write-Output "::warning::Could not resolve conflicts for the ${branch} branch of ${repo}."
-            exit 0
+            Write-Output "::notice::Rebased the ${branch} branch of ${repo}."
           }
           else {
-            Write-Output "::error::Failed to rebase the ${branch} branch of ${repo}. Error code: $LASTEXITCODE."
+            Write-Output "::error::Could not push changes to the ${branch} branch of ${repo}."
           }
