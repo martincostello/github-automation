@@ -211,6 +211,7 @@ jobs:
 
       - name: Push changes
         if : ${{ steps.rebase.outputs.rebased == 'true' }}
+        shell: pwsh
         run: |
           git push --force-with-lease origin "${{ inputs.branch }}"
           if ($LASTEXITCODE -eq 0) {
