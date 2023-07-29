@@ -4,10 +4,23 @@
 #Requires -Version 7
 
 param(
-    [Parameter(Mandatory = $true)][string] $RepoPath
+    [Parameter(Mandatory = $true)][string] $RepoPath,
+    [Parameter(Mandatory = $false)][string] $BaseBranch = ""
 )
 
 $ErrorActionPreference = "Stop"
-$ProgressPreference = "SilentlyContinue"
 
-dotnet run --project .\src\Rebaser\Rebaser.csproj -- $RepoPath --interactive
+$arguments = @(
+    "--project",
+    ".\src\Rebaser\Rebaser.csproj",
+    "--",
+    $RepoPath
+)
+
+if (-Not [string]::IsNullOrWhiteSpace($BaseBranch)) {
+    $arguments += $BaseBranch
+}
+
+$arguments += "--interactive"
+
+dotnet run $arguments
