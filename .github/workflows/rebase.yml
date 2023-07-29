@@ -204,7 +204,7 @@ jobs:
           token: ${{ secrets.ACCESS_TOKEN }}
 
       - name: Rebase ${{ inputs.branch }}
-        uses: martincostello/rebaser@main
+        uses: martincostello/rebaser@fixes
         id: rebase
         with:
           branch: ${{ inputs.base || 'main' }}
