@@ -207,7 +207,7 @@ jobs:
         uses: martincostello/rebaser@main
         id: rebase
         with:
-          branch: ${{ inputs.base || 'main' }}
+          branch: origin/${{ inputs.base || 'main' }}
 
       - name: Push changes
         if : ${{ steps.rebase.outputs.rebased == 'true' }}
