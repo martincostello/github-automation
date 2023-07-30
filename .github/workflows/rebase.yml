@@ -208,6 +208,8 @@ jobs:
         id: rebase
         with:
           branch: origin/${{ inputs.base || 'main' }}
+          user-email: ${{ vars.REBASE_GIT_COMMIT_USER_EMAIL }}
+          user-name: ${{ vars.REBASE_GIT_COMMIT_USER_NAME }}
 
       - name: Push changes
         if : ${{ steps.rebase.outputs.rebased == 'true' }}
