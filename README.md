@@ -87,11 +87,10 @@ owner using the [github/issue-metrics][issue-metrics-action] action.
 The [rebase][rebase] workflow rebases a branch of the
 configured repositories onto the default branch of the repository.
 
-The [Rebaser][rebaser] tool is used to rebase the branch with
-[libgit2sharp][libgit2sharp]. Rebaser will attempt to resolve
-conflicts for versions of the .NET SDK, NuGet packages and npm
-packages automatically by always preferring the highest version
-number.
+The [Rebaser][rebaser] action is used to rebase the branch.
+Rebaser will attempt to resolve conflicts for versions of the
+.NET SDK, NuGet packages and npm packages automatically by always
+preferring the highest version number.
 
 If the conflicts in a rebase cannot be automatically resolved,
 then it will be aborted and it will need to be manually dealt with.
@@ -100,7 +99,7 @@ then it will be aborted and it will need to be manually dealt with.
 
 To manually resolve the conflicts, you can checkout this repository
 locally and run the following commands to interatively rebase the
-branch using Rebaser and Visual Studio Code.
+branch using the [Rebaser][rebaser-cli] .NET tool and Visual Studio Code.
 
 ```powershell
 # First checkout the repository you wish to rebase locally, and then checkout
@@ -115,8 +114,8 @@ $defaultBranch = "main"
 git clone https://github.com/martincostello/github-automation
 cd ../github-automation
 
-# Run rebaser interactively.
-dotnet run --project ./src/Rebaser/Rebaser.csproj -- $repositoryPath $defaultBranch --interactive
+# Run Rebaser interactively via the helper script.
+./rebase.ps1 $repositoryPath $defaultBranch
 
 # Rebaser will open Visual Studio Code for each file that needs a merge
 # conflict to be resolved. Once you have resolved the conflicts, save the
@@ -167,11 +166,11 @@ This project is licensed under the [Apache 2.0][license] license.
 [issue-metrics]: https://github.com/martincostello/github-automation/blob/main/.github/workflows/issue-metrics.yml
 [issue-metrics-action]: https://github.com/github/issue-metrics#readme
 [issues]: https://github.com/martincostello/github-automation/issues "Issues for this project on GitHub.com"
-[libgit2sharp]: https://github.com/libgit2/libgit2sharp#readme
 [license]: http://www.apache.org/licenses/LICENSE-2.0.txt "The Apache 2.0 license"
 [onboarding]: ./docs/onboarding.md
 [rebase]: ./.github/workflows/rebase.yml
-[rebaser]: ./src/Rebaser/Program.cs
+[rebaser]: https://github.com/martincostello/rebaser
+[rebaser-cli]: ./src/Rebaser/Program.cs
 [repository]: https://github.com/martincostello/github-automation "This project on GitHub.com"
 [update-dotnet-sdks]: .github/workflows/update-dotnet-sdks.yml
 [update-dotnet-sdks-for-nightly]: https://github.com/martincostello/github-automation/blob/main/.github/workflows/update-dotnet-sdks-for-nightly.yml
