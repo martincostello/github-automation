@@ -78,6 +78,8 @@ jobs:
 
       - name: Get repositories to rebase
         id: get-repos
+        env:
+          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         shell: pwsh
         run: |
           if (-Not [string]::IsNullOrEmpty("${{ inputs.repository }}")) {
