@@ -215,8 +215,8 @@ jobs:
         run: |
           git push --force-with-lease origin "${{ inputs.branch }}"
           if ($LASTEXITCODE -eq 0) {
-            Write-Output "::notice::Rebased the ${branch} branch of ${repo}."
+            Write-Output "::notice::Rebased the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
           }
           else {
-            Write-Output "::error::Could not push changes to the ${branch} branch of ${repo}."
+            Write-Output "::error::Could not push changes to the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
           }
