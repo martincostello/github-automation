@@ -204,7 +204,7 @@ jobs:
           token: ${{ secrets.ACCESS_TOKEN }}
 
       - name: Rebase ${{ inputs.branch }}
-        uses: martincostello/rebaser@c25164a13aae345b7a09cec321c01e7290f5db1c # v1.0.0
+        uses: martincostello/rebaser@58e3fef88ac4f98fe4aebbd969550cb869b1bfc0 # v1.0.0
         id: rebase
         with:
           branch: origin/${{ inputs.base || 'main' }}
@@ -212,7 +212,7 @@ jobs:
           user-name: ${{ vars.REBASE_GIT_COMMIT_USER_NAME }}
 
       - name: Push changes
-        if : ${{ steps.rebase.outputs.rebased == 'true' }}
+        if : ${{ steps.rebase.outputs.result == 'success' }}
         shell: pwsh
         run: |
           git push --force-with-lease origin "${{ inputs.branch }}"
@@ -222,3 +222,7 @@ jobs:
           else {
             Write-Output "::error::Could not push changes to the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
           }
+
+      - name: Warn if rebase unsuccessful
+        if : ${{ steps.rebase.outputs.result == 'conflicts' || steps.rebase.outputs.result == 'error' }}
+        run: echo "::warning::Could not resolve conflicts for the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
