@@ -184,7 +184,8 @@ jobs:
                 pollCount++;
               }
 
-              const hasConflicts = pr.data.mergeable_state === 'dirty';
+              const pull = pr.data;
+              const hasConflicts = pull.mergeable_state === 'dirty';
 
               const checkStatuses = await github.rest.checks.listForRef({
                 owner,
@@ -228,19 +229,19 @@ jobs:
 
               const buildColor = combinedStatus === 'success' ? 'brightgreen' : combinedStatus === 'pending' ? 'yellow' : 'red';
               const buildBadge = getBadge('build', combinedStatus, buildColor, 'github');
-              const buildUrl = pr.url;
+              const buildUrl = pull.html_url;
 
               const purple = '512BD4';
               const sdkColor = sdkVersion === latestVersion ? purple : 'yellow';
               const sdkBadge = getBadge('SDK', sdkVersion, sdkColor, 'dotnet');
-              const sdkUrl = `${{ github.server_url }}/${repo}/blob/${branch}/global.json#L${lineNumber}`;
+              const sdkUrl = `${{ github.server_url }}/${slug}/blob/${branch}/global.json#L${lineNumber}`;
 
               const conflictsColor = hasConflicts ? 'red' : 'brightgreen';
               const conflictsBadge = getBadge('Conflicts', hasConflicts ? 'Yes' : 'No', conflictsColor, 'git');
-              const conflictsUrl = pr.url;
+              const conflictsUrl = pull.html_url;
 
               report.push(
-                `| [${repo}#${pr.number}](${pr.url}) | [![.NET SDK version](${sdkBadge})](${sdkUrl}) | [![Build: ${combinedStatus}](${buildBadge})](${buildUrl}) | [![Merge conflicts?](${conflictsBadge})](${conflictsUrl}) |`
+                `| [${slug}#${pull.number}](${pull.html_url}) | [![.NET SDK version](${sdkBadge})](${sdkUrl}) | [![Build: ${combinedStatus}](${buildBadge})](${buildUrl}) | [![Merge conflicts?](${conflictsBadge})](${conflictsUrl}) |`
               );
             }
 
