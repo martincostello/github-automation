@@ -114,7 +114,7 @@ jobs:
               const [owner, repo] = slug.split('/');
               let commit_sha;
               try {
-                const response = await octokit.rest.repos.getBranch({
+                const response = await github.rest.repos.getBranch({
                   owner,
                   repo,
                   branch,
