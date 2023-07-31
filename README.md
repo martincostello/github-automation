@@ -159,11 +159,11 @@ This project is licensed under the [Apache 2.0][license] license.
 
 [costellobot]: https://github.com/martincostello/costellobot
 [dotnet-core]: https://github.com/dotnet/core
-[dotnet-dependencies-updated]: https://github.com/martincostello/github-automation/blob/main/.github/workflows/dotnet-dependencies-updated.yml
-[dotnet-release]: https://github.com/martincostello/github-automation/blob/main/.github/workflows/dotnet-release.yml
-[dotnet-upgrade-report]: https://github.com/martincostello/github-automation/blob/main/.github/workflows/dotnet-upgrade-report.yml
-[dotnet-version-report]: https://github.com/martincostello/github-automation/blob/main/.github/workflows/dotnet-version-report.yml
-[issue-metrics]: https://github.com/martincostello/github-automation/blob/main/.github/workflows/issue-metrics.yml
+[dotnet-dependencies-updated]: ./.github/workflows/dotnet-dependencies-updated.yml
+[dotnet-release]: ./.github/workflows/dotnet-release.yml
+[dotnet-upgrade-report]: ./.github/workflows/dotnet-upgrade-report.yml
+[dotnet-version-report]: ./.github/workflows/dotnet-version-report.yml
+[issue-metrics]: ./.github/workflows/issue-metrics.yml
 [issue-metrics-action]: https://github.com/github/issue-metrics#readme
 [issues]: https://github.com/martincostello/github-automation/issues "Issues for this project on GitHub.com"
 [license]: http://www.apache.org/licenses/LICENSE-2.0.txt "The Apache 2.0 license"
@@ -172,6 +172,6 @@ This project is licensed under the [Apache 2.0][license] license.
 [rebaser]: https://github.com/martincostello/rebaser
 [rebaser-cli]: ./src/Rebaser/Program.cs
 [repository]: https://github.com/martincostello/github-automation "This project on GitHub.com"
-[update-dotnet-sdks]: .github/workflows/update-dotnet-sdks.yml
-[update-dotnet-sdks-for-nightly]: https://github.com/martincostello/github-automation/blob/main/.github/workflows/update-dotnet-sdks-for-nightly.yml
+[update-dotnet-sdks]: ./.github/workflows/update-dotnet-sdks.yml
+[update-dotnet-sdks-for-nightly]: ./.github/workflows/update-dotnet-sdks-for-nightly.yml
 [upgrade-report-gist]: https://gist.github.com/martincostello/2083bcc83f30a5038175e4f31e0fc59f
