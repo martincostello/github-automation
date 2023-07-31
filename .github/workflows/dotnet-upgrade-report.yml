@@ -136,7 +136,14 @@ jobs:
               } else {
                 base_ref = 'dotnet-vnext';
               }
-
+              const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                owner,
+                repo,
+                commit_sha,
+              });
+              if (prs.data.length < 1) {
+                continue;
+              }
               const pull_for_ref = prs.data.find((pull) => pull.base.ref === base_ref);
               if (!pull_for_ref) {
                 core.debug(`The ${branch} branch of ${slug} does not have an open pull request targeting ${base}.`);
