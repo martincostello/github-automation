@@ -215,7 +215,7 @@ jobs:
               const sdkVersion = globalJson.sdk.version;
 
               let lineNumber = -1;
-              const globalJsonLines = globalJson.split('\n');
+              const globalJsonLines = globalJsonString.split('\n');
               for (let i = 0; i < globalJsonLines.length; i++) {
                 const line = globalJsonLines[i];
                 if (line.includes(sdkVersion)) {
