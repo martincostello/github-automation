@@ -19,13 +19,9 @@ permissions: {}
 jobs:
   generate:
     runs-on: ubuntu-latest
-
     concurrency:
       group: '${{ github.workflow }}-${{ inputs.branch }}'
       cancel-in-progress: false
-
-    env:
-      GIST_ID: '2083bcc83f30a5038175e4f31e0fc59f'
 
     steps:
       - name: Generate report
@@ -252,7 +248,7 @@ jobs:
 
             if (branch === default_branch) {
               const gist = await github.rest.gists.update({
-                gist_id: `${process.env.GIST_ID}`,
+                gist_id: '${{ vars.UPGRADE_REPORT_GIST_ID }}',
                 files: {
                   'summary.md': {
                     content: report.join('\n'),
