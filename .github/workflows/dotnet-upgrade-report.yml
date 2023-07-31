@@ -182,7 +182,7 @@ jobs:
                 pollCount++;
               }
 
-              const isDirty = pr.data.mergeable_state === 'dirty';
+              const hasConflicts = pr.data.mergeable_state === 'dirty';
 
               const checkStatuses = await github.rest.checks.listForRef({
                 owner,
@@ -233,9 +233,8 @@ jobs:
               const sdkBadge = getBadge('SDK', sdkVersion, sdkColor, 'dotnet');
               const sdkUrl = `${{ github.server_url }}/${repo}/blob/${branch}/global.json#L${lineNumber}`;
 
-              const hasConflicts = isDirty === 'dirty';
               const conflictsColor = hasConflicts ? 'red' : 'brightgreen';
-              const conflictsBadge = getBadge('Conflicts', $hasConflicts ? 'Yes' : 'No', conflictsColor, 'git');
+              const conflictsBadge = getBadge('Conflicts', hasConflicts ? 'Yes' : 'No', conflictsColor, 'git');
               const conflictsUrl = pr.url;
 
               report.push(
