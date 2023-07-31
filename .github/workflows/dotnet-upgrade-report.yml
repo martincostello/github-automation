@@ -34,10 +34,10 @@ jobs:
           github-token: ${{ secrets.ACCESS_TOKEN }}
           script: |
             const branch = `${{ inputs.branch }}`.trim();
-            let defaultBranch = 'dotnet-vnext';
+            const default_branch = 'dotnet-vnext';
 
             if (!branch) {
-              branch = defaultBranch;
+              branch = default_branch;
             }
 
             const checksOfInterest = [
