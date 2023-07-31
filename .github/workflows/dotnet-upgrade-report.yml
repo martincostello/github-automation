@@ -127,7 +127,7 @@ jobs:
 
               let base_ref;
 
-              if (branch === defaultBranch) {
+              if (branch === default_branch) {
                 const repository = await github.rest.repos.get({
                   owner,
                   repo,
@@ -240,7 +240,7 @@ jobs:
 
             await core.summary.addRaw(report.join('\n')).write();
 
-            if (branch === defaultBranch) {
+            if (branch === default_branch) {
               const gist = await github.rest.gists.update({
                 gist_id: `${process.env.GIST_ID}`,
                 files: {
