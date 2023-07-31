@@ -112,53 +112,75 @@ jobs:
 
             for (let slug of repos) {
               const [owner, repo] = slug.split('/');
-              let head;
-
+              let commit_sha;
               try {
                 const response = await octokit.rest.repos.getBranch({
                   owner,
                   repo,
                   branch,
                 });
-                head = response.data.sha;
+                commit_sha = response.data.commit.sha;
               } catch (err) {
                 core.debug(`The ${branch} branch of ${slug} does not exist or does not have an open pull request.`);
                 continue;
               }
 
-              let base;
+              let base_ref;
 
               if (branch === defaultBranch) {
                 const repository = await github.rest.repos.get({
                   owner,
                   repo,
                 });
-                base = repository.data.default_branch;
+                base_ref = repository.data.default_branch;
               } else {
-                base = 'dotnet-vnext';
+                base_ref = 'dotnet-vnext';
               }
 
-              const branchPR = await github.rest.repos.listPullRequestsAssociatedWithCommit({
-                owner,
-                repo,
-                commit_sha: head,
-              });
-              let pr = branchPR.data.find((pr) => pr.base.ref === base);
-              if (!pr) {
+              const pull_for_ref = prs.data.find((pull) => pull.base.ref === base_ref);
+              if (!pull_for_ref) {
                 core.debug(`The ${branch} branch of ${slug} does not have an open pull request targeting ${base}.`);
                 continue;
               }
-
-              pr = github.rest.pulls.get({
+              const pull_number = pull_for_ref.number;
+              let pr = await github.rest.pulls.get({
                 owner,
                 repo,
-                pull_number: pr.number,
+                pull_number,
               });
+              core.debug(`${owner}/${repo}#${pull_number} mergeable_state: ${pr.data.mergeable_state}.`);
+
+              // Poll for changes if the mergeable state is not yet known if a push just occurred.
+              // The first read above will start a background job to re-calcuate the mergeability, but it may not be ready immediately.
+              // See https://docs.github.com/en/rest/guides/using-the-rest-api-to-interact-with-your-git-database?apiVersion=2022-11-28#checking-mergeability-of-pull-requests
+              // and https://github.com/pullreminders/backlog/issues/42#issuecomment-436412823.
+              let pollCount = 0;
+              const pollDelay = 5000;
+              const timeout = 60000;
+              const maxPollCount = 60000 / pollDelay;
+              while ((pr.data.mergeable_state === null || pr.data.mergeable_state === 'unknown') && pollCount < maxPollCount) {
+                await new Promise((resolve) => setTimeout(resolve, pollDelay));
+                pr = await github.rest.pulls.get({
+                  owner,
+                  repo,
+                  pull_number,
+                  // Specify cache headers to make the most of the GitHub API's rate limits.
+                  // See https://jamiemagee.co.uk/blog/making-the-most-of-github-rate-limits/.
+                  headers: {
+                    'If-Modified-Since': pr.headers['Last-Modified'],
+                    'If-None-Match': pr.headers['Etag'],
+                  },
+                });
+                core.debug(`${owner}/${repo}#${pull_number} mergeable_state: ${pr.data.mergeable_state}.`);
+                pollCount++;
+              }
+
+              const isDirty = pr.data.mergeable_state === 'dirty';
 
               const checkStatuses = await github.rest.checks.listForRef({
                 owner,
                 repo,
-                ref: head,
+                ref: commit_sha,
               });
 
               const statusesOfInterest = checkStatuses.data.check_runs
@@ -203,7 +225,7 @@ jobs:
               const sdkBadge = getBadge('SDK', sdkVersion, sdkColor, 'dotnet');
               const sdkUrl = `${{ github.server_url }}/${repo}/blob/${branch}/global.json#L${lineNumber}`;
 
-              const hasConflicts = pr.mergeable_state === 'dirty';
+              const hasConflicts = isDirty === 'dirty';
               const conflictsColor = hasConflicts ? 'red' : 'brightgreen';
               const conflictsBadge = getBadge('Conflicts', $hasConflicts ? 'Yes' : 'No', conflictsColor, 'git');
               const conflictsUrl = pr.url;
