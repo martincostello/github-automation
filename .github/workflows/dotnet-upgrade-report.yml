@@ -111,6 +111,8 @@ jobs:
             ];
 
             for (let slug of repos) {
+              console.log(`Fetching data for ${slug}.`);
+
               const [owner, repo] = slug.split('/');
               let commit_sha;
               try {
