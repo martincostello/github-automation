@@ -38,8 +38,8 @@ jobs:
             }
 
             repos = repos
-              .filter((repo) => !repo.fork)
               .filter((repo) => !repo.archived)
+              .filter((repo) => !repo.fork)
               .filter((repo) => !repo.is_template);
 
             const getFileContents = async (owner, repo, path, ref) => {
@@ -59,15 +59,15 @@ jobs:
               }
             };
 
-            function formatSlug(value) {
+            const formatSlug = (value) => {
               return value.replace('-', '--').replace('_', '__').replace(' ', '_');
-            }
+            };
 
-            function getBadge(label, message, color, logo) {
+            const getBadge = (label, message, color, logo) => {
               label = formatSlug(label);
               message = formatSlug(message);
               return `https://img.shields.io/badge/${label}-${message}-${color}?logo=${logo}`;
-            }
+            };
 
             const releases = JSON.parse(await getFileContents(
               'dotnet',
@@ -84,24 +84,22 @@ jobs:
             ];
 
             for (let repository of repos) {
-              const name = repository.full_name;
-              const owner = repository.owner.login;
-              const repo = repository.name;
+              const slug = repository.full_name;
               const branch = repository.default_branch;
 
-              console.log(`Fetching data for ${name}.`);
+              console.log(`Fetching data for ${slug}.`);
 
               let globalJsonString;
 
               try {
                 globalJsonString = await getFileContents(
-                  owner,
-                  repo,
+                  repository.owner.login,
+                  repository.name,
                   'global.json',
                   branch,
                 );
               } catch (err) {
-                console.log(`No global.json found in ${name}.`);
+                console.log(`No global.json found in ${slug}.`);
                 continue;
               }
 
@@ -133,10 +131,10 @@ jobs:
               const purple = '512BD4';
               const sdkColor = sdkVersion === latestVersion ? purple : 'yellow';
               const sdkBadge = getBadge('SDK', sdkVersion, sdkColor, 'dotnet');
-              const sdkUrl = `${{ github.server_url }}/${name}/blob/${branch}/global.json#L${lineNumber}`;
+              const sdkUrl = `${{ github.server_url }}/${slug}/blob/${branch}/global.json#L${lineNumber}`;
 
               report.push(
-                `| [${name}](${repository.html_url}) | [![.NET SDK version](${sdkBadge})](${sdkUrl}) |`
+                `| [${slug}](${repository.html_url}) | [![.NET SDK version](${sdkBadge})](${sdkUrl}) |`
               );
             }
 
