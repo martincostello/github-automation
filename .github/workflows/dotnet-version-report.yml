@@ -17,11 +17,27 @@ jobs:
         with:
           github-token: ${{ secrets.ACCESS_TOKEN }}
           script: |
-            let { data: repos } = await github.rest.repos.listForUser({
+            let page = 1;
+            const per_page = 100;
+            const type = 'owner';
+
+            let { data: repos } = await github.rest.repos.listForAuthenticatedUser({
               username: '${{ github.repository_owner }}',
-              per_page: 100,
-              type: 'owner',
+              page,
+              per_page,
+              type,
             });
+
+            while (repos.length === per_page) {
+              page++;
+              const { data: next } = await github.rest.repos.listForAuthenticatedUser({
+                username: '${{ github.repository_owner }}',
+                page,
+                per_page,
+                type,
+              });
+              repos = repos.concat(next);
+            }
 
             repos = repos.filter((repo) => !repo.fork && !repo.archived);
 
