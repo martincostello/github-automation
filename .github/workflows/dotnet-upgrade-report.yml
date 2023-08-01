@@ -29,12 +29,8 @@ jobs:
         with:
           github-token: ${{ secrets.ACCESS_TOKEN }}
           script: |
-            let branch = `${{ inputs.branch }}`.trim();
             const default_branch = 'dotnet-vnext';
-
-            if (!branch) {
-              branch = default_branch;
-            }
+            const branch = `${{ inputs.branch }}`.trim() || default_branch;
 
             const getFileContents = async (owner, repo, path, ref) => {
               const { data: contents } = await github.rest.repos.getContent({
@@ -63,15 +59,15 @@ jobs:
             const checksOfInterest = config.checksOfInterest;
             const repos = config.repositories;
 
-            function formatSlug(value) {
+            const formatSlug = (value) => {
               return value.replace('-', '--').replace('_', '__').replace(' ', '_');
-            }
+            };
 
-            function getBadge(label, message, color, logo) {
+            const getBadge = (label, message, color, logo) => {
               label = formatSlug(label);
               message = formatSlug(message);
               return `https://img.shields.io/badge/${label}-${message}-${color}?logo=${logo}`;
-            }
+            };
 
             let latestVersion;
 
