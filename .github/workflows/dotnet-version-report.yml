@@ -22,7 +22,6 @@ jobs:
             const type = 'owner';
 
             let { data: repos } = await github.rest.repos.listForAuthenticatedUser({
-              username: '${{ github.repository_owner }}',
               page,
               per_page,
               type,
@@ -31,7 +30,6 @@ jobs:
             while (repos.length === per_page) {
               page++;
               const { data: next } = await github.rest.repos.listForAuthenticatedUser({
-                username: '${{ github.repository_owner }}',
                 page,
                 per_page,
                 type,
