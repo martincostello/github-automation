@@ -2,7 +2,7 @@ name: dependency-review
 
 on:
   pull_request:
-    branches: [ main, dotnet-vnext ]
+    branches: [ main ]
 
 permissions:
   contents: read

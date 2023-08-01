@@ -29,8 +29,7 @@ labels: bug
 
 <!--
 - OS: [e.g. Windows 10]
-- Application Version [e.g. Git commit SHA]
-- .NET version (e.g. output from `dotnet --info`)
+- Code Version [e.g. Git commit SHA]
 -->
 
 ### Additional context

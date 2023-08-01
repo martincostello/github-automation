@@ -1,15 +1,5 @@
 {
   "version": "0.2.0",
   "configurations": [
-    {
-      "name": "Launch Rebaser",
-      "type": "coreclr",
-      "request": "launch",
-      "preLaunchTask": "build",
-      "program": "${workspaceFolder}/src/Rebaser/bin/Debug/net7.0/Rebaser.dll",
-      "args": [],
-      "cwd": "${workspaceFolder}/src/Rebaser",
-      "stopAtEntry": false
-    }
   ]
 }

@@ -97,9 +97,9 @@ then it will be aborted and it will need to be manually dealt with.
 
 #### Manually Rebasing
 
-To manually resolve the conflicts, you can checkout this repository
-locally and run the following commands to interatively rebase the
-branch using the [Rebaser][rebaser-cli] .NET tool and Visual Studio Code.
+To manually resolve the conflicts, you can checkout the [rebaser][rebaser]
+repository locally and run the following commands to interatively rebase the
+branch locally using the action using Node.js and Visual Studio Code.
 
 ```powershell
 # First checkout the repository you wish to rebase locally, and then checkout
@@ -111,10 +111,10 @@ $repositoryPath = "my-repository"
 $defaultBranch = "main"
 
 # Clone this repository to build and run the Rebaser tool.
-git clone https://github.com/martincostello/github-automation
-cd ../github-automation
+git clone https://github.com/martincostello/rebaser
+cd ../rebaser
 
-# Run Rebaser interactively via the helper script.
+# Run martincostello/rebaser interactively via the helper script.
 ./rebase.ps1 $repositoryPath $defaultBranch
 
 # Rebaser will open Visual Studio Code for each file that needs a merge
@@ -170,7 +170,6 @@ This project is licensed under the [Apache 2.0][license] license.
 [onboarding]: ./docs/onboarding.md
 [rebase]: ./.github/workflows/rebase.yml
 [rebaser]: https://github.com/martincostello/rebaser
-[rebaser-cli]: ./src/Rebaser/Program.cs
 [repository]: https://github.com/martincostello/github-automation "This project on GitHub.com"
 [update-dotnet-sdks]: ./.github/workflows/update-dotnet-sdks.yml
 [update-dotnet-sdks-for-nightly]: ./.github/workflows/update-dotnet-sdks-for-nightly.yml

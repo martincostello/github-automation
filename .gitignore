@@ -1,5 +1,4 @@
 .DS_Store
-.dotnetcli
 .idea
 .metadata
 .settings
@@ -9,7 +8,6 @@ _reports
 _UpgradeReport_Files/
 artifacts/
 Backup*/
-BenchmarkDotNet.Artifacts/
 bin
 Bin
 coverage
@@ -18,7 +16,6 @@ node_modules
 obj
 packages
 project.lock.json
-src/Rebaser/Properties/launchSettings.json
 TestResults
 typings
 UpgradeLog*.htm
