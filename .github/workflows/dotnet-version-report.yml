@@ -23,11 +23,7 @@ jobs:
               type: 'owner',
             });
 
-            console.log(`Found ${repos.length} repositories.`);
-
             repos = repos.filter((repo) => !repo.fork && !repo.archived);
-
-            console.log(`Found ${repos.length} repositories after filtering.`);
 
             const getFileContents = async (owner, repo, path, ref) => {
               const { data: contents } = await github.rest.repos.getContent({
@@ -71,9 +67,12 @@ jobs:
             ];
 
             for (let repository of repos) {
+              const name = repository.full_name;
               const owner = repository.owner;
               const repo = repository.repo;
               const branch = repository.default_branch;
+
+              console.log(`Fetching data for ${name}.`);
 
               let globalJsonString;
 
@@ -85,6 +84,7 @@ jobs:
                   branch,
                 );
               } catch (err) {
+                console.log(`No global.json found in for ${name}: ${err}`);
                 continue;
               }
 
@@ -109,16 +109,17 @@ jobs:
                 .reduce((p) => p['latest-sdk']);
 
               if (!latestVersion) {
+                console.log(`No latest version found for channel ${channel}`);
                 continue;
               }
 
               const purple = '512BD4';
               const sdkColor = sdkVersion === latestVersion ? purple : 'yellow';
               const sdkBadge = getBadge('SDK', sdkVersion, sdkColor, 'dotnet');
-              const sdkUrl = `${{ github.server_url }}/${repo.full_name}/blob/${branch}/global.json#L${lineNumber}`;
+              const sdkUrl = `${{ github.server_url }}/${name}/blob/${branch}/global.json#L${lineNumber}`;
 
               report.push(
-                `| [${repository.full_name}](${repository.html_url}) | [![.NET SDK version](${sdkBadge})](${sdkUrl}) |`
+                `| [${name}](${repository.html_url}) | [![.NET SDK version](${sdkBadge})](${sdkUrl}) |`
               );
             }
 
