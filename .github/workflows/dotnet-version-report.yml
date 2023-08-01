@@ -93,8 +93,8 @@ jobs:
 
               try {
                 globalJsonString = await getFileContents(
-                  owner: repository.owner.login,
-                  repo: repository.name,
+                  repository.owner.login,
+                  repository.name,
                   'global.json',
                   branch,
                 );
