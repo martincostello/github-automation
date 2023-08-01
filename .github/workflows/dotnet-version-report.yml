@@ -74,6 +74,7 @@ jobs:
               'release-notes/releases-index.json',
               'main',
             ));
+            console.log(JSON.stringify(releases, null, 2));
 
             const report = [
               '# .NET SDK Version Report',
@@ -83,14 +84,12 @@ jobs:
             ];
 
             for (let repository of repos) {
-              console.log(JSON.stringify(repository));
-
               const name = repository.full_name;
               const owner = repository.owner.login;
               const repo = repository.name;
               const branch = repository.default_branch;
 
-              console.log(`Fetching data for ${owner}/${repo}.`);
+              console.log(`Fetching data for ${name}.`);
 
               let globalJsonString;
 
@@ -125,6 +124,8 @@ jobs:
               const [latestVersion] = releases['releases-index']
                 .filter((p) => p['channel-version'] === channel)
                 .reduce((p) => p['latest-sdk']);
+
+              console.log(`.NET SDK version is ${sdkVersion} (channel ${channel})`);
 
               if (!latestVersion) {
                 console.log(`No latest version found for channel ${channel}`);
