@@ -83,12 +83,14 @@ jobs:
             ];
 
             for (let repository of repos) {
+              console.log(JSON.stringify(repository));
+
               const name = repository.full_name;
               const owner = repository.owner.login;
               const repo = repository.name;
               const branch = repository.default_branch;
 
-              console.log(`Fetching data for ${name}.`);
+              console.log(`Fetching data for ${owner}/${repo}.`);
 
               let globalJsonString;
 
