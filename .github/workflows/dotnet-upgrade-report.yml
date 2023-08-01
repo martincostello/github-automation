@@ -37,19 +37,19 @@ jobs:
             }
 
             const getFileContents = async (owner, repo, path, ref) => {
-              let contents = await github.rest.repos.getContent({
+              const { data: contents } = await github.rest.repos.getContent({
                 owner,
                 repo,
                 path,
                 ref,
               });
-              if (contents.data.encoding === 'base64') {
-                return Buffer.from(contents.data.content, 'base64').toString();
-              } else if (contents.data.encoding === 'none') {
-                const response = await fetch(contents.data.download_url);
+              if (contents.encoding === 'base64') {
+                return Buffer.from(contents.content, 'base64').toString();
+              } else if (contents.encoding === 'none') {
+                const response = await fetch(contents.download_url);
                 return await response.text();
               } else {
-                throw new Error(`Unexpected encoding for ${path}: ${contents.data.encoding}`);
+                throw new Error(`Unexpected encoding for ${path}: ${contents.encoding}`);
               }
             };
 
@@ -114,23 +114,23 @@ jobs:
               let base_ref;
 
               if (branch === default_branch) {
-                const repository = await github.rest.repos.get({
+                const { data: repository } = await github.rest.repos.get({
                   owner,
                   repo,
                 });
-                base_ref = repository.data.default_branch;
+                base_ref = repository.default_branch;
               } else {
                 base_ref = 'dotnet-vnext';
               }
-              const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
                 owner,
                 repo,
                 commit_sha,
               });
-              if (prs.data.length < 1) {
+              if (prs.length < 1) {
                 continue;
               }
-              const pull_for_ref = prs.data.find((pull) => pull.base.ref === base_ref);
+              const pull_for_ref = prs.find((pull) => pull.base.ref === base_ref);
               if (!pull_for_ref) {
                 core.debug(`The ${branch} branch of ${slug} does not have an open pull request targeting ${base}.`);
                 continue;
@@ -171,13 +171,13 @@ jobs:
               const pull = pr.data;
               const hasConflicts = pull.mergeable_state === 'dirty';
 
-              const checkStatuses = await github.rest.checks.listForRef({
+              const { data: checkStatuses } = await github.rest.checks.listForRef({
                 owner,
                 repo,
                 ref: commit_sha,
               });
 
-              const statusesOfInterest = checkStatuses.data.check_runs
+              const statusesOfInterest = checkStatuses.check_runs
                 .filter((check) => checksOfInterest.includes(check.name))
                 .map((check) => check.conclusion);
 
@@ -235,7 +235,7 @@ jobs:
             await core.summary.addRaw(report.join('\n')).write();
 
             if (branch === default_branch) {
-              const gist = await github.rest.gists.update({
+              const { data: gist } = await github.rest.gists.update({
                 gist_id: '${{ vars.UPGRADE_REPORT_GIST_ID }}',
                 files: {
                   'summary.md': {
@@ -243,5 +243,5 @@ jobs:
                   },
                 },
               });
-              core.notice(gist.data.html_url);
+              core.notice(gist.html_url);
             }
