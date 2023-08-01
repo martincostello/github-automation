@@ -110,7 +110,7 @@ $repositoryPath = "my-repository"
 # The default branch parameter is optional and defaults to "main".
 $defaultBranch = "main"
 
-# Clone this repository to build and run the Rebaser tool.
+# Clone the martincostello/rebaser repository.
 git clone https://github.com/martincostello/rebaser
 cd ./rebaser
 
