@@ -27,7 +27,7 @@ jobs:
         echo "last-month=$first_day..$last_day" >> "$GITHUB_OUTPUT"
 
     - name: Run issue-metrics tool
-      uses: github/issue-metrics@8dd9b248ac863297408f31c6ace7b9790ec39b41 # v2.4.0
+      uses: github/issue-metrics@7296d9db68bae9c82ac0604cc76265e696814bc0 # v2.4.1
       env:
         GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         SEARCH_QUERY: 'owner:${{ github.repository_owner }} created:${{ steps.last-month.outputs.last-month }} -reason:"not planned" -author:app/dependabot'
