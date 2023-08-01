@@ -112,7 +112,7 @@ $defaultBranch = "main"
 
 # Clone this repository to build and run the Rebaser tool.
 git clone https://github.com/martincostello/rebaser
-cd ../rebaser
+cd ./rebaser
 
 # Run martincostello/rebaser interactively via the helper script.
 ./rebase.ps1 $repositoryPath $defaultBranch
