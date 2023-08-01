@@ -105,6 +105,8 @@ jobs:
                 continue;
               }
 
+              console.log(JSON.stringify(globalJsonString, null, 2));
+
               const globalJson = JSON.parse(globalJsonString);
               const sdkVersion = globalJson.sdk.version;
 
@@ -121,11 +123,11 @@ jobs:
               const parts = sdkVersion.split('.');
               const channel = `${parts[0]}.${parts[1]}`;
 
+              console.log(`.NET SDK version is ${sdkVersion} (channel ${channel})`);
+
               const [latestVersion] = releases['releases-index']
                 .filter((p) => p['channel-version'] === channel)
                 .reduce((p) => p['latest-sdk']);
-
-              console.log(`.NET SDK version is ${sdkVersion} (channel ${channel})`);
 
               if (!latestVersion) {
                 console.log(`No latest version found for channel ${channel}`);
