@@ -39,7 +39,10 @@ jobs:
               repos = repos.concat(next);
             }
 
-            repos = repos.filter((repo) => !repo.fork && !repo.archived);
+            repos = repos
+              .filter((repo) => !repo.fork)
+              .filter((repo) => !repo.archived)
+              .filter((repo) => !repo.is_template);
 
             const getFileContents = async (owner, repo, path, ref) => {
               const { data: contents } = await github.rest.repos.getContent({
