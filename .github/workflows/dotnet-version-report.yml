@@ -84,8 +84,8 @@ jobs:
 
             for (let repository of repos) {
               const name = repository.full_name;
-              const owner = repository.owner;
-              const repo = repository.repo;
+              const owner = repository.owner.login;
+              const repo = repository.name;
               const branch = repository.default_branch;
 
               console.log(`Fetching data for ${name}.`);
