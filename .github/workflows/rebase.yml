@@ -108,33 +108,33 @@ jobs:
               const [ owner, repo ] = repos[i].split('/');
               let commit_sha;
               try {
-                const branch = await github.rest.repos.getBranch({
+                const { data: branch } = await github.rest.repos.getBranch({
                   owner,
                   repo,
                   branch: '${{ inputs.branch }}',
                 });
-                commit_sha = branch.data.commit.sha;
+                commit_sha = branch.commit.sha;
               } catch (err) {
                 core.debug(`Could not get branch: ${err}`);
                 continue;
               }
-              const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
                 owner,
                 repo,
                 commit_sha,
               });
-              if (prs.data.length < 1) {
+              if (prs.length < 1) {
                 continue;
               }
               let base_ref = '${{ inputs.base }}';
               if (base_ref === '') {
-                const repository = await github.rest.repos.get({
+                const { data: repository } = await github.rest.repos.get({
                   owner,
                   repo,
                 });
-                base_ref = repository.data.default_branch;
+                base_ref = repository.default_branch;
               }
-              const pull_for_ref = prs.data.find((pull) => pull.base.ref === base_ref);
+              const pull_for_ref = prs.find((pull) => pull.base.ref === base_ref);
               if (!pull_for_ref) {
                 core.debug(`No pull request found targeting ${base_ref}.`);
                 continue;
