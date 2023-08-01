@@ -36,19 +36,6 @@ jobs:
               branch = default_branch;
             }
 
-            const checksOfInterest = [
-              'code-ql',
-              'code-ql (csharp)',
-              'code-ql (javascript)',
-              'dependency-review',
-              'lighthouse',
-              'lint',
-              'macos-latest',
-              'ubuntu-latest',
-              'validate-packages',
-              'windows-latest',
-            ];
-
             const getFileContents = async (owner, repo, path, ref) => {
               let contents = await github.rest.repos.getContent({
                 owner,
@@ -73,6 +60,7 @@ jobs:
               '${{ github.sha }}'
             ));
 
+            const checksOfInterest = config.checksOfInterest;
             const repos = config.repositories;
 
             function formatSlug(value) {

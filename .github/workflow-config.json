@@ -1,4 +1,16 @@
 {
+  "checksOfInterest": [
+    "code-ql",
+    "code-ql (csharp)",
+    "code-ql (javascript)",
+    "dependency-review",
+    "lighthouse",
+    "lint",
+    "macos-latest",
+    "ubuntu-latest",
+    "validate-packages",
+    "windows-latest"
+  ],
   "repositories": [
     "justeattakeaway/ApplePayJSSample",
     "justeattakeaway/httpclient-interception",
