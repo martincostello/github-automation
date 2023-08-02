@@ -30,7 +30,7 @@ jobs:
       uses: github/issue-metrics@92b849a76ac293a943ad1bb1fced57a6ad7ca49b # v2.5.0
       env:
         GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        IGNORE_USERS: 'app/costellobot,app/github-actions,costellobot'
+        IGNORE_USERS: 'app/codecov,app/costellobot,app/github-actions,costellobot'
         SEARCH_QUERY: 'owner:${{ github.repository_owner }} created:${{ steps.last-month.outputs.last-month }} -reason:"not planned" -author:app/dependabot'
 
     - name: Output the report
