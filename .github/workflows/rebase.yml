@@ -199,7 +199,7 @@ jobs:
           token: ${{ secrets.ACCESS_TOKEN }}
 
       - name: Rebase ${{ inputs.branch }}
-        uses: martincostello/rebaser@7ebb53335a79c11e3f37e2347cc738eb06008269 # v1.0.0
+        uses: martincostello/rebaser@71d7f548726f81faa236687960acf041e8bd84a9 # v1.0.1
         id: rebase
         with:
           branch: origin/${{ inputs.base || 'main' }}
