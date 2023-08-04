@@ -24,7 +24,7 @@ jobs:
         first_day=$(date -d "last month" +%Y-%m-01)
         last_day=$(date -d "$first_day +1 month -1 day" +%Y-%m-%d)
         echo "$first_day..$last_day"
-        echo "last-month=$first_day..$last_day" >> "$GITHUB_OUTPUT"
+        echo "last-month=$first_day..$last_day" >> $GITHUB_OUTPUT
 
     - name: Run issue-metrics tool
       uses: github/issue-metrics@c3d29d0f01c1e97b393bce9ce84cdf3489e32bdf # v2.6.0
