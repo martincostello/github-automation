@@ -1,0 +1,14 @@
+name: 'dotnet-version-report'
+description: 'Generates a report of the .NET SDK versions used by the default branch of repositories.'
+author: 'Martin Costello'
+branding:
+  icon: 'file-text'
+  color: 'purple'
+inputs:
+  github-token:
+    description: 'The GitHub token to use.'
+    default: ${{ github.token }}
+    required: false
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
