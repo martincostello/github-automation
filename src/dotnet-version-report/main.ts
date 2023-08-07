@@ -3,9 +3,8 @@
 
 import * as core from '@actions/core';
 import { Context } from '@actions/github/lib/context';
-import { getOctokit } from '@actions/github';
 import { getBadge } from '../shared/badges';
-import { getFileContents } from '../shared/github';
+import { getFileContents, getOctokit } from '../shared/github';
 
 /* eslint-disable no-console */
 

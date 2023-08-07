@@ -2,16 +2,19 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
 import * as core from '@actions/core';
-import { getOctokit } from '@actions/github';
-import { getFileContents } from '../shared/github';
+import { Context } from '@actions/github/lib/context';
+import { getFileContents, getOctokit } from '../shared/github';
+import { isPreview, ReleaseChannel } from '../shared/dotnet';
 
 /* eslint-disable no-console */
 
 export async function run(): Promise<void> {
   try {
-    const token = core.getInput('github-token', { required: false });
+    const githubToken = core.getInput('github-token', { required: false });
     const previousSha = core.getInput('ref', { required: false });
-    const github = getOctokit(token);
+
+    const context = new Context();
+    let github = getOctokit(githubToken);
 
     const owner = 'dotnet';
     const repo = 'core';
@@ -47,7 +50,7 @@ export async function run(): Promise<void> {
     }
 
     const releaseNotesUpdated = releaseNotesFiles.length > 0;
-    const releaseNotes: any[] = [];
+    const releaseNotes: ReleaseChannel[] = [];
 
     if (releaseNotesUpdated) {
       for (const path of releaseNotesFiles) {
@@ -64,9 +67,47 @@ export async function run(): Promise<void> {
       }
     }
 
-    core.setOutput('dotnet-core-updated-sha', updatedSha);
-    core.setOutput('dotnet-release-notes', JSON.stringify(releaseNotes));
-    core.setOutput('dotnet-releases-updated', releaseNotesUpdated);
+    if (releaseNotesUpdated) {
+      const branchesToDispatch: string[] = [];
+      if (releaseNotes.some((release) => !isPreview(release))) {
+        branchesToDispatch.push('main');
+      }
+      if (releaseNotes.some((release) => isPreview(release))) {
+        branchesToDispatch.push('dotnet-vnext');
+      }
+
+      const event_type = 'dotnet_release';
+
+      for (const name of branchesToDispatch) {
+        type dotnet_release = {
+          branch: string;
+        };
+        const client_payload: dotnet_release = {
+          branch: name,
+        };
+
+        await github.rest.repos.createDispatchEvent({
+          owner: context.repo.owner,
+          repo: context.repo.repo,
+          event_type,
+          client_payload,
+        });
+        core.notice(`Dispatched ${event_type} for branch ${name}`);
+      }
+    }
+
+    if (updatedSha) {
+      const stateToken = core.getInput('state-token', { required: false });
+      github = getOctokit(stateToken);
+
+      await github.rest.actions.updateRepoVariable({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        name: 'DOTNET_CORE_SHA',
+        value: updatedSha,
+      });
+      core.notice(`dotnet/core SHA updated to ${updatedSha}`);
+    }
   } catch (error: any) {
     core.error(error);
     if (error instanceof Error) {
@@ -77,24 +118,4 @@ export async function run(): Promise<void> {
 
 if (require.main === module) {
   run();
-}
-
-interface ReleaseChannel {
-  'channel-version': string;
-  'latest-release': string;
-  'latest-release-date': string;
-  'latest-runtime': string;
-  'latest-sdk': string;
-  'release-type': string;
-  'support-phase': string;
-  'eol-date"': string;
-  'lifecycle-policy"': string;
-  'releases'?: Release[];
-}
-
-interface Release {
-  'release-date': string;
-  'release-version': string;
-  'security': boolean;
-  'release-notes': string;
 }

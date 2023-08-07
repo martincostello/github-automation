@@ -15,12 +15,9 @@ permissions: {}
 
 jobs:
   check-for-release:
-    name: check-for-release
 
-    outputs:
-      dotnet-core-updated-sha: ${{ steps.check-for-release.outputs.dotnet-core-updated-sha }}
-      dotnet-release-notes: ${{ steps.check-for-release.outputs.dotnet-release-notes }}
-      dotnet-releases-updated: ${{ steps.check-for-release.outputs.dotnet-releases-updated }}
+    permissions:
+      contents: write
 
     runs-on: [ ubuntu-latest ]
 
@@ -29,93 +26,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
 
-      - name: 'Get latest dotnet/core SHA and check for release notes changes'
+      - name: Check for new .NET releases
         uses: ./actions/dotnet-release
-        id: check-for-release
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          state-token: ${{ secrets.ACCESS_TOKEN }}
           ref: ${{ inputs.ref || vars.DOTNET_CORE_SHA }}
-
-  update-sha:
-    name: update-sha
-    needs: check-for-release
-    if: ${{ needs.check-for-release.outputs.dotnet-core-updated-sha != '' }}
-
-    concurrency:
-      group: 'update-sha'
-      cancel-in-progress: false
-
-    runs-on: [ ubuntu-latest ]
-
-    steps:
-      - name: 'Update DOTNET_CORE_SHA'
-      #  uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
-      #  with:
-      #    github-token: ${{ secrets.ACCESS_TOKEN }}
-      #    script: |
-      #      const sha = '${{ needs.check-for-release.outputs.dotnet-core-updated-sha }}';
-      #      await github.rest.actions.updateRepoVariable({
-      #        owner: context.repo.owner,
-      #        repo: context.repo.repo,
-      #        name: 'DOTNET_CORE_SHA',
-      #        value: sha,
-      #      });
-      #      core.notice(`dotnet/core SHA updated to ${sha}`);
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        run: |
-          $sha = "${{ needs.check-for-release.outputs.dotnet-core-updated-sha }}"
-          gh api --method PATCH "/repos/${{ github.repository }}/actions/variables/DOTNET_CORE_SHA" -f value='${{ needs.check-for-release.outputs.dotnet-core-updated-sha }}'
-          Write-Output "::notice::dotnet/core SHA updated to ${sha}"
-
-  create-dispatch:
-    name: create-dispatch
-    needs: check-for-release
-    if: ${{ needs.check-for-release.outputs.dotnet-releases-updated == 'true' }}
-
-    concurrency:
-      group: 'create-dispatch'
-      cancel-in-progress: false
-
-    permissions:
-      contents: write
-
-    runs-on: [ ubuntu-latest ]
-
-    steps:
-      - name: 'Create repository dispatch for dotnet_release'
-        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
-        with:
-          script: |
-            const releaseNotes = JSON.parse(`${{ needs.check-for-release.outputs.dotnet-release-notes }}`);
-            const isPreview = (release) => {
-              switch (release['support-phase']) {
-                case 'go-live':
-                case 'preview':
-                  return true;
-                default:
-                  return false;
-              }
-            };
-
-            const branchesToDispatch = [];
-            if (releaseNotes.some(release => !isPreview(release))) {
-              branchesToDispatch.push('main');
-            }
-            if (releaseNotes.some(release => isPreview(release))) {
-              branchesToDispatch.push('dotnet-vnext');
-            }
-
-            const event_type = 'dotnet_release';
-
-            for (let branch of branchesToDispatch) {
-              await github.rest.repos.createDispatchEvent({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                event_type,
-                client_payload: {
-                  branch
-                }
-              });
-              core.notice(`Dispatched ${event_type} for branch ${branch}`);
-            }
