@@ -1,7 +1,7 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 3687:
+/***/ 958:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -35,74 +35,74 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const context_1 = __nccwpck_require__(4087);
-const badges_1 = __nccwpck_require__(4270);
 const github_1 = __nccwpck_require__(7427);
-/* eslint-disable no-console */
 async function run() {
     try {
+        const headBranch = core.getInput('branch', { required: true });
+        const baseBranch = core.getInput('base', { required: false });
+        const force = core.getInput('force', { required: false }) === 'true';
+        const specificRepo = core.getInput('repository', { required: false }) || '';
         const token = core.getInput('github-token', { required: false });
-        const context = new context_1.Context();
         const github = (0, github_1.getOctokit)(token);
-        let page = 1;
-        const per_page = 100;
-        const type = 'owner';
-        let { data: repos } = await github.rest.repos.listForAuthenticatedUser({
-            page,
-            per_page,
-            type,
-        });
-        while (repos.length === per_page) {
-            page++;
-            const { data: next } = await github.rest.repos.listForAuthenticatedUser({
-                page,
-                per_page,
-                type,
-            });
-            repos = repos.concat(next);
+        let repositories;
+        if (specificRepo) {
+            repositories = [specificRepo];
         }
-        repos = repos
-            .filter((repo) => !repo.archived)
-            .filter((repo) => !repo.fork)
-            .filter((repo) => !repo.is_template);
-        const releases = JSON.parse(await (0, github_1.getFileContents)(github, 'dotnet', 'core', 'release-notes/releases-index.json', 'main'));
-        const report = ['# .NET SDK Version Report', '', '| Repository | SDK Version |', '| :--------- | :---------- |'];
-        for (const repository of repos) {
-            const slug = repository.full_name;
-            const branch = repository.default_branch;
+        else {
+            const context = new context_1.Context();
+            repositories = JSON.parse(await (0, github_1.getFileContents)(github, context.repo.owner, context.repo.repo, '.github/workflow-config.json', context.sha)).repositories;
+        }
+        const result = [];
+        for (const slug of repositories) {
+            // eslint-disable-next-line no-console
             console.log(`Fetching data for ${slug}.`);
-            let globalJsonString;
+            const [owner, repo] = slug.split('/');
+            let commit_sha;
             try {
-                globalJsonString = await (0, github_1.getFileContents)(github, repository.owner.login, repository.name, 'global.json', branch);
+                const { data: branch } = await github.rest.repos.getBranch({
+                    owner,
+                    repo,
+                    branch: headBranch,
+                });
+                commit_sha = branch.commit.sha;
             }
             catch (err) {
-                console.log(`No global.json found in ${slug}.`);
+                core.debug(`Could not get branch ${headBranch}: ${err}`);
                 continue;
             }
-            const globalJson = JSON.parse(globalJsonString);
-            const sdkVersion = globalJson.sdk.version;
-            let lineNumber = -1;
-            const globalJsonLines = globalJsonString.split('\n');
-            for (let i = 0; i < globalJsonLines.length; i++) {
-                const line = globalJsonLines[i];
-                if (line.includes(sdkVersion)) {
-                    lineNumber = i + 1;
-                    break;
+            const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                owner,
+                repo,
+                commit_sha,
+            });
+            if (prs.length < 1) {
+                continue;
+            }
+            let baseRef = baseBranch;
+            if (baseRef === '') {
+                const { data: repository } = await github.rest.repos.get({
+                    owner,
+                    repo,
+                });
+                baseRef = repository.default_branch;
+            }
+            let rebaseBranch = force;
+            if (!rebaseBranch) {
+                const pull_for_ref = prs.find((pull) => pull.base.ref === baseRef);
+                if (!pull_for_ref) {
+                    core.debug(`No pull request found targeting ${baseRef}.`);
+                    continue;
+                }
+                rebaseBranch = (await (0, github_1.getPullMergeableState)(github, owner, repo, pull_for_ref.number)) === 'dirty';
+                if (rebaseBranch) {
+                    core.notice(`${slug} needs rebasing.`);
                 }
             }
-            const parts = sdkVersion.split('.');
-            const channel = `${parts[0]}.${parts[1]}`;
-            const [latestVersion] = releases['releases-index'].filter((p) => p['channel-version'] === channel).map((p) => p['latest-sdk']);
-            if (!latestVersion) {
-                console.info(`No latest version found for channel ${channel}`);
-                continue;
+            if (rebaseBranch) {
+                result.push(slug);
             }
-            const purple = '512BD4';
-            const sdkColor = sdkVersion === latestVersion ? purple : 'yellow';
-            const sdkBadge = (0, badges_1.getBadge)('SDK', sdkVersion, sdkColor, 'dotnet');
-            const sdkUrl = `${context.serverUrl}/${slug}/blob/${branch}/global.json#L${lineNumber}`;
-            report.push(`| [${slug}](${repository.html_url}) | [![.NET SDK version](${sdkBadge})](${sdkUrl}) |`);
         }
-        await core.summary.addRaw(report.join('\n')).write();
+        core.setOutput('repositories', JSON.stringify(result));
     }
     catch (error) {
         core.error(error);
@@ -115,28 +115,6 @@ exports.run = run;
 if (require.main === require.cache[eval('__filename')]) {
     run();
 }
-
-
-/***/ }),
-
-/***/ 4270:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-// Copyright (c) Martin Costello, 2023. All rights reserved.
-// Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getBadge = void 0;
-function formatSlug(value) {
-    return value.replace('-', '--').replace('_', '__').replace(' ', '_');
-}
-function getBadge(label, message, color, logo) {
-    label = formatSlug(label);
-    message = formatSlug(message);
-    return `https://img.shields.io/badge/${label}-${message}-${color}?logo=${logo}`;
-}
-exports.getBadge = getBadge;
 
 
 /***/ }),
@@ -10821,7 +10799,7 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(3687);
+/******/ 	var __webpack_exports__ = __nccwpck_require__(958);
 /******/ 	module.exports = __webpack_exports__;
 /******/ 	
 /******/ })()
