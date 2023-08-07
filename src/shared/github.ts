@@ -3,6 +3,7 @@
 
 /* eslint-disable import/no-unresolved */
 
+import fetch from 'node-fetch';
 import { Context } from '@actions/github/lib/context';
 import { HttpClient } from '@actions/http-client';
 import { Octokit } from '@octokit/core';
@@ -28,6 +29,9 @@ export function getOctokit(token: string): InstanceType<typeof GitHub> {
   const GitHubWithPlugins = GitHub.plugin(...additionalPlugins);
   return new GitHubWithPlugins({
     auth: `token ${token}`,
+    request: {
+      fetch,
+    },
   });
 }
 
