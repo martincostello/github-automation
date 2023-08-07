@@ -1,0 +1,26 @@
+name: 'dotnet-release'
+description: 'Checks for new official releases of the .NET SDK.'
+author: 'Martin Costello'
+branding:
+  icon: 'refresh-cw'
+  color: 'purple'
+inputs:
+  github-token:
+    description: 'The GitHub token to use.'
+    default: ${{ github.token }}
+    required: false
+  ref:
+    description: 'The dotnet/core ref to check for a new release against.'
+    required: false
+    type: string
+    default: ''
+outputs:
+  dotnet-core-updated-sha:
+    description: 'The updated Git SHA of the dotnet/core repository.'
+  dotnet-release-notes:
+    description: 'A JSON array containing release notes that were updated.'
+  dotnet-releases-updated:
+    description: 'A boolean indicating whether any .NET releases were updated.'
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
