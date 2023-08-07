@@ -128,7 +128,7 @@ jobs:
               }
               const pull_for_ref = prs.find((pull) => pull.base.ref === base_ref);
               if (!pull_for_ref) {
-                core.debug(`The ${branch} branch of ${slug} does not have an open pull request targeting ${base}.`);
+                core.debug(`The ${branch} branch of ${slug} does not have an open pull request targeting ${base_ref}.`);
                 continue;
               }
               const pull_number = pull_for_ref.number;
