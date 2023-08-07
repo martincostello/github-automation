@@ -4,6 +4,8 @@
 import * as core from '@actions/core';
 import { Context } from '@actions/github/lib/context';
 import { getOctokit } from '@actions/github';
+import { getBadge } from '../shared/badges';
+import { getFileContents } from '../shared/github';
 
 /* eslint-disable no-console */
 
@@ -38,35 +40,7 @@ export async function run(): Promise<void> {
       .filter((repo) => !repo.fork)
       .filter((repo) => !repo.is_template);
 
-    const getFileContents = async (owner: string, repo: string, path: string, ref: string): Promise<string> => {
-      const { data: contents } = await github.rest.repos.getContent({
-        owner,
-        repo,
-        path,
-        ref,
-      });
-      const encoding = contents['encoding'];
-      if (encoding === 'base64' && contents['content']) {
-        return Buffer.from(contents['content'], 'base64').toString();
-      } else if (encoding === 'none') {
-        const response = await fetch(contents['download_url']);
-        return await response.text();
-      } else {
-        throw new Error(`Unexpected encoding for ${path}: ${encoding}`);
-      }
-    };
-
-    const formatSlug = (value: string): string => {
-      return value.replace('-', '--').replace('_', '__').replace(' ', '_');
-    };
-
-    const getBadge = (label: string, message: string, color: string, logo: string): string => {
-      label = formatSlug(label);
-      message = formatSlug(message);
-      return `https://img.shields.io/badge/${label}-${message}-${color}?logo=${logo}`;
-    };
-
-    const releases = JSON.parse(await getFileContents('dotnet', 'core', 'release-notes/releases-index.json', 'main'));
+    const releases = JSON.parse(await getFileContents(github, 'dotnet', 'core', 'release-notes/releases-index.json', 'main'));
 
     const report = ['# .NET SDK Version Report', '', '| Repository | SDK Version |', '| :--------- | :---------- |'];
 
@@ -79,7 +53,7 @@ export async function run(): Promise<void> {
       let globalJsonString;
 
       try {
-        globalJsonString = await getFileContents(repository.owner.login, repository.name, 'global.json', branch);
+        globalJsonString = await getFileContents(github, repository.owner.login, repository.name, 'global.json', branch);
       } catch (err) {
         console.log(`No global.json found in ${slug}.`);
         continue;
