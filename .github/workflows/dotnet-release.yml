@@ -2,14 +2,14 @@ name: dotnet-release
 
 on:
   schedule:
-    - cron: "*/15 08-22 * * MON-FRI"
+    - cron: '*/15 08-22 * * MON-FRI'
   workflow_dispatch:
     inputs:
       ref:
-        description: "The dotnet/core ref to check for a new release against."
+        description: 'The dotnet/core ref to check for a new release against.'
         required: false
         type: string
-        default: ""
+        default: ''
 
 permissions: {}
 
@@ -26,78 +26,14 @@ jobs:
 
     steps:
 
-      - name: "Get latest dotnet/core SHA and check for release notes changes"
-        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
+      - name: Checkout code
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+
+      - name: 'Get latest dotnet/core SHA and check for release notes changes'
+        uses: ./actions/dotnet-release
         id: check-for-release
         with:
-          script: |
-            const owner = 'dotnet';
-            const repo = 'core';
-
-            const { data: branch } = await github.rest.repos.getBranch({
-              owner,
-              repo,
-              branch: 'main',
-            });
-
-            const currentSha = branch.commit.sha;
-            const previousSha = '${{ inputs.ref || vars.DOTNET_CORE_SHA }}';
-
-            console.log(` Current SHA: ${currentSha}`);
-            console.log(`Previous SHA: ${previousSha}`);
-
-            let releaseNotesFiles = [];
-            let updatedSha = '';
-
-            if (currentSha !== previousSha) {
-              const { data: diff } = await github.rest.repos.compareCommitsWithBasehead({
-                owner,
-                repo,
-                basehead: `${previousSha}...${currentSha}`,
-              });
-              updatedSha = currentSha;
-              releaseNotesFiles = diff.files
-                .map(file => file.filename)
-                .filter(file => file.startsWith('release-notes/') && file.endsWith('/releases.json'));
-
-              console.log(`${releaseNotesFiles} release notes file(s) were updated.`);
-            }
-
-            const releaseNotesUpdated = releaseNotesFiles.length > 0;
-            const releaseNotes = [];
-
-            if (releaseNotesUpdated) {
-              for (let path of releaseNotesFiles) {
-                const { data: content } = await github.rest.repos.getContent({
-                  owner,
-                  repo,
-                  path,
-                  ref: currentSha,
-                });
-                let release;
-                if (content.encoding === 'base64') {
-                  release = Buffer.from(content.content, 'base64').toString();
-                } else if (content.encoding === 'none') {
-                  const response = await fetch(content.download_url);
-                  release = await response.text();
-                } else {
-                  throw new Error(`Unexpected encoding for ${path}: ${content.encoding}`);
-                }
-
-                // Remove the releases array from the release notes
-                // otherwise the JSON is too large to use as an output.
-                const notes = JSON.parse(release);
-                delete notes.releases;
-
-                console.log(`Release notes for ${path}:\n${JSON.stringify(notes, null, 2)}`);
-
-                releaseNotes.push(notes);
-              }
-            }
-
-            core.setOutput('dotnet-core-updated-sha', updatedSha);
-            core.setOutput('dotnet-release-notes', JSON.stringify(releaseNotes));
-            core.setOutput('dotnet-releases-updated', releaseNotesUpdated);
+          ref: ${{ inputs.ref || vars.DOTNET_CORE_SHA }}
 
   update-sha:
     name: update-sha
@@ -105,13 +41,13 @@ jobs:
     if: ${{ needs.check-for-release.outputs.dotnet-core-updated-sha != '' }}
 
     concurrency:
-      group: "update-sha"
+      group: 'update-sha'
       cancel-in-progress: false
 
     runs-on: [ ubuntu-latest ]
 
     steps:
-      - name: "Update DOTNET_CORE_SHA"
+      - name: 'Update DOTNET_CORE_SHA'
       #  uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
       #  with:
       #    github-token: ${{ secrets.ACCESS_TOKEN }}
@@ -138,7 +74,7 @@ jobs:
     if: ${{ needs.check-for-release.outputs.dotnet-releases-updated == 'true' }}
 
     concurrency:
-      group: "create-dispatch"
+      group: 'create-dispatch'
       cancel-in-progress: false
 
     permissions:
@@ -147,7 +83,7 @@ jobs:
     runs-on: [ ubuntu-latest ]
 
     steps:
-      - name: "Create repository dispatch for dotnet_release"
+      - name: 'Create repository dispatch for dotnet_release'
         uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
         with:
           script: |
