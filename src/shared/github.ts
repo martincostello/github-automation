@@ -2,8 +2,10 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
 import { debug } from '@actions/core';
+import { Context } from '@actions/github/lib/context';
 /* eslint-disable import/no-unresolved */
 import { Api } from '@octokit/plugin-rest-endpoint-methods/dist-types/types';
+import { WorkflowConfig } from './config';
 
 export async function getFileContents(octokit: Api, owner: string, repo: string, path: string, ref: string): Promise<string> {
   const { data: contents } = await octokit.rest.repos.getContent({
@@ -23,7 +25,16 @@ export async function getFileContents(octokit: Api, owner: string, repo: string,
   }
 }
 
-export async function getPullMergeableState(octokit: Api, owner: string, repo: string, pull_number: number): Promise<string> {
+export async function getPull(
+  octokit: Api,
+  owner: string,
+  repo: string,
+  pull_number: number
+): Promise<{
+  html_url: string;
+  mergeable_state: string;
+  number: number;
+}> {
   let pr = await octokit.rest.pulls.get({
     owner,
     repo,
@@ -63,5 +74,51 @@ export async function getPullMergeableState(octokit: Api, owner: string, repo: s
     pollCount++;
   }
 
-  return pr.data.mergeable_state;
+  return pr.data;
+}
+
+export async function getWorkflowConfig(octokit: Api, context: Context): Promise<WorkflowConfig> {
+  return JSON.parse(await getFileContents(octokit, context.repo.owner, context.repo.repo, '.github/workflow-config.json', context.sha));
+}
+
+export type RepositoryDotNetSdk = {
+  version: string;
+  line: number;
+};
+
+type GlobalJson = {
+  sdk: {
+    version: string;
+  };
+};
+
+export async function getDotNetSdk(octokit: Api, owner: string, repo: string, ref: string): Promise<RepositoryDotNetSdk | null> {
+  let globalJsonString: string;
+
+  try {
+    globalJsonString = await getFileContents(octokit, owner, repo, 'global.json', ref);
+  } catch (err) {
+    return null;
+  }
+
+  const globalJson: GlobalJson = JSON.parse(globalJsonString);
+  const sdkVersion = globalJson.sdk?.version;
+
+  let lineNumber = -1;
+
+  if (sdkVersion) {
+    const globalJsonLines = globalJsonString.split('\n');
+    for (let i = 0; i < globalJsonLines.length; i++) {
+      const line = globalJsonLines[i];
+      if (line.includes(sdkVersion)) {
+        lineNumber = i + 1;
+        break;
+      }
+    }
+  }
+
+  return {
+    version: sdkVersion,
+    line: lineNumber,
+  };
 }

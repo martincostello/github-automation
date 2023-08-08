@@ -3,6 +3,10 @@
 
 export type SupportPhase = 'preview' | 'go-live' | 'active' | 'maintenance' | 'eol';
 
+export interface ReleasesIndex {
+  'releases-index': ReleaseChannel[];
+}
+
 export interface ReleaseChannel {
   'channel-version': string;
   'latest-release': string;
