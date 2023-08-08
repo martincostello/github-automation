@@ -166,9 +166,11 @@ jobs:
             if (releaseNotes.some(release => !isPreview(release))) {
               branchesToDispatch.push('main');
             }
+            /*
             if (releaseNotes.some(release => isPreview(release))) {
               branchesToDispatch.push('dotnet-vnext');
             }
+            */
 
             const event_type = 'dotnet_release';
 
