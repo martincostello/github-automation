@@ -5,7 +5,7 @@ import * as core from '@actions/core';
 import { getOctokit } from '@actions/github';
 import { Context } from '@actions/github/lib/context';
 import { getBadge } from '../shared/badges';
-import { getDotNetSdk, getPull, getWorkflowConfig } from '../shared/github';
+import { getDotNetSdk, getFileContents, getPull, getWorkflowConfig } from '../shared/github';
 import { ReleasesIndex } from '../shared/dotnet';
 
 export async function run(): Promise<void> {
@@ -25,8 +25,8 @@ export async function run(): Promise<void> {
     let latestVersion: string;
 
     if (branch === default_branch || !channel) {
-      const releasesIndex = await fetch('https://raw.githubusercontent.com/dotnet/core/main/release-notes/releases-index.json');
-      const releases: ReleasesIndex = await releasesIndex.json();
+      const releasesIndex = await getFileContents(github, 'dotnet', 'core', 'release-notes/releases-index.json', 'main');
+      const releases: ReleasesIndex = JSON.parse(releasesIndex);
       if (releases['releases-index']?.length < 0) {
         throw new Error('No releases found in releases-index.json.');
       }
