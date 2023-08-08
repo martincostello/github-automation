@@ -27,7 +27,7 @@ jobs:
         echo "last-month=$first_day..$last_day" >> "$GITHUB_OUTPUT"
 
     - name: Run issue-metrics tool
-      uses: github/issue-metrics@c3d29d0f01c1e97b393bce9ce84cdf3489e32bdf # v2.6.0
+      uses: github/issue-metrics@f5bda660a57a786081766ae9935cf6fbfc3cd778 # v2.6.1
       env:
         GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         IGNORE_USERS: 'codecov[bot],costellobot,costellobot[bot],github-actions[bot]'
