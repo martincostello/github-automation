@@ -1,0 +1,30 @@
+name: 'dotnet-upgrade-report'
+description: 'Produces a report for a specified branch used for testing .NET vNext.'
+author: 'Martin Costello'
+branding:
+  icon: 'file-text'
+  color: 'purple'
+inputs:
+  branch:
+    description: 'The branch to run the report for.'
+    required: false
+    default: 'dotnet-vnext'
+  channel:
+    description: 'The channel to use when the branch is not dotnet-vnext.'
+    required: false
+    default: ''
+  gist-id:
+    description: 'The optional ID of the Gist to write the report to.'
+    required: false
+    default: ''
+  github-token:
+    description: 'The GitHub token to use.'
+    required: false
+    default: ${{ github.token }}
+  quality:
+    description: 'The quality to use when the branch is not dotnet-vnext.'
+    required: false
+    default: ''
+runs:
+  using: 'node16'
+  main: 'dist/index.js'

@@ -4,7 +4,7 @@
 import * as core from '@actions/core';
 import { getOctokit } from '@actions/github';
 import { Context } from '@actions/github/lib/context';
-import { getFileContents, getPullMergeableState } from '../shared/github';
+import { getPull, getWorkflowConfig } from '../shared/github';
 
 export async function run(): Promise<void> {
   try {
@@ -22,9 +22,7 @@ export async function run(): Promise<void> {
       repositories = [specificRepo];
     } else {
       const context = new Context();
-      repositories = JSON.parse(
-        await getFileContents(github, context.repo.owner, context.repo.repo, '.github/workflow-config.json', context.sha)
-      ).repositories;
+      repositories = (await getWorkflowConfig(github, context)).repositories;
     }
 
     const result: string[] = [];
@@ -74,7 +72,7 @@ export async function run(): Promise<void> {
           continue;
         }
 
-        rebaseBranch = (await getPullMergeableState(github, owner, repo, pull_for_ref.number)) === 'dirty';
+        rebaseBranch = (await getPull(github, owner, repo, pull_for_ref.number)).mergeable_state === 'dirty';
         if (rebaseBranch) {
           core.notice(`${slug} needs rebasing.`);
         }
