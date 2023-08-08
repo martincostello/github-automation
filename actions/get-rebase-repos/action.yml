@@ -1,0 +1,32 @@
+name: 'get-rebase-repos'
+description: 'Gets the repositories whose pull requests to a branch have conflicts and need rebasing.'
+author: 'Martin Costello'
+branding:
+  icon: 'git-branch'
+  color: 'green'
+inputs:
+  branch:
+    description: 'The branch to rebase.'
+    required: true
+  base:
+    description: 'The branch to rebase against.'
+    required: false
+    default: ''
+  force:
+    description: 'The dotnet/core ref to check for a new release against.'
+    required: false
+    default: false
+  github-token:
+    description: 'The GitHub token to use.'
+    required: false
+    default: ${{ github.token }}
+  repository:
+    description: 'An optional single repository to check for pull requests against.'
+    required: false
+    default: ''
+outputs:
+  repositories:
+    description: 'A JSON array of the full names of repositories which need rebasing.'
+runs:
+  using: 'node16'
+  main: 'dist/index.js'

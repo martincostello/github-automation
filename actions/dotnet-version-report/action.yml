@@ -7,8 +7,8 @@ branding:
 inputs:
   github-token:
     description: 'The GitHub token to use.'
-    default: ${{ github.token }}
     required: false
+    default: ${{ github.token }}
 runs:
   using: 'node16'
   main: 'dist/index.js'

@@ -2,9 +2,10 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
 import * as core from '@actions/core';
+import { getOctokit } from '@actions/github';
 import { Context } from '@actions/github/lib/context';
 import { getBadge } from '../shared/badges';
-import { getFileContents, getOctokit } from '../shared/github';
+import { getFileContents } from '../shared/github';
 
 /* eslint-disable no-console */
 

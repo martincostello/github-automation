@@ -7,16 +7,15 @@ branding:
 inputs:
   github-token:
     description: 'The GitHub token to use query for releases and to dispatch events.'
-    default: ${{ github.token }}
     required: false
+    default: ${{ github.token }}
   state-token:
     description: 'The GitHub token to use to update the state.'
-    default: ${{ github.token }}
     required: false
+    default: ${{ github.token }}
   ref:
     description: 'The dotnet/core ref to check for a new release against.'
     required: false
-    type: string
     default: ''
 runs:
   using: 'node16'

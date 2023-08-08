@@ -2,8 +2,9 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
 import * as core from '@actions/core';
+import { getOctokit } from '@actions/github';
 import { Context } from '@actions/github/lib/context';
-import { getFileContents, getOctokit } from '../shared/github';
+import { getFileContents } from '../shared/github';
 import { isPreview, ReleaseChannel } from '../shared/dotnet';
 
 /* eslint-disable no-console */
@@ -100,12 +101,13 @@ export async function run(): Promise<void> {
       const stateToken = core.getInput('state-token', { required: false });
       github = getOctokit(stateToken);
 
-      await github.rest.actions.updateRepoVariable({
+      await github.request('PATCH /repos/{owner}/{repo}/actions/variables/{name}', {
         owner: context.repo.owner,
         repo: context.repo.repo,
         name: 'DOTNET_CORE_SHA',
         value: updatedSha,
       });
+
       core.notice(`dotnet/core SHA updated to ${updatedSha}`);
     }
   } catch (error: any) {

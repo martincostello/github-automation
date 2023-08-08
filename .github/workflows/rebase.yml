@@ -61,7 +61,7 @@ jobs:
   get-repos:
 
     outputs:
-      repos: ${{ steps.needs-rebase.outputs.result }}
+      repos: ${{ steps.get-repos.outputs.repositories }}
 
     permissions: {}
 
@@ -69,113 +69,18 @@ jobs:
 
     steps:
 
+      - name: Checkout code
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+
       - name: Get repositories to rebase
+        uses: ./actions/get-rebase-repos
         id: get-repos
-        env:
-          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        shell: pwsh
-        run: |
-          if (-Not [string]::IsNullOrEmpty("${{ inputs.repository }}")) {
-            $repos = @("${{ inputs.repository }}")
-          }
-          else {
-            $contents = gh api "repos/${{ github.repository }}/contents/.github/workflow-config.json?ref=${{ github.sha }}" | ConvertFrom-Json
-            $repos = ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($contents.content)) | ConvertFrom-Json).repositories
-          }
-          $reposJson = ConvertTo-Json $repos -Compress
-          "repos=${reposJson}" >> $env:GITHUB_OUTPUT
-
-      - name: Check if branches need rebasing
-        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
-        id: needs-rebase
         with:
+          base: ${{ inputs.base }}
+          branch: ${{ inputs.branch }}
+          force: ${{ inputs.force }}
           github-token: ${{ secrets.ACCESS_TOKEN }}
-          result-encoding: json
-          script: |
-            const repos = JSON.parse(`${{ steps.get-repos.outputs.repos }}`);
-            const dirtyRepos = [];
-            for (let i = 0; i < repos.length; i++) {
-              console.log(`Fetching data for ${repos[i]}.`);
-              const [ owner, repo ] = repos[i].split('/');
-              let commit_sha;
-              try {
-                const { data: branch } = await github.rest.repos.getBranch({
-                  owner,
-                  repo,
-                  branch: '${{ inputs.branch }}',
-                });
-                commit_sha = branch.commit.sha;
-              } catch (err) {
-                core.debug(`Could not get branch: ${err}`);
-                continue;
-              }
-              const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
-                owner,
-                repo,
-                commit_sha,
-              });
-              if (prs.length < 1) {
-                continue;
-              }
-              let base_ref = '${{ inputs.base }}';
-              if (base_ref === '') {
-                const { data: repository } = await github.rest.repos.get({
-                  owner,
-                  repo,
-                });
-                base_ref = repository.default_branch;
-              }
-              let rebaseBranch = ${{ inputs.force }};
-              if (!rebaseBranch) {
-                const pull_for_ref = prs.find((pull) => pull.base.ref === base_ref);
-                if (!pull_for_ref) {
-                  core.debug(`No pull request found targeting ${base_ref}.`);
-                  continue;
-                }
-                const pull_number = pull_for_ref.number;
-                let pr = await github.rest.pulls.get({
-                  owner,
-                  repo,
-                  pull_number,
-                });
-                core.debug(`${owner}/${repo}#${pull_number} mergeable_state: ${pr.data.mergeable_state}.`);
-
-                // Poll for changes if the mergeable state is not yet known if a push just occurred.
-                // The first read above will start a background job to re-calcuate the mergeability, but it may not be ready immediately.
-                // See https://docs.github.com/en/rest/guides/using-the-rest-api-to-interact-with-your-git-database?apiVersion=2022-11-28#checking-mergeability-of-pull-requests
-                // and https://github.com/pullreminders/backlog/issues/42#issuecomment-436412823.
-                let pollCount = 0;
-                const pollDelay = 5000;
-                const timeout = 60000;
-                const maxPollCount = 60000 / pollDelay;
-                while ((pr.data.mergeable_state === null || pr.data.mergeable_state === 'unknown') && pollCount < maxPollCount) {
-                  await new Promise((resolve) => setTimeout(resolve, pollDelay));
-                  pr = await github.rest.pulls.get({
-                    owner,
-                    repo,
-                    pull_number,
-                    // Specify cache headers to make the most of the GitHub API's rate limits.
-                    // See https://jamiemagee.co.uk/blog/making-the-most-of-github-rate-limits/.
-                    headers: {
-                      'If-Modified-Since': pr.headers['Last-Modified'],
-                      'If-None-Match': pr.headers['Etag'],
-                    },
-                  });
-                  core.debug(`${owner}/${repo}#${pull_number} mergeable_state: ${pr.data.mergeable_state}.`);
-                  pollCount++;
-                }
-
-                rebaseBranch = pr.data.mergeable_state === 'dirty';
-                if (rebaseBranch) {
-                  core.notice(`${repos[i]} needs rebasing.`);
-                }
-              }
-
-              if (rebaseBranch) {
-                dirtyRepos.push(repos[i]);
-              }
-            }
-            return dirtyRepos;
+          repository: ${{ inputs.repository }}
 
   rebase:
     name: "rebase-${{ matrix.repo }}"
