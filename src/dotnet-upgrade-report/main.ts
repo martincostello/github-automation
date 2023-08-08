@@ -5,7 +5,7 @@ import * as core from '@actions/core';
 import { getOctokit } from '@actions/github';
 import { Context } from '@actions/github/lib/context';
 import { getBadge } from '../shared/badges';
-import { getFileContents, getPull, getWorkflowConfig } from '../shared/github';
+import { getDotNetSdk, getPull, getWorkflowConfig } from '../shared/github';
 import { ReleasesIndex } from '../shared/dotnet';
 
 export async function run(): Promise<void> {
@@ -115,19 +115,14 @@ export async function run(): Promise<void> {
         }
       }
 
-      const globalJsonString = await getFileContents(github, owner, repo, 'global.json', branch);
-      const globalJson = JSON.parse(globalJsonString);
-      const sdkVersion = globalJson.sdk.version;
+      const dotnetSdk = await getDotNetSdk(github, owner, repo, branch);
 
-      let lineNumber = -1;
-      const globalJsonLines = globalJsonString.split('\n');
-      for (let i = 0; i < globalJsonLines.length; i++) {
-        const line = globalJsonLines[i];
-        if (line.includes(sdkVersion)) {
-          lineNumber = i + 1;
-          break;
-        }
+      if (!dotnetSdk) {
+        core.debug(`The ${branch} branch of ${slug} does not have a global.json file.`);
+        continue;
       }
+
+      const sdkVersion = dotnetSdk.version;
 
       const buildColor = combinedStatus === 'success' ? 'brightgreen' : combinedStatus === 'pending' ? 'yellow' : 'red';
       const buildBadge = getBadge('build', combinedStatus, buildColor, 'github');
@@ -136,7 +131,7 @@ export async function run(): Promise<void> {
       const purple = '512BD4';
       const sdkColor = sdkVersion === latestVersion ? purple : 'yellow';
       const sdkBadge = getBadge('SDK', sdkVersion, sdkColor, 'dotnet');
-      const sdkUrl = `${context.serverUrl}/${slug}/blob/${branch}/global.json#L${lineNumber}`;
+      const sdkUrl = `${context.serverUrl}/${slug}/blob/${branch}/global.json#L${dotnetSdk.line}`;
 
       const conflictsColor = hasConflicts ? 'red' : 'brightgreen';
       const conflictsBadge = getBadge('Conflicts', hasConflicts ? 'Yes' : 'No', conflictsColor, 'git');

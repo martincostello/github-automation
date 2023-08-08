@@ -5,7 +5,7 @@ import * as core from '@actions/core';
 import { getOctokit } from '@actions/github';
 import { Context } from '@actions/github/lib/context';
 import { getBadge } from '../shared/badges';
-import { getFileContents } from '../shared/github';
+import { getFileContents, getDotNetSdk } from '../shared/github';
 
 /* eslint-disable no-console */
 
@@ -50,28 +50,14 @@ export async function run(): Promise<void> {
 
       console.log(`Fetching data for ${slug}.`);
 
-      let globalJsonString;
+      const dotnetSdk = await getDotNetSdk(github, repository.owner.login, repository.name, branch);
 
-      try {
-        globalJsonString = await getFileContents(github, repository.owner.login, repository.name, 'global.json', branch);
-      } catch (err) {
+      if (!dotnetSdk) {
         console.log(`No global.json found in ${slug}.`);
         continue;
       }
 
-      const globalJson = JSON.parse(globalJsonString);
-      const sdkVersion = globalJson.sdk.version;
-
-      let lineNumber = -1;
-      const globalJsonLines = globalJsonString.split('\n');
-      for (let i = 0; i < globalJsonLines.length; i++) {
-        const line = globalJsonLines[i];
-        if (line.includes(sdkVersion)) {
-          lineNumber = i + 1;
-          break;
-        }
-      }
-
+      const sdkVersion = dotnetSdk.version;
       const parts = sdkVersion.split('.');
       const channel = `${parts[0]}.${parts[1]}`;
 
@@ -85,7 +71,7 @@ export async function run(): Promise<void> {
       const purple = '512BD4';
       const sdkColor = sdkVersion === latestVersion ? purple : 'yellow';
       const sdkBadge = getBadge('SDK', sdkVersion, sdkColor, 'dotnet');
-      const sdkUrl = `${context.serverUrl}/${slug}/blob/${branch}/global.json#L${lineNumber}`;
+      const sdkUrl = `${context.serverUrl}/${slug}/blob/${branch}/global.json#L${dotnetSdk.line}`;
 
       report.push(`| [${slug}](${repository.html_url}) | [![.NET SDK version](${sdkBadge})](${sdkUrl}) |`);
     }
