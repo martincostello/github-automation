@@ -177,17 +177,14 @@ const plugin_paginate_rest_1 = __nccwpck_require__(4193);
 const plugin_rest_endpoint_methods_1 = __nccwpck_require__(3044);
 const baseUrl = new context_1.Context().apiUrl;
 const agent = new http_client_1.HttpClient().getAgent(baseUrl);
-const defaults = {
+const GitHub = core_2.Octokit.plugin(plugin_rest_endpoint_methods_1.restEndpointMethods, plugin_paginate_rest_1.paginateRest).defaults({
     baseUrl,
     request: {
         agent,
     },
-};
-const GitHub = core_2.Octokit.plugin(plugin_rest_endpoint_methods_1.restEndpointMethods, plugin_paginate_rest_1.paginateRest).defaults(defaults);
+});
 function getOctokit(token) {
-    const additionalPlugins = [];
-    const GitHubWithPlugins = GitHub.plugin(...additionalPlugins);
-    return new GitHubWithPlugins({
+    return new GitHub({
         auth: `token ${token}`,
         request: {
             fetch: node_fetch_1.default,
