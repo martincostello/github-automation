@@ -4,6 +4,7 @@
 import * as core from '@actions/core';
 import { getOctokit } from '@actions/github';
 import { Context } from '@actions/github/lib/context';
+import fetch from 'node-fetch';
 import { getBadge } from '../shared/badges';
 import { getDotNetSdk, getFileContents, getPull, getWorkflowConfig } from '../shared/github';
 import { ReleasesIndex } from '../shared/dotnet';
