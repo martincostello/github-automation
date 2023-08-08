@@ -2,8 +2,9 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
 import * as core from '@actions/core';
+import { getOctokit } from '@actions/github';
 import { Context } from '@actions/github/lib/context';
-import { getFileContents, getOctokit, getPullMergeableState } from '../shared/github';
+import { getFileContents, getPullMergeableState } from '../shared/github';
 
 export async function run(): Promise<void> {
   try {

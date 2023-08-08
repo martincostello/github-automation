@@ -1,35 +1,9 @@
 // Copyright (c) Martin Costello, 2023. All rights reserved.
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
-/* eslint-disable import/no-unresolved */
-
-import fetch from 'node-fetch';
 import { debug } from '@actions/core';
-import { Context } from '@actions/github/lib/context';
-import { HttpClient } from '@actions/http-client';
-import { Octokit } from '@octokit/core';
-import { paginateRest } from '@octokit/plugin-paginate-rest';
-import { restEndpointMethods } from '@octokit/plugin-rest-endpoint-methods';
+/* eslint-disable import/no-unresolved */
 import { Api } from '@octokit/plugin-rest-endpoint-methods/dist-types/types';
-
-const baseUrl = new Context().apiUrl;
-const agent = new HttpClient().getAgent(baseUrl);
-
-const GitHub = Octokit.plugin(restEndpointMethods, paginateRest).defaults({
-  baseUrl,
-  request: {
-    agent,
-  },
-});
-
-export function getOctokit(token: string): InstanceType<typeof GitHub> {
-  return new GitHub({
-    auth: `token ${token}`,
-    request: {
-      fetch,
-    },
-  });
-}
 
 export async function getFileContents(octokit: Api, owner: string, repo: string, path: string, ref: string): Promise<string> {
   const { data: contents } = await octokit.rest.repos.getContent({
