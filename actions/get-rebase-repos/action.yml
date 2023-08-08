@@ -13,7 +13,7 @@ inputs:
     required: false
     default: ''
   force:
-    description: 'The dotnet/core ref to check for a new release against.'
+    description: 'Whether to rebase even if the branch has no conflicts.'
     required: false
     default: false
   github-token:
