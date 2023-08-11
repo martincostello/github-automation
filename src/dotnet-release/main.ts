@@ -53,7 +53,10 @@ export async function run(): Promise<void> {
           .filter((file) => file.startsWith('release-notes/') && file.endsWith('/releases.json'));
       }
 
-      console.log(`${releaseNotesFiles} release notes file(s) were updated.`);
+      console.log(`${releaseNotesFiles.length} release notes file(s) were updated:`);
+      for (const path of releaseNotesFiles) {
+        console.log(` - ${path}`);
+      }
     }
 
     const releaseNotesUpdated = releaseNotesFiles.length > 0;
