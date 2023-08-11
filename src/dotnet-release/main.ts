@@ -79,7 +79,10 @@ export async function run(): Promise<void> {
       if (releaseNotes.some((release) => !isPreview(release))) {
         branchesToDispatch.push('main');
       }
-      if (releaseNotes.some((release) => isPreview(release))) {
+
+      // Only dispatch for dotnet-vnext if only a preview was released.
+      // Otherwise changes to main will just end up creating merge conflicts.
+      if (releaseNotes.every((release) => isPreview(release))) {
         branchesToDispatch.push('dotnet-vnext');
       }
 
