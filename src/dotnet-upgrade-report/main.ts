@@ -168,6 +168,9 @@ export async function run(): Promise<void> {
   } catch (error: any) {
     core.error(error);
     if (error instanceof Error) {
+      if (error.stack) {
+        core.error(error.stack);
+      }
       core.setFailed(error.message);
     }
   }

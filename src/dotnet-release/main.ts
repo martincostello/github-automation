@@ -47,7 +47,10 @@ export async function run(): Promise<void> {
           .filter((file) => file.startsWith('release-notes/') && file.endsWith('/releases.json'));
       }
 
-      console.log(`${releaseNotesFiles} release notes file(s) were updated.`);
+      console.log(`${releaseNotesFiles.length} release notes file(s) were updated:`);
+      for (const path of releaseNotesFiles) {
+        console.log(` - ${path}`);
+      }
     }
 
     const releaseNotesUpdated = releaseNotesFiles.length > 0;
@@ -73,7 +76,10 @@ export async function run(): Promise<void> {
       if (releaseNotes.some((release) => !isPreview(release))) {
         branchesToDispatch.push('main');
       }
-      if (releaseNotes.some((release) => isPreview(release))) {
+
+      // Only dispatch for dotnet-vnext if only a preview was released.
+      // Otherwise changes to main will just end up creating merge conflicts.
+      if (releaseNotes.every((release) => isPreview(release))) {
         branchesToDispatch.push('dotnet-vnext');
       }
 
@@ -113,6 +119,9 @@ export async function run(): Promise<void> {
   } catch (error: any) {
     core.error(error);
     if (error instanceof Error) {
+      if (error.stack) {
+        core.error(error.stack);
+      }
       core.setFailed(error.message);
     }
   }
