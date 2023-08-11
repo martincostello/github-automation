@@ -31,7 +31,6 @@
     "martincostello/dotnet-patch-automation-sample",
     "martincostello/dotnet-playwright-tests",
     "martincostello/dotnet-repo-template",
-    "martincostello/github-automation",
     "martincostello/home",
     "martincostello/lambda-test-server",
     "martincostello/polly-rate-limiting",
