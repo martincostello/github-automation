@@ -2,6 +2,7 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
 import * as core from '@actions/core';
+import fetch from 'node-fetch';
 import { getOctokit } from '@actions/github';
 import { Context } from '@actions/github/lib/context';
 import { getFileContents } from '../shared/github';
@@ -15,7 +16,12 @@ export async function run(): Promise<void> {
     const previousSha = core.getInput('ref', { required: false });
 
     const context = new Context();
-    let github = getOctokit(githubToken);
+
+    let github = getOctokit(githubToken, {
+      request: {
+        fetch,
+      },
+    });
 
     const owner = 'dotnet';
     const repo = 'core';
@@ -99,7 +105,11 @@ export async function run(): Promise<void> {
 
     if (updatedSha) {
       const stateToken = core.getInput('state-token', { required: false });
-      github = getOctokit(stateToken);
+      github = getOctokit(stateToken, {
+        request: {
+          fetch,
+        },
+      });
 
       await github.request('PATCH /repos/{owner}/{repo}/actions/variables/{name}', {
         owner: context.repo.owner,
