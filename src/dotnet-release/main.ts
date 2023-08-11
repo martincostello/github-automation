@@ -15,7 +15,6 @@ export async function run(): Promise<void> {
     const previousSha = core.getInput('ref', { required: false });
 
     const context = new Context();
-
     let github = getOctokit(githubToken);
 
     const owner = 'dotnet';
