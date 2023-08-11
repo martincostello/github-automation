@@ -1,9 +1,10 @@
 // Copyright (c) Martin Costello, 2023. All rights reserved.
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
+import fetch from 'node-fetch';
 import { debug } from '@actions/core';
 import { Context } from '@actions/github/lib/context';
-/* eslint-disable import/no-unresolved */
+// eslint-disable-next-line import/no-unresolved
 import { Api } from '@octokit/plugin-rest-endpoint-methods/dist-types/types';
 import { WorkflowConfig } from './config';
 
