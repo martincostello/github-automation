@@ -6,31 +6,37 @@ on:
   workflow_call:
     inputs:
       branch:
-        description: "The branch to run the SDK updates for."
+        description: 'The branch to run the SDK updates for.'
         required: true
         type: string
   workflow_dispatch:
     inputs:
       branch:
-        description: "The branch to run the SDK updates for."
+        description: 'The branch to run the SDK updates for.'
         required: false
         type: choice
         options:
-          - "main"
-          - "dotnet-vnext"
-          - "dotnet-nightly"
-        default: "main"
+          - 'main'
+          - 'dotnet-vnext'
+          - 'dotnet-nightly'
+        default: 'main'
 
 permissions: {}
 
 jobs:
   get-repos:
     runs-on: [ ubuntu-latest ]
+
     concurrency:
       group: ${{ github.workflow }}
       cancel-in-progress: false
+
+    outputs:
+      repos: ${{ steps.get-repos.outputs.repos }}
+
     steps:
-      - name: Update .NET SDKs
+      - name: Get repositories
+        id: get-repos
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
@@ -43,13 +49,13 @@ jobs:
           "repos=${reposJson}" >> $env:GITHUB_OUTPUT
 
   update-sdk:
-    name: "rebase-${{ matrix.repo }}"
+    name: 'rebase-${{ matrix.repo }}'
     needs: get-repos
     if: ${{ needs.get-repos.outputs.repos != '[]' }}
-    uses: martincostello/update-dotnet-sdk/.github/workflows/update-dotnet-sdk.yml@15b03c51be79edc43aebce5e9cce63dfb6a7637e # v2.3.1
+    uses: martincostello/update-dotnet-sdk/.github/workflows/update-dotnet-sdk.yml@dff4a89c9023c82ab5ef78ac8d275fc908456bd3 # v2.3.1
 
     concurrency:
-      group: "rebase-${{ matrix.repo }}"
+      group: 'update-sdk-${{ matrix.repo }}'
       cancel-in-progress: false
 
     strategy:
