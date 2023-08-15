@@ -40,5 +40,15 @@
     "martincostello/sqllocaldb",
     "martincostello/website",
     "martincostello/xunit-logging"
-  ]
+  ],
+  "update-dotnet-sdks": {
+    "martincostello": {
+      "lambda-test-server" : {
+        "update-nuget-packages": false
+      },
+      "sqllocaldb": {
+        "include-nuget-packages": "Microsoft.AspNetCore.,Microsoft.EntityFrameworkCore.,System.Text.Json"
+      }
+    }
+  }
 }
