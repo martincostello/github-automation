@@ -86,26 +86,20 @@ export type Repository = {
   html_url: string;
 };
 
-export async function getReposForCurrentUser(octokit: Api): Promise<Repository[]> {
-  let page = 1;
+export async function getReposForCurrentUser({
+  octokit,
+}: {
+  octokit: Api & {
+    paginate: import('@octokit/plugin-paginate-rest').PaginateInterface;
+  };
+}): Promise<Repository[]> {
   const per_page = 100;
   const type = 'owner';
 
-  let { data: repos } = await octokit.rest.repos.listForAuthenticatedUser({
-    page,
+  const repos = await octokit.paginate(octokit.rest.repos.listForAuthenticatedUser, {
     per_page,
     type,
   });
-
-  while (repos.length === per_page) {
-    page++;
-    const { data: next } = await octokit.rest.repos.listForAuthenticatedUser({
-      page,
-      per_page,
-      type,
-    });
-    repos = repos.concat(next);
-  }
 
   return repos
     .filter((repo) => !repo.archived)
