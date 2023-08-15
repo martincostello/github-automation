@@ -56,7 +56,7 @@ jobs:
           "repos=${reposJson}" >> $env:GITHUB_OUTPUT
 
   update-sdk:
-    name: 'rebase-${{ matrix.repo }}'
+    name: 'update-${{ matrix.repo }}'
     needs: get-repos
     if: ${{ needs.get-repos.outputs.repos != '[]' }}
     uses: martincostello/update-dotnet-sdk/.github/workflows/update-dotnet-sdk.yml@dff4a89c9023c82ab5ef78ac8d275fc908456bd3 # v2.3.1
