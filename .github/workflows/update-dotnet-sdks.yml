@@ -45,7 +45,13 @@ jobs:
           # Then iterate through ignoring forks and those that are archived and apply any custom config on top of that
           $contents = gh api "repos/${{ github.repository }}/contents/.github/workflow-config.json?ref=${{ github.sha }}" | ConvertFrom-Json
           $repos = ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($contents.content)) | ConvertFrom-Json).repositories
-          $reposJson = ConvertTo-Json $repos -Compress
+          $filteredRepos = @()
+          foreach ($repo in $repos) {
+            if ($repo.StartsWith("${{ github.repository_owner }}/")) {
+              $filteredRepos += $repo
+            }
+          }
+          $reposJson = ConvertTo-Json $filteredRepos -Compress
           "repos=${reposJson}" >> $env:GITHUB_OUTPUT
 
   update-sdk:
