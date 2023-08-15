@@ -70,7 +70,7 @@ jobs:
     with:
       checkout-ref: ${{ (github.event.client_payload && github.event.client_payload.branch) || inputs.branch || 'main' }}
       labels: 'dependencies,.NET'
-      repo: ${{ github.event.client_payload.repo }}
+      repo: ${{ matrix.repo }}
       user-email: ${{ vars.GIT_COMMIT_USER_EMAIL }}
       user-name: ${{ vars.GIT_COMMIT_USER_NAME }}
     secrets:
