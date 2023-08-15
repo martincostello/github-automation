@@ -78,6 +78,50 @@ export async function getPull(
   return pr.data;
 }
 
+export type Repository = {
+  full_name: string;
+  name: string;
+  owner: string;
+  default_branch: string;
+  html_url: string;
+};
+
+export async function getReposForCurrentUser(octokit: Api): Promise<Repository[]> {
+  let page = 1;
+  const per_page = 100;
+  const type = 'owner';
+
+  let { data: repos } = await octokit.rest.repos.listForAuthenticatedUser({
+    page,
+    per_page,
+    type,
+  });
+
+  while (repos.length === per_page) {
+    page++;
+    const { data: next } = await octokit.rest.repos.listForAuthenticatedUser({
+      page,
+      per_page,
+      type,
+    });
+    repos = repos.concat(next);
+  }
+
+  return repos
+    .filter((repo) => !repo.archived)
+    .filter((repo) => !repo.fork)
+    .filter((repo) => !repo.is_template)
+    .map((repo) => {
+      return {
+        full_name: repo.full_name,
+        name: repo.name,
+        owner: repo.owner.login,
+        default_branch: repo.default_branch,
+        html_url: repo.html_url,
+      };
+    });
+}
+
 export async function getWorkflowConfig(octokit: Api, context: Context): Promise<WorkflowConfig> {
   return JSON.parse(await getFileContents(octokit, context.repo.owner, context.repo.repo, '.github/workflow-config.json', context.sha));
 }
