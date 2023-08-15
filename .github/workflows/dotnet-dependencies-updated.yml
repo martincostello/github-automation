@@ -9,9 +9,12 @@ permissions: {}
 
 jobs:
   rebase:
+    if: github.event.client_payload.ref_name == 'dotnet-vnext' || github.event.client_payload.ref_name == 'dotnet-nightly'
     uses: ./.github/workflows/rebase.yml
     permissions:
       contents: read
     secrets: inherit
     with:
+      base: ${{ github.event.client_payload.ref_name == 'dotnet-vnext' && 'main' || 'dotnet-vnext' }}
+      branch: ${{ github.event.client_payload.ref_name }}
       repository: ${{ github.event.client_payload.repository }}
