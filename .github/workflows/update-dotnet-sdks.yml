@@ -39,7 +39,7 @@ jobs:
         id: get-repos
         shell: pwsh
         env:
-          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          GH_TOKEN: ${{ secrets.COSTELLOBOT_TOKEN }}
         run: |
           # TODO Query repositories for the same owner for those that contain a global.json file
           # Then iterate through ignoring forks and those that are archived and apply any custom config on top of that
@@ -82,4 +82,4 @@ jobs:
       user-email: ${{ vars.GIT_COMMIT_USER_EMAIL }}
       user-name: ${{ vars.GIT_COMMIT_USER_NAME }}
     secrets:
-      repo-token: ${{ secrets.ACCESS_TOKEN }}
+      repo-token: ${{ secrets.COSTELLOBOT_TOKEN }}
