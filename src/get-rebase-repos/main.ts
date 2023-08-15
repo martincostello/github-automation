@@ -74,7 +74,7 @@ export async function run(): Promise<void> {
 
         rebaseBranch = (await getPull(github, owner, repo, pull_for_ref.number)).mergeable_state === 'dirty';
         if (rebaseBranch) {
-          core.notice(`${slug} needs rebasing.`);
+          core.notice(`${slug}:${headBranch} needs rebasing.`);
         }
       }
 
