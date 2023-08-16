@@ -86,16 +86,14 @@ export type Repository = {
   html_url: string;
 };
 
-export async function getReposForCurrentUser({
-  octokit,
-}: {
+type PaginatedApi = {
   octokit: Api & {
     paginate: import('@octokit/plugin-paginate-rest').PaginateInterface;
   };
-}): Promise<Repository[]> {
-  const per_page = 100;
-  const type = 'owner';
+};
 
+export async function getReposForCurrentUser({ octokit }: PaginatedApi, type: 'owner' | 'member'): Promise<Repository[]> {
+  const per_page = 100;
   const repos = await octokit.paginate(octokit.rest.repos.listForAuthenticatedUser, {
     per_page,
     type,

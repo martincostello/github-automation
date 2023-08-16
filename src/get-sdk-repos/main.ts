@@ -15,7 +15,7 @@ export async function run(): Promise<void> {
     const context = new Context();
     const updatesConfig = (await getWorkflowConfig(github, context))['update-dotnet-sdks'][context.repo.owner];
 
-    const repositories = await getReposForCurrentUser({ octokit: github });
+    const repositories = await getReposForCurrentUser({ octokit: github }, 'member');
 
     const labels = 'dependencies,.NET';
     const ref = branch || '';

@@ -15,7 +15,7 @@ export async function run(): Promise<void> {
     const context = new Context();
     const github = getOctokit(token);
 
-    const repos = await getReposForCurrentUser({ octokit: github });
+    const repos = await getReposForCurrentUser({ octokit: github }, 'owner');
 
     const releases = JSON.parse(await getFileContents(github, 'dotnet', 'core', 'release-notes/releases-index.json', 'main'));
 
