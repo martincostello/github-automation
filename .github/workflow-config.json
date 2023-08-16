@@ -43,6 +43,9 @@
   ],
   "update-dotnet-sdks": {
     "martincostello": {
+      "dotnet-patch-automation-sample": {
+        "ignore": true
+      },
       "lambda-test-server" : {
         "update-nuget-packages": false
       },
