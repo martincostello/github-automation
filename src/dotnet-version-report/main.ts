@@ -5,7 +5,7 @@ import * as core from '@actions/core';
 import { getOctokit } from '@actions/github';
 import { Context } from '@actions/github/lib/context';
 import { getBadge } from '../shared/badges';
-import { getFileContents, getDotNetSdk } from '../shared/github';
+import { getFileContents, getDotNetSdk, getReposForCurrentUser } from '../shared/github';
 
 /* eslint-disable no-console */
 
@@ -15,30 +15,7 @@ export async function run(): Promise<void> {
     const context = new Context();
     const github = getOctokit(token);
 
-    let page = 1;
-    const per_page = 100;
-    const type = 'owner';
-
-    let { data: repos } = await github.rest.repos.listForAuthenticatedUser({
-      page,
-      per_page,
-      type,
-    });
-
-    while (repos.length === per_page) {
-      page++;
-      const { data: next } = await github.rest.repos.listForAuthenticatedUser({
-        page,
-        per_page,
-        type,
-      });
-      repos = repos.concat(next);
-    }
-
-    repos = repos
-      .filter((repo) => !repo.archived)
-      .filter((repo) => !repo.fork)
-      .filter((repo) => !repo.is_template);
+    const repos = await getReposForCurrentUser({ octokit: github }, 'owner');
 
     const releases = JSON.parse(await getFileContents(github, 'dotnet', 'core', 'release-notes/releases-index.json', 'main'));
 
@@ -50,7 +27,7 @@ export async function run(): Promise<void> {
 
       console.log(`Fetching data for ${slug}.`);
 
-      const dotnetSdk = await getDotNetSdk(github, repository.owner.login, repository.name, branch);
+      const dotnetSdk = await getDotNetSdk(github, repository.owner, repository.repo, branch);
 
       if (!dotnetSdk) {
         console.log(`No global.json found in ${slug}.`);

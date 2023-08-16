@@ -1,0 +1,21 @@
+name: 'get-sdk-repos'
+description: 'Gets the repositories for which .NET SDK updates should be performed.'
+author: 'Martin Costello'
+branding:
+  icon: 'refresh-cw'
+  color: 'blue'
+inputs:
+  branch:
+    description: 'The branch to run the SDK updates for.'
+    required: false
+    default: ''
+  github-token:
+    description: 'The GitHub token to use.'
+    required: false
+    default: ${{ github.token }}
+outputs:
+  updates:
+    description: 'A JSON array of the repositories for which .NET SDK updates should be performed.'
+runs:
+  using: 'node16'
+  main: 'dist/index.js'

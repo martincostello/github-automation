@@ -3,50 +3,79 @@ name: update-dotnet-sdks
 on:
   repository_dispatch:
     types: [ dotnet_release ]
+  schedule:
+    - cron:  '00 19 * * TUE'
   workflow_call:
     inputs:
       branch:
-        description: "The branch to run the SDK updates for."
+        description: 'The branch to run the SDK updates for.'
         required: true
         type: string
   workflow_dispatch:
     inputs:
       branch:
-        description: "The branch to run the SDK updates for."
+        description: 'The branch to run the SDK updates for.'
         required: false
         type: choice
         options:
-          - "main"
-          - "dotnet-vnext"
-          - "dotnet-nightly"
-        default: "main"
+          - 'main'
+          - 'dotnet-vnext'
+          - 'dotnet-nightly'
+        default: 'main'
 
 permissions: {}
 
 jobs:
-  update-dotnet-sdks:
+  get-repos:
     runs-on: [ ubuntu-latest ]
+
     concurrency:
       group: ${{ github.workflow }}
       cancel-in-progress: false
+
+    outputs:
+      updates: ${{ steps.get-repos.outputs.updates }}
+
     steps:
-      - name: Update .NET SDKs
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        run: |
-          $branch = "${{ (github.event.client_payload && github.event.client_payload.branch) || inputs.branch || 'main' }}"
 
-          $contents = gh api "repos/${{ github.repository }}/contents/.github/workflow-config.json?ref=${{ github.sha }}" | ConvertFrom-Json
-          $repos = ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($contents.content)) | ConvertFrom-Json).repositories
+      - name: Checkout code
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
 
-          foreach ($repo in $repos) {
-            gh api "repos/${repo}/branches/${branch}" 2> $null | Out-Null
-            if ($LASTEXITCODE -ne 0) {
-              Write-Output "::Debug::Skipping ${repo} as the ${branch} branch does not exist."
-              continue
-            }
-            gh workflow run "update-dotnet-sdk.yml" --ref $branch --repo $repo
-            Start-Sleep -Seconds 10 # Wait 10 seconds to prevent issues with GitHub secondary rate limits
-          }
-          exit 0
+      - name: Get repositories to update
+        uses: ./actions/get-sdk-repos
+        id: get-repos
+        with:
+          branch: ${{ (github.event.client_payload && github.event.client_payload.branch) || inputs.branch || '' }}
+          github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
+
+  update-sdk:
+    name: 'update-${{ matrix.repo }}'
+    needs: get-repos
+    if: ${{ needs.get-repos.outputs.updates != '[]' }}
+    uses: martincostello/update-dotnet-sdk/.github/workflows/update-dotnet-sdk.yml@77e8b4787c513d4cb8b4c70cf92aa0b0a7f1c8d8 # v2.3.1
+
+    concurrency:
+      group: 'update-sdk-${{ matrix.repo }}'
+      cancel-in-progress: false
+
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        include: ${{ fromJSON(needs.get-repos.outputs.updates) }}
+
+    # costellobot will need a custom trigger for the below to update SignalR:
+    # on:
+    #   pull_request: [ update-dotnet-sdk-* ]
+    with:
+      channel: ${{ matrix.channel }}
+      include-nuget-packages: ${{ matrix.include-nuget-packages }}
+      labels: ${{ matrix.labels }}
+      quality: ${{  matrix.quality }}
+      ref: ${{ matrix.ref }}
+      repo: ${{ matrix.repo }}
+      update-nuget-packages: ${{ matrix.update-nuget-packages }}
+      user-email: ${{ vars.GIT_COMMIT_USER_EMAIL }}
+      user-name: ${{ vars.GIT_COMMIT_USER_NAME }}
+    secrets:
+      repo-token: ${{ secrets.COSTELLOBOT_TOKEN }}
