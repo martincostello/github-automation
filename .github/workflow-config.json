@@ -49,6 +49,9 @@
       "lambda-test-server" : {
         "update-nuget-packages": false
       },
+      "repo-migrations": {
+        "ignore": true
+      },
       "sqllocaldb": {
         "include-nuget-packages": "Microsoft.AspNetCore.,Microsoft.EntityFrameworkCore.,System.Text.Json"
       }
