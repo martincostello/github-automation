@@ -34,6 +34,12 @@ export async function run(): Promise<void> {
 
     const result: UpdateConfiguration[] = [];
     for (const repository of repositories) {
+      const repoConfig = updatesConfig[repository.repo];
+      if (repoConfig?.ignore) {
+        core.debug(`Ignoring ${repository.full_name}.`);
+        continue;
+      }
+
       // eslint-disable-next-line no-console
       console.log(`Fetching data for ${repository.full_name}.`);
       try {
@@ -52,8 +58,6 @@ export async function run(): Promise<void> {
           'repo': repository.full_name,
           'update-nuget-packages': true,
         };
-
-        const repoConfig = updatesConfig[repository.repo];
 
         if (repoConfig) {
           config['include-nuget-packages'] = repoConfig['include-nuget-packages'];

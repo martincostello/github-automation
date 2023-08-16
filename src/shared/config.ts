@@ -2,6 +2,7 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
 export type UpdateDotNetSdkConfig = {
+  'ignore': boolean | undefined;
   'include-nuget-packages': string | undefined;
   'update-nuget-packages': boolean | undefined;
 };
