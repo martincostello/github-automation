@@ -29,7 +29,7 @@ export async function run(): Promise<void> {
       'quality': string;
       'ref': string;
       'repo': string;
-      'update-nuget-packages': boolean | undefined;
+      'update-nuget-packages': boolean;
     };
 
     const result: UpdateConfiguration[] = [];
@@ -50,14 +50,17 @@ export async function run(): Promise<void> {
           quality,
           ref,
           'repo': repository.full_name,
-          'update-nuget-packages': undefined,
+          'update-nuget-packages': true,
         };
 
         const repoConfig = updatesConfig[repository.repo];
 
         if (repoConfig) {
           config['include-nuget-packages'] = repoConfig['include-nuget-packages'];
-          config['update-nuget-packages'] = repoConfig['update-nuget-packages'];
+          const updatePackages = repoConfig['update-nuget-packages'];
+          if (updatePackages !== undefined) {
+            config['update-nuget-packages'] = updatePackages;
+          }
         }
 
         result.push(config);
