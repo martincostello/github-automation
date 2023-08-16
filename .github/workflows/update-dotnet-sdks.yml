@@ -59,7 +59,7 @@ jobs:
     name: 'update-${{ matrix.repo }}'
     needs: get-repos
     if: ${{ needs.get-repos.outputs.repos != '[]' }}
-    uses: martincostello/update-dotnet-sdk/.github/workflows/update-dotnet-sdk.yml@dff4a89c9023c82ab5ef78ac8d275fc908456bd3 # v2.3.1
+    uses: martincostello/update-dotnet-sdk/.github/workflows/update-dotnet-sdk.yml@77e8b4787c513d4cb8b4c70cf92aa0b0a7f1c8d8 # v2.3.1
 
     concurrency:
       group: 'update-sdk-${{ matrix.repo }}'
@@ -75,11 +75,12 @@ jobs:
     # on:
     #   pull_request: [ update-dotnet-sdk-* ]
     with:
-      checkout-ref: ${{ (github.event.client_payload && github.event.client_payload.branch) || inputs.branch || 'main' }}
       labels: 'dependencies,.NET'
-      quality: ${{ ((github.event.client_payload && github.event.client_payload.branch) || inputs.branch) == 'dotnet-nightly' && 'daily' || '' }}
+      ref: ${{ (github.event.client_payload && github.event.client_payload.branch) || inputs.branch || '' }}
       repo: ${{ matrix.repo }}
       user-email: ${{ vars.GIT_COMMIT_USER_EMAIL }}
       user-name: ${{ vars.GIT_COMMIT_USER_NAME }}
+      channel: ${{ ((github.event.client_payload && github.event.client_payload.branch) || inputs.branch) == 'dotnet-nightly' && '8.0.1xx-rc1' || '' }}
+      quality: ${{ ((github.event.client_payload && github.event.client_payload.branch) || inputs.branch) == 'dotnet-nightly' && 'daily' || '' }}
     secrets:
       repo-token: ${{ secrets.COSTELLOBOT_TOKEN }}
