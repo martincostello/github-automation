@@ -80,7 +80,7 @@ export async function getPull(
 
 export type Repository = {
   full_name: string;
-  name: string;
+  repo: string;
   owner: string;
   default_branch: string;
   html_url: string;
@@ -108,7 +108,7 @@ export async function getReposForCurrentUser({
     .map((repo) => {
       return {
         full_name: repo.full_name,
-        name: repo.name,
+        repo: repo.name,
         owner: repo.owner.login,
         default_branch: repo.default_branch,
         html_url: repo.html_url,

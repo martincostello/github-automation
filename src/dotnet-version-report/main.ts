@@ -27,7 +27,7 @@ export async function run(): Promise<void> {
 
       console.log(`Fetching data for ${slug}.`);
 
-      const dotnetSdk = await getDotNetSdk(github, repository.owner, repository.name, branch);
+      const dotnetSdk = await getDotNetSdk(github, repository.owner, repository.repo, branch);
 
       if (!dotnetSdk) {
         console.log(`No global.json found in ${slug}.`);

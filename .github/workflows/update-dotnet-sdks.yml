@@ -32,33 +32,24 @@ jobs:
       cancel-in-progress: false
 
     outputs:
-      repos: ${{ steps.get-repos.outputs.repos }}
+      updates: ${{ steps.get-repos.outputs.updates }}
 
     steps:
-      - name: Get repositories
+
+      - name: Checkout code
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+
+      - name: Get repositories to update
+        uses: ./actions/get-sdk-repos
         id: get-repos
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.COSTELLOBOT_TOKEN }}
-        run: |
-          # TODO Query repositories for the same owner for those that contain a global.json file
-          # Then iterate through ignoring forks and those that are archived and apply any custom config on top of that
-          # Need to check that the input branch actually exists if it's not main.
-          $contents = gh api "repos/${{ github.repository }}/contents/.github/workflow-config.json?ref=${{ github.sha }}" | ConvertFrom-Json
-          $repos = ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($contents.content)) | ConvertFrom-Json).repositories
-          $filteredRepos = @()
-          foreach ($repo in $repos) {
-            if ($repo.StartsWith("${{ github.repository_owner }}/")) {
-              $filteredRepos += $repo
-            }
-          }
-          $reposJson = ConvertTo-Json $filteredRepos -Compress
-          "repos=${reposJson}" >> $env:GITHUB_OUTPUT
+        with:
+          branch: ${{ (github.event.client_payload && github.event.client_payload.branch) || inputs.branch || '' }}
+          github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
 
   update-sdk:
     name: 'update-${{ matrix.repo }}'
     needs: get-repos
-    if: ${{ needs.get-repos.outputs.repos != '[]' }}
+    if: ${{ needs.get-repos.outputs.updates != '[]' }}
     uses: martincostello/update-dotnet-sdk/.github/workflows/update-dotnet-sdk.yml@77e8b4787c513d4cb8b4c70cf92aa0b0a7f1c8d8 # v2.3.1
 
     concurrency:
@@ -67,20 +58,22 @@ jobs:
 
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 3
       matrix:
-        repo: ${{ fromJSON(needs.get-repos.outputs.repos) }}
+        include: ${{ fromJSON(needs.get-repos.outputs.updates) }}
 
     # costellobot will need a custom trigger for the below to update SignalR:
     # on:
     #   pull_request: [ update-dotnet-sdk-* ]
     with:
-      labels: 'dependencies,.NET'
-      ref: ${{ (github.event.client_payload && github.event.client_payload.branch) || inputs.branch || '' }}
+      channel: ${{ matrix.channel }}
+      include-nuget-packages: ${{ matrix.include-nuget-packages }}
+      labels: ${{ matrix.labels }}
+      quality: ${{  matrix.quality }}
+      ref: ${{ matrix.ref }}
       repo: ${{ matrix.repo }}
+      update-nuget-packages: ${{ matrix.update-nuget-packages }}
       user-email: ${{ vars.GIT_COMMIT_USER_EMAIL }}
       user-name: ${{ vars.GIT_COMMIT_USER_NAME }}
-      channel: ${{ ((github.event.client_payload && github.event.client_payload.branch) || inputs.branch) == 'dotnet-nightly' && '8.0.1xx-rc1' || '' }}
-      quality: ${{ ((github.event.client_payload && github.event.client_payload.branch) || inputs.branch) == 'dotnet-nightly' && 'daily' || '' }}
     secrets:
       repo-token: ${{ secrets.COSTELLOBOT_TOKEN }}
