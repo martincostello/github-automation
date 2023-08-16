@@ -56,5 +56,14 @@
         "include-nuget-packages": "Microsoft.AspNetCore.,Microsoft.EntityFrameworkCore.,System.Text.Json"
       }
     }
-  }
+  },
+  "update-static-assets": [
+    "martincostello/adventofcode",
+    "martincostello/alexa-london-travel-site",
+    "martincostello/api",
+    "martincostello/costellobot",
+    "martincostello/dependabot-helper",
+    "martincostello/SignInWithAppleSample",
+    "martincostello/website"
+  ]
 }
