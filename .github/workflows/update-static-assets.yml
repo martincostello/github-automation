@@ -56,13 +56,13 @@ jobs:
     steps:
 
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
       with:
         repository: ${{ matrix.repo }}
         token: ${{ secrets.ACCESS_TOKEN }}
 
     - name: Update static assets
-      uses: martincostello/update-static-assets@v1
+      uses: martincostello/update-static-assets@33f77c04b20b70d75c70688876c01c0c7a5f4385 # v1.1.4
       with:
         labels: dependencies
         repo: ${{ matrix.repo }}
