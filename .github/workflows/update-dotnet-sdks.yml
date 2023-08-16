@@ -64,14 +64,11 @@ jobs:
       matrix:
         include: ${{ fromJSON(needs.get-repos.outputs.updates) }}
 
-    # costellobot will need a custom trigger for the below to update SignalR:
-    # on:
-    #   pull_request: [ update-dotnet-sdk-* ]
     with:
       channel: ${{ matrix.channel }}
       include-nuget-packages: ${{ matrix.include-nuget-packages }}
       labels: ${{ matrix.labels }}
-      quality: ${{  matrix.quality }}
+      quality: ${{ matrix.quality }}
       ref: ${{ matrix.ref }}
       repo: ${{ matrix.repo }}
       update-nuget-packages: ${{ matrix.update-nuget-packages }}
