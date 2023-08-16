@@ -4,7 +4,7 @@
 import * as core from '@actions/core';
 import { getOctokit } from '@actions/github';
 import { Context } from '@actions/github/lib/context';
-import { getReposForCurrentUser, getWorkflowConfig } from '../shared/github';
+import { getDotNetSdk, getReposForCurrentUser, getWorkflowConfig } from '../shared/github';
 
 export async function run(): Promise<void> {
   try {
@@ -43,11 +43,10 @@ export async function run(): Promise<void> {
       // eslint-disable-next-line no-console
       console.log(`Fetching data for ${repository.full_name}.`);
       try {
-        await github.rest.repos.getBranch({
-          owner: repository.owner,
-          repo: repository.repo,
-          branch,
-        });
+        if (!(await getDotNetSdk(github, repository.owner, repository.repo, branch))) {
+          core.debug(`The ${branch} branch of ${repository.full_name} does not exist or does not have a global.json file.`);
+          continue;
+        }
 
         const config: UpdateConfiguration = {
           channel,
