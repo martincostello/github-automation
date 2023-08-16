@@ -2,6 +2,7 @@
   "version": "1.0",
   "components": [
     "Microsoft.VisualStudio.Component.CoreEditor",
+    "Microsoft.VisualStudio.Component.Git",
     "Microsoft.VisualStudio.Workload.CoreEditor"
   ]
 }
