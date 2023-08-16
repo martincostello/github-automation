@@ -3,6 +3,8 @@ name: update-dotnet-sdks
 on:
   repository_dispatch:
     types: [ dotnet_release ]
+  schedule:
+    - cron:  '00 19 * * TUE'
   workflow_call:
     inputs:
       branch:
