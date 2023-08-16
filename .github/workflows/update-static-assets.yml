@@ -1,0 +1,71 @@
+name: update-static-assets
+
+on:
+  schedule:
+    - cron:  '0 5 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+
+  get-repos:
+    runs-on: [ ubuntu-latest ]
+
+    concurrency:
+      group: ${{ github.workflow }}
+      cancel-in-progress: false
+
+    outputs:
+      repos: ${{ steps.get-repos.outputs.repos }}
+
+    steps:
+      - name: Get repositories
+        id: get-repos
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.COSTELLOBOT_TOKEN }}
+        run: |
+          $contents = gh api "repos/${{ github.repository }}/contents/.github/workflow-config.json?ref=${{ github.sha }}" | ConvertFrom-Json
+          $repos = ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($contents.content)) | ConvertFrom-Json).'update-static-assets'
+          $filteredRepos = @()
+          foreach ($repo in $repos) {
+            if ($repo.StartsWith("${{ github.repository_owner }}/")) {
+              $filteredRepos += $repo
+            }
+          }
+          $reposJson = ConvertTo-Json $filteredRepos -Compress
+          "repos=${reposJson}" >> $env:GITHUB_OUTPUT
+
+  update-static-assets:
+    name: 'update-${{ matrix.repo }}'
+    needs: get-repos
+    runs-on: ubuntu-latest
+    if: ${{ needs.get-repos.outputs.repos != '[]' }}
+
+    concurrency:
+      group: 'update-assets-${{ matrix.repo }}'
+      cancel-in-progress: false
+
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        repo: ${{ fromJSON(needs.get-repos.outputs.repos) }}
+
+    steps:
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        repository: ${{ matrix.repo }}
+        token: ${{ secrets.ACCESS_TOKEN }}
+
+    - name: Update static assets
+      uses: martincostello/update-static-assets@v1
+      with:
+        labels: dependencies
+        repo: ${{ matrix.repo }}
+        repo-token: ${{ secrets.COSTELLOBOT_TOKEN }}
+        user-email: ${{ vars.GIT_COMMIT_USER_EMAIL }}
+        user-name: ${{ vars.GIT_COMMIT_USER_NAME }}
