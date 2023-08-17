@@ -76,3 +76,34 @@ jobs:
       user-name: ${{ vars.GIT_COMMIT_USER_NAME }}
     secrets:
       repo-token: ${{ secrets.COSTELLOBOT_TOKEN }}
+
+  update-sdk-external:
+    runs-on: [ ubuntu-latest ]
+
+    concurrency:
+      group: ${{ github.workflow }}
+      cancel-in-progress: false
+
+    steps:
+      - name: Update .NET SDKs
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        run: |
+          $branch = "${{ (github.event.client_payload && github.event.client_payload.branch) || inputs.branch || 'main' }}"
+          $repos = @(
+            "justeattakeaway/ApplePayJSSample",
+            "justeattakeaway/httpclient-interception",
+            "justeattakeaway/JustEat.StatsD",
+            "justeattakeaway/JustSaying"
+          )
+          foreach ($repo in $repos) {
+            gh api "repos/${repo}/branches/${branch}" 2> $null | Out-Null
+            if ($LASTEXITCODE -ne 0) {
+              Write-Output "::Debug::Skipping ${repo} as the ${branch} branch does not exist."
+              continue
+            }
+            gh workflow run "update-dotnet-sdk.yml" --ref $branch --repo $repo
+            Start-Sleep -Seconds 10 # Wait 10 seconds to prevent issues with GitHub secondary rate limits
+          }
+          exit 0
