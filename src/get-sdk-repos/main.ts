@@ -50,7 +50,7 @@ export async function run(): Promise<void> {
 
         const config: UpdateConfiguration = {
           channel,
-          'include-nuget-packages': undefined,
+          'include-nuget-packages': 'Microsoft.AspNetCore.,Microsoft.EntityFrameworkCore.,Microsoft.Extensions.,System.Text.Json',
           labels,
           quality,
           ref,
