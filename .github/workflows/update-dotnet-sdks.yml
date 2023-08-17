@@ -81,7 +81,7 @@ jobs:
     runs-on: [ ubuntu-latest ]
 
     concurrency:
-      group: ${{ github.workflow }}
+      group: '${{ github.workflow }}-external'
       cancel-in-progress: false
 
     steps:
