@@ -100,8 +100,8 @@ sequenceDiagram
 
     alt Branch exists and global.json exists
 
-      update-one ->>+ repo: Get .github/update-dotnet-sdk.json
-      repo -->>- update-one: Update configuration
+      update-all ->>+ repo: Get .github/update-dotnet-sdk.json
+      repo -->>- update-all: Update configuration
 
       update-all -) update-one: workflow_call
 
