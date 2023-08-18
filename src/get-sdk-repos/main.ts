@@ -8,6 +8,7 @@ import { UpdateDotNetSdkConfig } from '../shared/config';
 
 type UpdateConfiguration = {
   'channel': string;
+  'exclude-nuget-packages': string | undefined;
   'include-nuget-packages': string | undefined;
   'labels': string;
   'quality': string;
@@ -51,6 +52,7 @@ export async function run(): Promise<void> {
 
     const repositories = await getReposForCurrentUser({ octokit: github }, 'member');
 
+    const excludePackages = '';
     const includePackages = 'Microsoft.AspNetCore.,Microsoft.EntityFrameworkCore.,Microsoft.Extensions.,System.Text.Json';
     const labels = 'dependencies,.NET';
     const ref = branch || '';
@@ -95,6 +97,7 @@ export async function run(): Promise<void> {
 
         const config: UpdateConfiguration = {
           channel,
+          'exclude-nuget-packages': valueOrDefault(updateConfig['exclude-nuget-packages'], excludePackages),
           'include-nuget-packages': valueOrDefault(updateConfig['include-nuget-packages'], includePackages),
           labels,
           quality,

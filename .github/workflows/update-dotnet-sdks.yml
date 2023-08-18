@@ -76,6 +76,7 @@ jobs:
 
     with:
       channel: ${{ matrix.channel }}
+      exclude-nuget-packages: ${{ matrix.exclude-nuget-packages }}
       include-nuget-packages: ${{ matrix.include-nuget-packages }}
       labels: ${{ matrix.labels }}
       quality: ${{ matrix.quality }}
