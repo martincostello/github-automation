@@ -57,12 +57,20 @@ export async function run(): Promise<void> {
     const channel = branch === 'dotnet-nightly' ? '8.0.1xx-rc1' : '';
     const quality = branch === 'dotnet-nightly' ? 'daily' : '';
 
+    const singleRepository = core.getInput('repository', { required: false });
+
     const result: UpdateConfiguration[] = [];
 
     for (const repository of repositories) {
+      const full_name = repository.full_name;
+
+      if (singleRepository && singleRepository !== full_name) {
+        core.debug(`Skipping repository ${full_name}.`);
+        continue;
+      }
+
       const owner = repository.owner;
       const repo = repository.repo;
-      const full_name = repository.full_name;
 
       const repoConfig = await getUpdateConfiguration(github, owner, repo, ref);
       if (repoConfig?.ignore) {
