@@ -11,6 +11,10 @@ on:
         description: 'The branch to run the SDK updates for.'
         required: true
         type: string
+      repository:
+        description: 'An optional single repository to update.'
+        required: false
+        type: string
   workflow_dispatch:
     inputs:
       branch:
@@ -22,6 +26,11 @@ on:
           - 'dotnet-vnext'
           - 'dotnet-nightly'
         default: 'main'
+      repository:
+        description: 'An optional single repository to update.'
+        required: false
+        type: string
+        default: ''
 
 permissions: {}
 
@@ -47,6 +56,7 @@ jobs:
         with:
           branch: ${{ (github.event.client_payload && github.event.client_payload.branch) || inputs.branch || '' }}
           github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
+          repository: ${{ inputs.repository || '' }}
 
   update-sdk:
     name: 'update-${{ matrix.repo }}'
