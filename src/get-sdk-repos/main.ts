@@ -3,8 +3,45 @@
 
 import * as core from '@actions/core';
 import { getOctokit } from '@actions/github';
-import { Context } from '@actions/github/lib/context';
-import { getDotNetSdk, getReposForCurrentUser, getWorkflowConfig } from '../shared/github';
+import { getDotNetSdk, getReposForCurrentUser, getUpdateConfiguration } from '../shared/github';
+import { UpdateDotNetSdkConfig } from '../shared/config';
+
+type UpdateConfiguration = {
+  'channel': string;
+  'include-nuget-packages': string | undefined;
+  'labels': string;
+  'quality': string;
+  'ref': string;
+  'repo': string;
+  'update-nuget-packages': boolean;
+};
+
+function getConfiguration(overrides: UpdateDotNetSdkConfig | null): UpdateDotNetSdkConfig {
+  const config: UpdateDotNetSdkConfig = {};
+
+  const updateIfDefined = (candidate: UpdateDotNetSdkConfig, key: string): void => {
+    const value = candidate[key];
+    if (value !== undefined) {
+      config[key] = value;
+    }
+  };
+
+  if (overrides) {
+    core.debug(`Baseline configuration: ${JSON.stringify(config)}`);
+    core.debug(`Repository configuration: ${JSON.stringify(overrides)}`);
+
+    updateIfDefined(overrides, 'channel');
+    updateIfDefined(overrides, 'exclude-nuget-packages');
+    updateIfDefined(overrides, 'include-nuget-packages');
+    updateIfDefined(overrides, 'labels');
+    updateIfDefined(overrides, 'quality');
+    updateIfDefined(overrides, 'update-nuget-packages');
+
+    core.debug(`Merged configuration: ${JSON.stringify(config)}`);
+  }
+
+  return config;
+}
 
 export async function run(): Promise<void> {
   try {
@@ -12,63 +49,55 @@ export async function run(): Promise<void> {
     const token = core.getInput('github-token', { required: false });
     const github = getOctokit(token);
 
-    const context = new Context();
-    const updatesConfig = (await getWorkflowConfig(github, context))['update-dotnet-sdks'][context.repo.owner];
-
     const repositories = await getReposForCurrentUser({ octokit: github }, 'member');
 
+    const includePackages = 'Microsoft.AspNetCore.,Microsoft.EntityFrameworkCore.,Microsoft.Extensions.,System.Text.Json';
     const labels = 'dependencies,.NET';
     const ref = branch || '';
     const channel = branch === 'dotnet-nightly' ? '8.0.1xx-rc1' : '';
     const quality = branch === 'dotnet-nightly' ? 'daily' : '';
 
-    type UpdateConfiguration = {
-      'channel': string;
-      'include-nuget-packages': string | undefined;
-      'labels': string;
-      'quality': string;
-      'ref': string;
-      'repo': string;
-      'update-nuget-packages': boolean;
-    };
-
     const result: UpdateConfiguration[] = [];
+
     for (const repository of repositories) {
-      const repoConfig = updatesConfig[repository.repo];
+      const owner = repository.owner;
+      const repo = repository.repo;
+      const full_name = repository.full_name;
+
+      const repoConfig = await getUpdateConfiguration(github, owner, repo, ref);
       if (repoConfig?.ignore) {
-        core.debug(`Ignoring ${repository.full_name}.`);
+        core.debug(`Ignoring ${full_name}.`);
         continue;
       }
 
-      // eslint-disable-next-line no-console
-      console.log(`Fetching data for ${repository.full_name}.`);
       try {
-        if (!(await getDotNetSdk(github, repository.owner, repository.repo, branch))) {
-          core.debug(`The ${branch} branch of ${repository.full_name} does not exist or does not have a global.json file.`);
+        // eslint-disable-next-line no-console
+        console.log(`Fetching data for ${full_name}.`);
+
+        if (!(await getDotNetSdk(github, owner, repo, branch))) {
+          core.debug(`The ${branch} branch of ${full_name} does not exist or does not have a global.json file.`);
           continue;
         }
 
+        const updateConfig = getConfiguration(repoConfig);
+
+        const valueOrDefault = <T>(value: T | undefined, defaultValue: T): T => {
+          return value !== undefined ? value : defaultValue;
+        };
+
         const config: UpdateConfiguration = {
           channel,
-          'include-nuget-packages': 'Microsoft.AspNetCore.,Microsoft.EntityFrameworkCore.,Microsoft.Extensions.,System.Text.Json',
+          'include-nuget-packages': valueOrDefault(updateConfig['include-nuget-packages'], includePackages),
           labels,
           quality,
           ref,
-          'repo': repository.full_name,
-          'update-nuget-packages': true,
+          'repo': full_name,
+          'update-nuget-packages': valueOrDefault(updateConfig['update-nuget-packages'], true),
         };
-
-        if (repoConfig) {
-          config['include-nuget-packages'] = repoConfig['include-nuget-packages'];
-          const updatePackages = repoConfig['update-nuget-packages'];
-          if (updatePackages !== undefined) {
-            config['update-nuget-packages'] = updatePackages;
-          }
-        }
 
         result.push(config);
       } catch (err) {
-        core.debug(`Could not get branch ${branch}: ${err}`);
+        core.debug(`Failed to get data for ${full_name}: ${err}`);
       }
     }
 

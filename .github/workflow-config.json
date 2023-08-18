@@ -41,22 +41,6 @@
     "martincostello/website",
     "martincostello/xunit-logging"
   ],
-  "update-dotnet-sdks": {
-    "martincostello": {
-      "dotnet-patch-automation-sample": {
-        "ignore": true
-      },
-      "lambda-test-server" : {
-        "update-nuget-packages": false
-      },
-      "repo-migrations": {
-        "ignore": true
-      },
-      "sqllocaldb": {
-        "include-nuget-packages": "Microsoft.AspNetCore.,Microsoft.EntityFrameworkCore.,System.Text.Json"
-      }
-    }
-  },
   "update-static-assets": [
     "martincostello/adventofcode",
     "martincostello/alexa-london-travel-site",
