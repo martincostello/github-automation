@@ -89,6 +89,7 @@ jobs:
 
   update-sdk-external:
     runs-on: [ ubuntu-latest ]
+    if: ${{ inputs.repository == '' }}
 
     concurrency:
       group: '${{ github.workflow }}-external'
