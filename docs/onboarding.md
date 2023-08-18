@@ -28,6 +28,6 @@ The `rebase` workflow relies on the following conventions:
 
 The `update-dotnet-sdks` workflow relies on the following conventions:
 
-1. The GitHub Personal Access Token (PAT) stored in the secret with the name `ACCESS_TOKEN` has push access to the configured repositories.
+1. The GitHub Personal Access Token (PAT) used by the workflow has push access to the configured repositories and can create pull requests.
 1. The default branch of each repository is `main`.
-1. Each repository contains a GitHub Actions workflow file named `update-dotnet-sdk.yml` on the branch on which it is run for which has no required input parameters.
+1. Each repository contains a `global.json` file in the root of the repository for the branch being updated.
