@@ -6,7 +6,7 @@ import { debug } from '@actions/core';
 import { Context } from '@actions/github/lib/context';
 // eslint-disable-next-line import/no-unresolved
 import { Api } from '@octokit/plugin-rest-endpoint-methods/dist-types/types';
-import { WorkflowConfig } from './config';
+import { UpdateDotNetSdkConfig, WorkflowConfig } from './config';
 
 export async function getFileContents(octokit: Api, owner: string, repo: string, path: string, ref: string): Promise<string> {
   const { data: contents } = await octokit.rest.repos.getContent({
@@ -112,6 +112,23 @@ export async function getReposForCurrentUser({ octokit }: PaginatedApi, type: 'o
         html_url: repo.html_url,
       };
     });
+}
+
+export async function getUpdateConfiguration(
+  octokit: Api,
+  owner: string,
+  repo: string,
+  ref: string
+): Promise<UpdateDotNetSdkConfig | null> {
+  let config: string;
+
+  try {
+    config = await getFileContents(octokit, owner, repo, '.github/update-dotnet-sdk.json', ref);
+  } catch (err) {
+    return null;
+  }
+
+  return JSON.parse(config);
 }
 
 export async function getWorkflowConfig(octokit: Api, context: Context): Promise<WorkflowConfig> {
