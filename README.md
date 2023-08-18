@@ -137,6 +137,8 @@ The behaviour of the `update-dotnet-sdk` workflow for a given repository
 can be configured through a `.github/update-dotnet-sdk.json` file in the
 repository to which updates are being performed.
 
+The schema for the configuration file can be found [here][update-dotnet-sdk-schema].
+
 ### Update .NET SDKs for Nightly
 
 The [update-dotnet-sdks-for-nightly][update-dotnet-sdks-for-nightly]
@@ -177,6 +179,7 @@ This project is licensed under the [Apache 2.0][license] license.
 [rebaser]: https://github.com/martincostello/rebaser
 [repository]: https://github.com/martincostello/github-automation "This project on GitHub.com"
 [update-dotnet-sdk]: https://github.com/martincostello/update-dotnet-sdk/blob/main/.github/workflows/update-dotnet-sdk.yml
+[update-dotnet-sdk-schema]: ./.github/update-dotnet-sdk-schema.json
 [update-dotnet-sdks]: ./.github/workflows/update-dotnet-sdks.yml
 [update-dotnet-sdks-for-nightly]: ./.github/workflows/update-dotnet-sdks-for-nightly.yml
 [upgrade-report-gist]: https://gist.github.com/martincostello/2083bcc83f30a5038175e4f31e0fc59f
