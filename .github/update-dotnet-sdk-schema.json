@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "https://github.com/martincostello/github-automation/blob/main/.github/update-dotnet-sdk-schema.json",
+  "title": "JSON Schema for configuring .NET SDK updates",
+  "type": "object",
+  "properties": {
+    "ignore": {
+      "type": "boolean",
+      "description": "Do not perform .NET SDK updates on this branch.",
+      "default": false
+    },
+    "exclude-nuget-packages": {
+      "type": "string",
+      "description": "A comma-separated list of NuGet package IDs (or substrings) to update, if update-nuget-packages is true.",
+      "default": ""
+    },
+    "include-nuget-packages": {
+      "type": "string",
+      "description": "A comma-separated list of NuGet package IDs (or substrings) to not update if update-nuget-packages is true.",
+      "default": "Microsoft.AspNetCore.,Microsoft.EntityFrameworkCore.,Microsoft.Extensions.,System.Text.Json"
+    },
+    "update-nuget-packages": {
+      "type": "boolean",
+      "description": "If true, the workflow will update any NuGet packages to their latest versions for the specified .NET release channel for the configured filters.",
+      "default": true
+    }
+  }
+}
