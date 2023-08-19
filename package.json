@@ -15,7 +15,7 @@
     "package:dotnet-version-report": "ncc build lib/dotnet-version-report/main.js --out actions/dotnet-version-report/dist --minify --source-map --license licenses.txt",
     "package:get-rebase-repos": "ncc build lib/get-rebase-repos/main.js --out actions/get-rebase-repos/dist --minify --source-map --license licenses.txt",
     "package:get-sdk-repos": "ncc build lib/get-sdk-repos/main.js --out actions/get-sdk-repos/dist --minify --source-map --license licenses.txt",
-    "test": "jest --coverage --collectCoverageFrom src/**/*.ts",
+    "test": "jest",
     "all": "npm run build && npm run format && npm run lint && npm run package && npm run test"
   },
   "repository": {
@@ -33,6 +33,21 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "jest": {
+    "clearMocks": true,
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/**/*.ts"
+    ],
+    "reporters": [
+      "default",
+      "github-actions"
+    ],
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "verbose": true
   },
   "license": "Apache-2.0",
   "bugs": {
