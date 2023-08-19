@@ -16,7 +16,7 @@
     "package:get-rebase-repos": "ncc build lib/get-rebase-repos/main.js --out actions/get-rebase-repos/dist --minify --source-map --license licenses.txt",
     "package:get-sdk-repos": "ncc build lib/get-sdk-repos/main.js --out actions/get-sdk-repos/dist --minify --source-map --license licenses.txt",
     "test": "jest --coverage --collectCoverageFrom src/**/*.ts",
-    "all": "npm run build && npm run format && npm run lint && npm run package"
+    "all": "npm run build && npm run format && npm run lint && npm run package && npm run test"
   },
   "repository": {
     "type": "git",
