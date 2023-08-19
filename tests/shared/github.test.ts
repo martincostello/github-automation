@@ -6,18 +6,7 @@ jest.mock('node-fetch');
 import fetch from 'node-fetch';
 import { beforeEach, describe, expect, jest, test } from '@jest/globals';
 import { getDotNetSdk, getFileContents, getUpdateConfiguration, getWorkflowConfig } from '../../src/shared/github';
-
-const getOctokitForContent = (data: any) => {
-  return {
-    rest: {
-      repos: {
-        getContent: jest.fn().mockReturnValueOnce({
-          data,
-        }),
-      },
-    },
-  };
-};
+import { getOctokitForContent } from '../mocks';
 
 const owner = 'owner';
 const repo = 'repo';
@@ -84,15 +73,11 @@ describe('getUpdateConfiguration', () => {
     let octokit;
 
     beforeEach(async () => {
-      const json = JSON.stringify({
+      octokit = getOctokitForContent({
         'ignore': true,
         'exclude-nuget-packages':'excluded',
         'include-nuget-packages': 'included',
         'update-nuget-packages': true,
-      });
-      octokit = getOctokitForContent({
-        content: Buffer.from(json).toString('base64'),
-        encoding: 'base64',
       });
     });
 
@@ -132,13 +117,9 @@ describe('getWorkflowConfig', () => {
   let octokit;
 
   beforeEach(async () => {
-    const json = JSON.stringify({
+    octokit = getOctokitForContent({
       checksOfInterest: ['check'],
       repositories: ['a/b', 'c/d']
-    });
-    octokit = getOctokitForContent({
-      content: Buffer.from(json).toString('base64'),
-      encoding: 'base64',
     });
   });
 
@@ -191,11 +172,7 @@ describe('getDotNetSdk', () => {
     let actual;
 
     beforeEach(async () => {
-      const json = JSON.stringify({});
-      octokit = getOctokitForContent({
-        content: Buffer.from(json).toString('base64'),
-        encoding: 'base64',
-      });
+      octokit = getOctokitForContent({});
       actual = await getDotNetSdk(octokit, owner, repo, ref);
     });
 
