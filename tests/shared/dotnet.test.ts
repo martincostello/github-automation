@@ -11,7 +11,7 @@ describe('isPreview', () => {
     ['active', false],
     ['maintenance', false],
     ['eol', false],
-    ['made-up', false]
+    ['made-up', false],
   ])('%s', (supportPhase: string, expected: boolean) => {
     const releaseChannel = {
       'support-phase': supportPhase as SupportPhase,

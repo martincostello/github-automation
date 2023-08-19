@@ -5,8 +5,15 @@ jest.mock('node-fetch');
 
 import fetch from 'node-fetch';
 import { beforeEach, describe, expect, jest, test } from '@jest/globals';
-import { getDotNetSdk, getFileContents, getReposForCurrentUser, getUpdateConfiguration, getWorkflowConfig } from '../../src/shared/github';
-import { getOctokitForContent, getOctokitForRepos } from '../mocks';
+import {
+  getDotNetSdk,
+  getFileContents,
+  getPull,
+  getReposForCurrentUser,
+  getUpdateConfiguration,
+  getWorkflowConfig,
+} from '../../src/shared/github';
+import { getOctokitForContent, getOctokitForPulls, getOctokitForRepos } from '../mocks';
 
 const owner = 'owner';
 const repo = 'repo';
@@ -60,22 +67,19 @@ describe('getFileContents', () => {
     });
 
     test('throws an error', async () => {
-      await expect(getFileContents(octokit, owner, repo, path, ref)).rejects.toThrow(
-        'Unexpected encoding for some/file: potato'
-      );
+      await expect(getFileContents(octokit, owner, repo, path, ref)).rejects.toThrow('Unexpected encoding for some/file: potato');
     });
   });
 });
 
 describe('getUpdateConfiguration', () => {
-
   describe('when the file exists', () => {
     let octokit;
 
     beforeEach(async () => {
       octokit = getOctokitForContent({
         'ignore': true,
-        'exclude-nuget-packages':'excluded',
+        'exclude-nuget-packages': 'excluded',
         'include-nuget-packages': 'included',
         'update-nuget-packages': true,
       });
@@ -119,7 +123,7 @@ describe('getWorkflowConfig', () => {
   beforeEach(async () => {
     octokit = getOctokitForContent({
       checksOfInterest: ['check'],
-      repositories: ['a/b', 'c/d']
+      repositories: ['a/b', 'c/d'],
     });
   });
 
@@ -140,17 +144,23 @@ describe('getWorkflowConfig', () => {
 });
 
 describe('getDotNetSdk', () => {
-
-  describe.each([[undefined, 1], [2, 3]])('when there is an SDK version with %s spaces', (space, line) => {
+  describe.each([
+    [undefined, 1],
+    [2, 3],
+  ])('when there is an SDK version with %s spaces', (space, line) => {
     let octokit;
     let actual;
 
     beforeEach(async () => {
-      const json = JSON.stringify({
-        sdk: {
-          version: '7.0.400'
-        }
-      }, null, space);
+      const json = JSON.stringify(
+        {
+          sdk: {
+            version: '7.0.400',
+          },
+        },
+        null,
+        space
+      );
       octokit = getOctokitForContent({
         content: Buffer.from(json).toString('base64'),
         encoding: 'base64',
@@ -284,13 +294,40 @@ describe('getReposForCurrentUser', () => {
           archived: false,
           fork: false,
           is_template: false,
-        }
+        },
       ]);
     });
 
     test('returns the correct repositories', async () => {
       const actual = await getReposForCurrentUser(octokit, 'member');
       expect(actual).toMatchSnapshot();
+    });
+  });
+});
+
+describe('getPull', () => {
+  describe.each([
+    [['behind'], 'behind'],
+    [['blocked'], 'blocked'],
+    [['clean'], 'clean'],
+    [['dirty'], 'dirty'],
+    [['draft'], 'draft'],
+    [['has_hooks'], 'has_hooks'],
+    [['unstable'], 'unstable'],
+    [['unknown', 'dirty'], 'dirty'],
+    [[null, 'dirty'], 'dirty'],
+  ])('when mergeable_state is %s', (mergeable_states: any[], expected: string) => {
+    let octokit;
+    let actual;
+
+    beforeEach(async () => {
+      octokit = getOctokitForPulls(mergeable_states.map((mergeable_state) => ({ mergeable_state })));
+      actual = await getPull(octokit, owner, repo, 42);
+    }, 15000);
+
+    test('returns mergeable_state', async () => {
+      expect(actual).not.toBeNull();
+      expect(actual['mergeable_state']).toBe(expected);
     });
   });
 });

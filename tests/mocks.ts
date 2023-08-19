@@ -33,6 +33,32 @@ export function getOctokitForContent(response: ContentResponse | any): any {
   };
 }
 
+export function getOctokitForPulls(responses: any | any[]): any {
+  let mock = jest.fn();
+
+  if (!Array.isArray(responses)) {
+    responses = [responses];
+  }
+
+  for (const data of responses) {
+    mock = mock.mockReturnValueOnce({
+      data,
+      headers: {
+        'Etag': '42',
+        'Last-Modified': new Date().toUTCString(),
+      },
+    });
+  }
+
+  return {
+    rest: {
+      pulls: {
+        get: mock,
+      },
+    },
+  };
+}
+
 export function getOctokitForRepos(data: any[]): any {
   return {
     octokit: {
