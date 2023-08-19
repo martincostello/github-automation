@@ -1,4 +1,5 @@
 {
+  "basePath": "https://api.github.com",
   "path": "/repos/dotnet/core/contents/release-notes%2Freleases-index.json?ref=main",
   "status": 200,
   "response": {

@@ -12,12 +12,12 @@ describe('dotnet-version-report', () => {
     let fixture: ActionFixture;
 
     beforeAll(async () => {
-      await setup('get-repos-owner');
-      await setup('dotnet-releases-index');
-      await setup('advent-of-code-global');
-      await setup('alexa-london-travel-global');
-      await setup('github-automation-global');
-      await setup('website-global');
+      await setup('user-repos-owner');
+      await setup('repos/dotnet/core/contents/main/releases-index');
+      await setup('repos/martincostello/adventofcode/contents/main/global');
+      await setup('repos/martincostello/alexa-london-travel/contents/main/global');
+      await setup('repos/martincostello/github-automation/contents/main/global');
+      await setup('repos/martincostello/website/contents/main/global');
 
       fixture = new ActionFixture(run);
       await fixture.run({

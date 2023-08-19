@@ -1,0 +1,9 @@
+{
+  "basePath": "https://api.github.com",
+  "path": "/repos/martincostello/alexa-london-travel/contents/global.json?ref=dotnet-vnext",
+  "status": 404,
+  "response": {
+    "message": "Not Found",
+    "documentation_url": "https://docs.github.com"
+  }
+}

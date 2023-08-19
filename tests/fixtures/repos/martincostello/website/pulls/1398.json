@@ -1,0 +1,9 @@
+{
+  "basePath": "https://api.github.com",
+  "path": "/repos/martincostello/website/pulls/1398",
+  "response": {
+    "html_url": "https://github.com/martincostello/website/pull/1398",
+    "number": 1398,
+    "mergeable_state": "clean"
+  }
+}

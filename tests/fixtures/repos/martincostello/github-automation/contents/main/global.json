@@ -1,4 +1,5 @@
 {
+  "basePath": "https://api.github.com",
   "path": "/repos/martincostello/github-automation/contents/global.json?ref=main",
   "status": 404,
   "response": {

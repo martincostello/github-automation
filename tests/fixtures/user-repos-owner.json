@@ -1,6 +1,6 @@
 {
+  "basePath": "https://api.github.com",
   "path": "/user/repos?per_page=100&type=owner",
-  "status": 200,
   "response": [
     {
       "name": "adventofcode",
