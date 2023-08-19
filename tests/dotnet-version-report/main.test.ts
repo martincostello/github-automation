@@ -2,20 +2,26 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
 import * as core from '@actions/core';
-import { afterAll, beforeAll, describe, expect, jest, test, xdescribe } from '@jest/globals';
+import { afterAll, beforeAll, describe, expect, jest, test } from '@jest/globals';
 import { ActionFixture } from '../ActionFixture';
 import { run } from '../../src/dotnet-version-report/main';
+import { setup } from '../fixtures';
 
 describe('dotnet-version-report', () => {
-  xdescribe('generating a report', () => {
+  describe('generating a report', () => {
     let fixture: ActionFixture;
 
     beforeAll(async () => {
-      fixture = new ActionFixture(run, () => {});
-      await fixture.initialize({
+      await setup('get-repos-owner');
+      await setup('dotnet-releases-index');
+      await setup('advent-of-code-global');
+      await setup('alexa-london-travel-global');
+      await setup('website-global');
+
+      fixture = new ActionFixture(run);
+      await fixture.run({
         'github-token': 'fake-token',
       });
-      await fixture.run();
     });
 
     afterAll(async () => {

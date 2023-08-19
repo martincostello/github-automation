@@ -15,12 +15,9 @@ export class ActionFixture {
   private outputPath: string = '';
   private outputs: Record<string, string> = {};
 
-  constructor(
-    private readonly sut: () => Promise<void>,
-    private readonly configureMocks: () => void = () => {}
-  ) {}
+  constructor(private readonly sut: () => Promise<void>) {}
 
-  async initialize(inputs: Record<string, string> = {}): Promise<void> {
+  async run(inputs: Record<string, string> = {}): Promise<void> {
     this.tempDir = await createTemporaryDirectory();
     this.githubStepSummary = path.join(this.tempDir, 'github-step-summary.md');
     this.outputPath = path.join(this.tempDir, 'github-outputs');
@@ -30,9 +27,7 @@ export class ActionFixture {
 
     this.setupEnvironment(inputs);
     this.setupMocks();
-  }
 
-  async run(): Promise<void> {
     await this.sut();
 
     const buffer = await fs.promises.readFile(this.outputPath);
@@ -74,14 +69,13 @@ export class ActionFixture {
     }
 
     for (const key in environment) {
-      process.env[key] = inputs[key as keyof typeof inputs];
+      process.env[key] = environment[key as keyof typeof inputs];
     }
   }
 
   private setupMocks(): void {
     jest.spyOn(core, 'setFailed').mockImplementation(() => {});
     this.setupLogging();
-    this.configureMocks();
   }
 
   private setupLogging(): void {

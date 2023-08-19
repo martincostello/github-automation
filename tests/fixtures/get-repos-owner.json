@@ -1,0 +1,45 @@
+{
+  "path": "/user/repos?per_page=100&type=owner",
+  "status": 200,
+  "response": [
+    {
+      "name": "adventofcode",
+      "full_name": "martincostello/adventofcode",
+      "private": false,
+      "owner": {
+        "login": "martincostello"
+      },
+      "html_url": "https://github.com/martincostello/adventofcode",
+      "fork": false,
+      "archived": false,
+      "is_template": false,
+      "default_branch": "main"
+    },
+    {
+      "name": "alexa-london-travel",
+      "full_name": "martincostello/alexa-london-travel",
+      "private": false,
+      "owner": {
+        "login": "martincostello"
+      },
+      "html_url": "https://github.com/martincostello/alexa-london-travel",
+      "fork": false,
+      "archived": false,
+      "is_template": false,
+      "default_branch": "main"
+    },
+    {
+      "name": "website",
+      "full_name": "martincostello/website",
+      "private": false,
+      "owner": {
+        "login": "martincostello"
+      },
+      "html_url": "https://github.com/martincostello/website",
+      "fork": false,
+      "archived": false,
+      "is_template": false,
+      "default_branch": "main"
+    }
+  ]
+}
