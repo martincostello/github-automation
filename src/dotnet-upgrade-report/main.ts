@@ -64,6 +64,13 @@ export async function run(): Promise<void> {
         continue;
       }
 
+      const dotnetSdk = await getDotNetSdk(github, owner, repo, branch);
+
+      if (!dotnetSdk) {
+        core.debug(`The ${branch} branch of ${slug} does not have a global.json file.`);
+        continue;
+      }
+
       let base_ref;
 
       if (branch === default_branch) {
@@ -114,13 +121,6 @@ export async function run(): Promise<void> {
         } else if (status === 'neutral') {
           combinedStatus = 'pending';
         }
-      }
-
-      const dotnetSdk = await getDotNetSdk(github, owner, repo, branch);
-
-      if (!dotnetSdk) {
-        core.debug(`The ${branch} branch of ${slug} does not have a global.json file.`);
-        continue;
       }
 
       const sdkVersion = dotnetSdk.version;
