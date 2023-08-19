@@ -1,0 +1,8 @@
+{
+  "basePath": "https://api.github.com",
+  "method": "PATCH",
+  "path": "/gists/fake-gist",
+  "response": {
+    "id": "fake-gist"
+  }
+}

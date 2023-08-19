@@ -60,6 +60,9 @@ export class ActionFixture {
   private setupEnvironment(inputs: Record<string, string>): void {
     const environment = {
       GITHUB_OUTPUT: this.outputPath,
+      GITHUB_REPOSITORY: 'martincostello/github-automation',
+      GITHUB_RUN_ID: '42',
+      GITHUB_SHA: 'fake-sha',
       GITHUB_STEP_SUMMARY: this.githubStepSummary,
       RUNNER_DEBUG: '1',
     };

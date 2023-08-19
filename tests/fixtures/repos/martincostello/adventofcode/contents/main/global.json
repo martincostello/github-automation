@@ -1,6 +1,6 @@
 {
+  "basePath": "https://api.github.com",
   "path": "/repos/martincostello/adventofcode/contents/global.json?ref=main",
-  "status": 200,
   "response": {
     "content": "ewogICJzZGsiOiB7CiAgICAidmVyc2lvbiI6ICI3LjAuNDAwIiwKICAgICJh\nbGxvd1ByZXJlbGVhc2UiOiBmYWxzZSwKICAgICJyb2xsRm9yd2FyZCI6ICJs\nYXRlc3RNYWpvciIKICB9Cn0K\n",
     "encoding": "base64"
