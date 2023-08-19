@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`dotnet-version-report generating a report outputs the Markdown report 1`] = `
+"# .NET SDK Version Report
+
+| Repository | SDK Version |
+| :--------- | :---------- |
+| [martincostello/adventofcode](https://github.com/martincostello/adventofcode) | [![.NET SDK version](https://img.shields.io/badge/SDK-7.0.400-512BD4?logo=dotnet)](https://github.com/martincostello/adventofcode/blob/main/global.json#L3) |
+| [martincostello/alexa-london-travel](https://github.com/martincostello/alexa-london-travel) | [![.NET SDK version](https://img.shields.io/badge/SDK-7.0.100-yellow?logo=dotnet)](https://github.com/martincostello/alexa-london-travel/blob/main/global.json#L3) |
+| [martincostello/website](https://github.com/martincostello/website) | [![.NET SDK version](https://img.shields.io/badge/SDK-6.0.413-512BD4?logo=dotnet)](https://github.com/martincostello/website/blob/main/global.json#L3) |"
+`;
