@@ -16,6 +16,7 @@ describe('dotnet-version-report', () => {
       await setup('dotnet-releases-index');
       await setup('advent-of-code-global');
       await setup('alexa-london-travel-global');
+      await setup('github-automation-global');
       await setup('website-global');
 
       fixture = new ActionFixture(run);

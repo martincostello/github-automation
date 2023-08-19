@@ -29,6 +29,19 @@
       "default_branch": "main"
     },
     {
+      "name": "github-automation",
+      "full_name": "martincostello/github-automation",
+      "private": false,
+      "owner": {
+        "login": "martincostello"
+      },
+      "html_url": "https://github.com/martincostello/github-automation",
+      "fork": false,
+      "archived": false,
+      "is_template": false,
+      "default_branch": "main"
+    },
+    {
       "name": "website",
       "full_name": "martincostello/website",
       "private": false,
