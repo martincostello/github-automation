@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getReposForCurrentUser when there are repositories returns the correct repositories 1`] = `
+[
+  {
+    "default_branch": "main",
+    "full_name": "org/name",
+    "html_url": "https://github.com/org/name",
+    "owner": "org",
+    "repo": "name",
+  },
+  {
+    "default_branch": "develop",
+    "full_name": "org2/name2",
+    "html_url": "https://github.com/org2/name2",
+    "owner": "org2",
+    "repo": "name2",
+  },
+]
+`;

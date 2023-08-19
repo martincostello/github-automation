@@ -5,8 +5,8 @@ jest.mock('node-fetch');
 
 import fetch from 'node-fetch';
 import { beforeEach, describe, expect, jest, test } from '@jest/globals';
-import { getDotNetSdk, getFileContents, getUpdateConfiguration, getWorkflowConfig } from '../../src/shared/github';
-import { getOctokitForContent } from '../mocks';
+import { getDotNetSdk, getFileContents, getReposForCurrentUser, getUpdateConfiguration, getWorkflowConfig } from '../../src/shared/github';
+import { getOctokitForContent, getOctokitForRepos } from '../mocks';
 
 const owner = 'owner';
 const repo = 'repo';
@@ -202,6 +202,95 @@ describe('getDotNetSdk', () => {
     test('returns null', async () => {
       const actual = await getDotNetSdk(octokit, owner, repo, ref);
       expect(actual).toBeNull();
+    });
+  });
+});
+
+describe('getReposForCurrentUser', () => {
+  describe('when there are no repositories', () => {
+    let octokit;
+
+    beforeEach(async () => {
+      octokit = getOctokitForRepos([]);
+    });
+
+    test('returns an empty array', async () => {
+      const actual = await getReposForCurrentUser(octokit, 'member');
+      expect(actual).not.toBeNull();
+      expect(actual.length).toBe(0);
+    });
+  });
+  describe('when there are repositories', () => {
+    let octokit;
+
+    beforeEach(async () => {
+      octokit = getOctokitForRepos([
+        {
+          full_name: 'org/name',
+          name: 'name',
+          owner: {
+            login: 'org',
+          },
+          default_branch: 'main',
+          html_url: 'https://github.com/org/name',
+          archived: false,
+          fork: false,
+          is_template: false,
+        },
+        {
+          full_name: 'org/archived',
+          name: 'archived',
+          owner: {
+            login: 'org',
+          },
+          default_branch: 'main',
+          html_url: 'https://github.com/org/archived',
+          archived: true,
+          fork: false,
+          is_template: false,
+        },
+        {
+          full_name: 'org/forked',
+          name: 'forked',
+          owner: {
+            login: 'org',
+          },
+          default_branch: 'main',
+          html_url: 'https://github.com/org/forked',
+          archived: false,
+          fork: true,
+          is_template: false,
+        },
+        {
+          full_name: 'org/template',
+          name: 'template',
+          owner: {
+            login: 'org',
+          },
+          default_branch: 'main',
+          html_url: 'https://github.com/org/template',
+          archived: false,
+          fork: false,
+          is_template: true,
+        },
+        {
+          full_name: 'org2/name2',
+          name: 'name2',
+          owner: {
+            login: 'org2',
+          },
+          default_branch: 'develop',
+          html_url: 'https://github.com/org2/name2',
+          archived: false,
+          fork: false,
+          is_template: false,
+        }
+      ]);
+    });
+
+    test('returns the correct repositories', async () => {
+      const actual = await getReposForCurrentUser(octokit, 'member');
+      expect(actual).toMatchSnapshot();
     });
   });
 });

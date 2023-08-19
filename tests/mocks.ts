@@ -32,3 +32,16 @@ export function getOctokitForContent(response: ContentResponse | any): any {
     },
   };
 }
+
+export function getOctokitForRepos(data: any[]): any {
+  return {
+    octokit: {
+      paginate: (...args: any[]) => args[0](args.slice(1)),
+      rest: {
+        repos: {
+          listForAuthenticatedUser: jest.fn().mockReturnValueOnce(data),
+        },
+      },
+    },
+  };
+}
