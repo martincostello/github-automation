@@ -18,7 +18,7 @@
     },
     {
       "basePath": "https://api.github.com",
-      "path": "/repos/martincostello/github-automation/branches/dotnet-vnext",
+      "path": "/repos/martincostello/github-automation/contents/global.json?ref=dotnet-vnext",
       "status": 404,
       "response": {
         "message": "Not Found",
