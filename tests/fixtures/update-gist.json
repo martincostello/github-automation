@@ -3,6 +3,7 @@
   "method": "PATCH",
   "path": "/gists/fake-gist",
   "response": {
-    "id": "fake-gist"
+    "id": "fake-gist",
+    "html_url": "https://gist.github.com/fake-gist"
   }
 }
