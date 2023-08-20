@@ -38,5 +38,9 @@ describe('dotnet-release', () => {
       expect(core.error).toHaveBeenCalledTimes(0);
       expect(core.setFailed).toHaveBeenCalledTimes(0);
     });
+
+    test('outputs the correct SDK versions', () => {
+      expect(fixture.getOutput('sdk-versions')).toMatchSnapshot();
+    });
   });
 });

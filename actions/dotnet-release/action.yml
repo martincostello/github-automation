@@ -17,6 +17,9 @@ inputs:
     description: 'The dotnet/core ref to check for a new release against.'
     required: false
     default: ''
+outputs:
+  sdk-versions:
+    description: 'A JSON array of the .NET SDK versions that were released.'
 runs:
   using: 'node16'
   main: 'dist/index.js'
