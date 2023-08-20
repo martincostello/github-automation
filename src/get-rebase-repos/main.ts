@@ -3,8 +3,7 @@
 
 import * as core from '@actions/core';
 import { getOctokit } from '@actions/github';
-import { Context } from '@actions/github/lib/context';
-import { getPull, getWorkflowConfig } from '../shared/github';
+import { getPull, getReposForCurrentUser } from '../shared/github';
 
 export async function run(): Promise<void> {
   try {
@@ -21,8 +20,7 @@ export async function run(): Promise<void> {
     if (specificRepo) {
       repositories = [specificRepo];
     } else {
-      const context = new Context();
-      repositories = (await getWorkflowConfig(github, context)).repositories;
+      repositories = (await getReposForCurrentUser({ octokit: github }, 'owner')).map((repo) => repo.full_name);
     }
 
     const result: string[] = [];
