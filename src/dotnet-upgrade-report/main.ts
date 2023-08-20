@@ -6,8 +6,9 @@ import { getOctokit } from '@actions/github';
 import { Context } from '@actions/github/lib/context';
 import fetch from 'node-fetch';
 import { getBadge } from '../shared/badges';
-import { getDotNetSdk, getFileContents, getPull, getReposForCurrentUser, getWorkflowConfig } from '../shared/github';
 import { ReleasesIndex } from '../shared/dotnet';
+import { handle } from '../shared/errors';
+import { getDotNetSdk, getFileContents, getPull, getReposForCurrentUser, getWorkflowConfig } from '../shared/github';
 
 export async function run(): Promise<void> {
   try {
@@ -177,13 +178,7 @@ export async function run(): Promise<void> {
       }
     }
   } catch (error: any) {
-    core.error(error);
-    if (error instanceof Error) {
-      if (error.stack) {
-        core.error(error.stack);
-      }
-      core.setFailed(error.message);
-    }
+    handle(error);
   }
 }
 

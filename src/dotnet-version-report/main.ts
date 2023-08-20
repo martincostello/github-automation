@@ -5,6 +5,7 @@ import * as core from '@actions/core';
 import { getOctokit } from '@actions/github';
 import { Context } from '@actions/github/lib/context';
 import { getBadge } from '../shared/badges';
+import { handle } from '../shared/errors';
 import { getFileContents, getDotNetSdk, getReposForCurrentUser } from '../shared/github';
 
 /* eslint-disable no-console */
@@ -55,13 +56,7 @@ export async function run(): Promise<void> {
 
     await core.summary.addRaw(report.join('\n')).write();
   } catch (error: any) {
-    core.error(error);
-    if (error instanceof Error) {
-      if (error.stack) {
-        core.error(error.stack);
-      }
-      core.setFailed(error.message);
-    }
+    handle(error);
   }
 }
 
