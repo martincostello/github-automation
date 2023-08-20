@@ -2,6 +2,35 @@
   "scenarios": [
     {
       "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/github-automation/contents/.github%2Fworkflow-config.json?ref=fake-sha",
+      "response": {
+        "download_url": "https://raw.githubusercontent.com/martincostello/github-automation/fake-sha/.github/workflow-config.json",
+        "encoding": "none"
+      }
+    },
+    {
+      "basePath": "https://raw.githubusercontent.com",
+      "path": "/martincostello/github-automation/fake-sha/.github/workflow-config.json",
+      "response": {
+        "checksOfInterest": [
+          "code-ql",
+          "code-ql (csharp)",
+          "code-ql (javascript)",
+          "dependency-review",
+          "lighthouse",
+          "lint",
+          "macos-latest",
+          "ubuntu-latest",
+          "validate-packages",
+          "windows-latest"
+        ],
+        "repositories": [
+          "martincostello/sqllocaldb"
+        ]
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
       "path": "/repos/martincostello/sqllocaldb",
       "response": {
         "default_branch": "main"

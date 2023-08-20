@@ -10,8 +10,8 @@ import { jest } from '@jest/globals';
 import { createEmptyFile, createTemporaryDirectory } from './helpers';
 
 export class ActionFixture {
+  public stepSummary: string = '';
   private tempDir: string = '';
-  private githubStepSummary: string = '';
   private outputPath: string = '';
   private outputs: Record<string, string> = {};
 
@@ -19,10 +19,8 @@ export class ActionFixture {
 
   async run(inputs: Record<string, string> = {}): Promise<void> {
     this.tempDir = await createTemporaryDirectory();
-    this.githubStepSummary = path.join(this.tempDir, 'github-step-summary.md');
     this.outputPath = path.join(this.tempDir, 'github-outputs');
 
-    await createEmptyFile(this.githubStepSummary);
     await createEmptyFile(this.outputPath);
 
     this.setupEnvironment(inputs);
@@ -30,8 +28,7 @@ export class ActionFixture {
 
     await this.sut();
 
-    const buffer = await fs.promises.readFile(this.outputPath);
-    const content = buffer.toString();
+    const content = await fs.promises.readFile(this.outputPath, 'utf8');
 
     const lines = content.split(os.EOL);
     for (let index = 0; index < lines.length; index += 3) {
@@ -53,17 +50,12 @@ export class ActionFixture {
     return this.outputs[name];
   }
 
-  async getStepSummary(): Promise<string> {
-    return await fs.promises.readFile(this.githubStepSummary, 'utf8');
-  }
-
   private setupEnvironment(inputs: Record<string, string>): void {
     const environment = {
       GITHUB_OUTPUT: this.outputPath,
       GITHUB_REPOSITORY: 'martincostello/github-automation',
       GITHUB_RUN_ID: '42',
       GITHUB_SHA: 'fake-sha',
-      GITHUB_STEP_SUMMARY: this.githubStepSummary,
       RUNNER_DEBUG: '1',
     };
 
@@ -101,5 +93,11 @@ export class ActionFixture {
     jest.spyOn(core, 'error').mockImplementation((arg) => {
       logger('error', arg);
     });
+
+    jest.spyOn(core.summary, 'addRaw').mockImplementation((text: string) => {
+      this.stepSummary += text;
+      return core.summary;
+    });
+    jest.spyOn(core.summary, 'write').mockReturnThis();
   }
 }
