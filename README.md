@@ -14,7 +14,7 @@ The following workflows are available.
 | [dotnet-version-report][dotnet-version-report]                   | Generates a report of the .NET SDK versions used by the default branch of my repositories.        |
 | [issue-metrics][issue-metrics]                                   | Runs monthly to generate a report of metrics for issues and pull requests for my repositories.    |
 | [rebase][rebase]                                                 | Rebases a branch of one or more repositories onto a specified base branch.                        |
-| [update-dotnet-sdks][update-dotnet-sdks]                         | Runs the `update-dotnet-sdk` workflow for the configured repositories for a specified branch.     |
+| [update-dotnet-sdks][update-dotnet-sdks]                         | Runs the `update-dotnet-sdk` workflow for one or more repositories for a specified branch.        |
 | [update-dotnet-sdks-for-nightly][update-dotnet-sdks-for-nightly] | Runs the `update-dotnet-sdks` workflow daily for the `dotnet-nightly` branch.                     |
 
 ### .NET Dependencies Updated
@@ -72,20 +72,22 @@ For the `dotnet-vnext` branch, the report content will also be updated [in this 
 ### .NET Version Report
 
 The [dotnet-version-report][dotnet-version-report] workflow runs on-demand and
-generates a markdown report that finds all of the repositories in the configured
-owner and shows which .NET SDK versions are used by the default branch of each of
-the repositories and whether that version is the latest official release.
+generates a markdown report that finds all of the repositories owned by the
+configured GitHub Personal Access Token (PAT) and shows which .NET SDK versions
+are used by the default branch of each of the repositories and whether that version
+is the latest official release.
 
 ### Issue Metrics
 
 The [issue-metrics][issue-metrics] workflow runs monthly and generates a markdown
-report about the issues and pull requests for the repositories for the configured
-owner using the [github/issue-metrics][issue-metrics-action] action.
+report about the issues and pull requests for the repositories owned by the
+configured GitHub Personal Access Token (PAT) using the
+[github/issue-metrics][issue-metrics-action] action.
 
 ### Rebase
 
-The [rebase][rebase] workflow rebases a branch of the
-configured repositories onto the default branch of the repository.
+The [rebase][rebase] workflow rebases a branch of all of the repositories in the
+configured owner onto the default branch of the repository.
 
 The [Rebaser][rebaser] action is used to rebase the branch.
 Rebaser will attempt to resolve conflicts for versions of the
