@@ -1,0 +1,176 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "path": "/user/repos?per_page=100&type=owner",
+      "response": [
+        {
+          "name": "adventofcode",
+          "full_name": "martincostello/adventofcode",
+          "private": false,
+          "owner": {
+            "login": "martincostello"
+          },
+          "html_url": "https://github.com/martincostello/adventofcode",
+          "fork": false,
+          "archived": false,
+          "is_template": false,
+          "default_branch": "main",
+          "language": "C#",
+          "permissions": {
+            "admin": true
+          }
+        },
+        {
+          "name": "alexa-london-travel",
+          "full_name": "martincostello/alexa-london-travel",
+          "private": false,
+          "owner": {
+            "login": "martincostello"
+          },
+          "html_url": "https://github.com/martincostello/alexa-london-travel",
+          "fork": false,
+          "archived": false,
+          "is_template": false,
+          "default_branch": "main",
+          "language": "C#",
+          "permissions": {
+            "admin": true
+          }
+        },
+        {
+          "name": "github-automation",
+          "full_name": "martincostello/github-automation",
+          "private": false,
+          "owner": {
+            "login": "martincostello"
+          },
+          "html_url": "https://github.com/martincostello/github-automation",
+          "fork": false,
+          "archived": false,
+          "is_template": false,
+          "default_branch": "main",
+          "language": "C#",
+          "permissions": {
+            "admin": true
+          }
+        },
+        {
+          "name": "website",
+          "full_name": "martincostello/website",
+          "private": false,
+          "owner": {
+            "login": "martincostello"
+          },
+          "html_url": "https://github.com/martincostello/website",
+          "fork": false,
+          "archived": false,
+          "is_template": false,
+          "default_branch": "main",
+          "language": "C#",
+          "permissions": {
+            "admin": true
+          }
+        }
+      ]
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/adventofcode/branches/dotnet-vnext",
+      "response": {
+        "name": "dotnet-vnext",
+        "commit": {
+          "sha": "acfe6bf45bfafb3ceac5fdbddc614024cb43a191"
+        }
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/adventofcode/commits/acfe6bf45bfafb3ceac5fdbddc614024cb43a191/pulls",
+      "response": [
+        {
+          "number": 1094,
+          "base": {
+            "ref": "dotnet-vnext"
+          }
+        },
+        {
+          "number": 992,
+          "base": {
+            "ref": "main"
+          }
+        }
+      ]
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/adventofcode/pulls/992",
+      "response": {
+        "html_url": "https://github.com/martincostello/adventofcode/pull/992",
+        "number": 1398,
+        "mergeable_state": "dirty"
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/alexa-london-travel/branches/dotnet-vnext",
+      "response": {
+        "name": "dotnet-vnext",
+        "commit": {
+          "sha": "9c6d15b21123bfc0174ef0aa2a9950a9f62ca83c"
+        }
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/alexa-london-travel/commits/9c6d15b21123bfc0174ef0aa2a9950a9f62ca83c/pulls",
+      "response": []
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/github-automation/branches/dotnet-vnext",
+      "status": 404,
+      "response": {
+        "message": "Not Found",
+        "documentation_url": "https://docs.github.com"
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/website/branches/dotnet-vnext",
+      "response": {
+        "name": "dotnet-vnext",
+        "commit": {
+          "sha": "adae44db6c432b2bb67705b0205306ea928735e7"
+        }
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/website/commits/adae44db6c432b2bb67705b0205306ea928735e7/pulls",
+      "response": [
+        {
+          "number": 1514,
+          "base": {
+            "ref": "dotnet-vnext"
+          }
+        },
+        {
+          "number": 1398,
+          "base": {
+            "ref": "main"
+          }
+        }
+      ]
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/website/pulls/1398",
+      "response": {
+        "html_url": "https://github.com/martincostello/website/pull/1398",
+        "number": 1398,
+        "mergeable_state": "clean"
+      }
+    }
+  ]
+}
