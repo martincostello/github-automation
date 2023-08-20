@@ -23,11 +23,31 @@
           "ubuntu-latest",
           "validate-packages",
           "windows-latest"
-        ],
-        "repositories": [
-          "martincostello/apple-fitness-workout-mapper"
         ]
       }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/user/repos?per_page=100&type=owner",
+      "response": [
+        {
+          "name": "apple-fitness-workout-mapper",
+          "full_name": "martincostello/apple-fitness-workout-mapper",
+          "private": false,
+          "owner": {
+            "login": "martincostello"
+          },
+          "html_url": "https://github.com/martincostello/apple-fitness-workout-mapper",
+          "fork": false,
+          "archived": false,
+          "is_template": false,
+          "default_branch": "main",
+          "language": "C#",
+          "permissions": {
+            "admin": true
+          }
+        }
+      ]
     },
     {
       "basePath": "https://api.github.com",

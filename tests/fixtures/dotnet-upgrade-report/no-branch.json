@@ -23,11 +23,31 @@
           "ubuntu-latest",
           "validate-packages",
           "windows-latest"
-        ],
-        "repositories": [
-          "martincostello/adventofcode"
         ]
       }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/user/repos?per_page=100&type=owner",
+      "response": [
+        {
+          "name": "adventofcode",
+          "full_name": "martincostello/adventofcode",
+          "private": false,
+          "owner": {
+            "login": "martincostello"
+          },
+          "html_url": "https://github.com/martincostello/adventofcode",
+          "fork": false,
+          "archived": false,
+          "is_template": false,
+          "default_branch": "main",
+          "language": "C#",
+          "permissions": {
+            "admin": true
+          }
+        }
+      ]
     },
     {
       "basePath": "https://api.github.com",

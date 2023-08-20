@@ -122,8 +122,7 @@ describe('getWorkflowConfig', () => {
 
   beforeEach(async () => {
     octokit = getOctokitForContent({
-      checksOfInterest: ['check'],
-      repositories: ['a/b', 'c/d'],
+      checksOfInterest: ['a', 'b'],
     });
   });
 
@@ -138,8 +137,7 @@ describe('getWorkflowConfig', () => {
     const actual = await getWorkflowConfig(octokit, context as any);
     expect(actual).not.toBeUndefined();
     expect(actual).not.toBeNull();
-    expect(actual?.checksOfInterest).toStrictEqual(['check']);
-    expect(actual?.repositories).toStrictEqual(['a/b', 'c/d']);
+    expect(actual?.checksOfInterest).toStrictEqual(['a', 'b']);
   });
 });
 

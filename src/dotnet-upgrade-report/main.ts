@@ -6,7 +6,7 @@ import { getOctokit } from '@actions/github';
 import { Context } from '@actions/github/lib/context';
 import fetch from 'node-fetch';
 import { getBadge } from '../shared/badges';
-import { getDotNetSdk, getFileContents, getPull, getWorkflowConfig } from '../shared/github';
+import { getDotNetSdk, getFileContents, getPull, getReposForCurrentUser, getWorkflowConfig } from '../shared/github';
 import { ReleasesIndex } from '../shared/dotnet';
 
 export async function run(): Promise<void> {
@@ -21,7 +21,8 @@ export async function run(): Promise<void> {
     const context = new Context();
     const github = getOctokit(token);
 
-    const { checksOfInterest, repositories } = await getWorkflowConfig(github, context);
+    const repositories = (await getReposForCurrentUser({ octokit: github }, 'owner')).map((repo) => repo.full_name);
+    const { checksOfInterest } = await getWorkflowConfig(github, context);
 
     let latestVersion: string;
 
