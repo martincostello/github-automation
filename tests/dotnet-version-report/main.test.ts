@@ -2,7 +2,7 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
 import * as core from '@actions/core';
-import { afterAll, beforeAll, describe, expect, jest, test } from '@jest/globals';
+import { afterAll, beforeAll, describe, expect, test } from '@jest/globals';
 import { ActionFixture } from '../ActionFixture';
 import { run } from '../../src/dotnet-version-report/main';
 import { setup } from '../fixtures';
@@ -30,8 +30,8 @@ describe('dotnet-version-report', () => {
       expect(core.setFailed).toHaveBeenCalledTimes(0);
     });
 
-    test('outputs the Markdown report', async () => {
-      expect(await fixture.getStepSummary()).toMatchSnapshot();
+    test('outputs the Markdown report', () => {
+      expect(fixture.stepSummary).toMatchSnapshot();
     });
   });
 });
