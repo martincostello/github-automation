@@ -175,7 +175,7 @@ describe('getDotNetSdk', () => {
 });
 
 describe('getReposForCurrentUser', () => {
-  describe.each([['member'], ['owner']])('when there are repositories for %s', (type: string) => {
+  describe.each([['all'], ['member'], ['owner']])('when there are repositories for %s', (type: string) => {
     let actual;
 
     beforeAll(async () => {
@@ -191,7 +191,7 @@ describe('getReposForCurrentUser', () => {
     });
   });
 
-  describe.each([['member'], ['owner']])('when there are no repositories for %s', (type: string) => {
+  describe.each([['all'], ['member'], ['owner']])('when there are no repositories for %s', (type: string) => {
     let actual;
 
     beforeAll(async () => {

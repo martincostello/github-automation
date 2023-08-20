@@ -92,7 +92,7 @@ type PaginatedApi = {
   };
 };
 
-export async function getReposForCurrentUser({ octokit }: PaginatedApi, type: 'owner' | 'member'): Promise<Repository[]> {
+export async function getReposForCurrentUser({ octokit }: PaginatedApi, type: 'all' | 'owner' | 'member'): Promise<Repository[]> {
   const per_page = 100;
   const repos = await octokit.paginate(octokit.rest.repos.listForAuthenticatedUser, {
     per_page,
@@ -108,7 +108,7 @@ export async function getReposForCurrentUser({ octokit }: PaginatedApi, type: 'o
     .filter((repo) => !repo.archived)
     .filter((repo) => !repo.fork)
     .filter((repo) => !repo.is_template)
-    .filter((repo) => (type === 'owner' ? repo.permissions?.admin : repo.permissions?.push))
+    .filter((repo) => repo.permissions?.push)
     .filter((repo) => repo.language === 'C#')
     .map((repo) => {
       return {
