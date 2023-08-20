@@ -117,6 +117,8 @@ export async function run(): Promise<void> {
 
       core.notice(`dotnet/core SHA updated to ${updatedSha}`);
     }
+
+    core.setOutput('sdk-versions', JSON.stringify(releaseNotes.map((r) => r['latest-sdk'])));
   } catch (error: any) {
     handle(error);
   }
