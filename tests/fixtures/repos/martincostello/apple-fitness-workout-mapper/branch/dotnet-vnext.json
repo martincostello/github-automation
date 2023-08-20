@@ -1,0 +1,10 @@
+{
+  "basePath": "https://api.github.com",
+  "path": "/repos/martincostello/apple-fitness-workout-mapper/branches/dotnet-vnext",
+  "response": {
+    "name": "dotnet-vnext",
+    "commit": {
+      "sha": "aa895b3bda70ae7595b8a3f3c64a267e37435140"
+    }
+  }
+}

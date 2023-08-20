@@ -1,0 +1,9 @@
+{
+  "basePath": "https://api.github.com",
+  "path": "/repos/martincostello/sqllocaldb/pulls/653",
+  "response": {
+    "html_url": "https://github.com/martincostello/sqllocaldb/pull/653",
+    "number": 653,
+    "mergeable_state": "clean"
+  }
+}

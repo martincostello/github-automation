@@ -1,0 +1,10 @@
+{
+  "basePath": "https://api.github.com",
+  "path": "/repos/martincostello/sqllocaldb/branches/dotnet-vnext",
+  "response": {
+    "name": "dotnet-vnext",
+    "commit": {
+      "sha": "a6245b1d9732843fa3188a15c91b1fba47cfac0d"
+    }
+  }
+}
