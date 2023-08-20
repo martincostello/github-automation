@@ -1,0 +1,21 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/dotnet/core/branches/main",
+      "response": {
+        "name": "main",
+        "commit": {
+          "sha": "6dc7506c307ddf3165cdd724ce1a5db4b31040a1"
+        }
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/dotnet/core/compare/main...6dc7506c307ddf3165cdd724ce1a5db4b31040a1",
+      "response": {
+        "files": []
+      }
+    }
+  ]
+}

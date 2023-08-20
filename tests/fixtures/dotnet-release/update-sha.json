@@ -1,0 +1,10 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/github-automation/actions/variables/DOTNET_CORE_SHA",
+      "method": "PATCH",
+      "response": {}
+    }
+  ]
+}
