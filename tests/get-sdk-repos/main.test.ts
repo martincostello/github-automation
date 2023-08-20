@@ -9,13 +9,13 @@ import { setup } from '../fixtures';
 
 describe('get-sdk-repos', () => {
   describe.each([
-    ['custom-config', 'dotnet-vnext'],
-    ['empty-custom-config', 'dotnet-vnext'],
-    ['ignored', 'dotnet-vnext'],
-    ['multiple', 'dotnet-vnext'],
-    ['nightly', 'dotnet-nightly'],
-    ['single', 'dotnet-vnext'],
-  ])('%s', (name: string, branch: string) => {
+    ['custom-config', 'dotnet-vnext', 'martincostello/website'],
+    ['empty-custom-config', 'dotnet-vnext', 'martincostello/website'],
+    ['ignored', 'dotnet-vnext', 'martincostello/website'],
+    ['multiple', 'dotnet-vnext', ''],
+    ['nightly', 'dotnet-nightly', ''],
+    ['single', 'dotnet-vnext', 'martincostello/website'],
+  ])('%s', (name: string, branch: string, repository: string) => {
     let fixture: ActionFixture;
 
     beforeAll(async () => {
@@ -26,6 +26,7 @@ describe('get-sdk-repos', () => {
       await fixture.run({
         'branch': branch,
         'github-token': 'fake-token',
+        'repository': repository,
       });
     });
 
