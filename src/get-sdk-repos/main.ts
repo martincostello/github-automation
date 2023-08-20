@@ -3,8 +3,9 @@
 
 import * as core from '@actions/core';
 import { getOctokit } from '@actions/github';
-import { getDotNetSdk, getReposForCurrentUser, getUpdateConfiguration } from '../shared/github';
 import { UpdateDotNetSdkConfig } from '../shared/config';
+import { handle } from '../shared/errors';
+import { getDotNetSdk, getReposForCurrentUser, getUpdateConfiguration } from '../shared/github';
 
 type UpdateConfiguration = {
   'channel': string;
@@ -114,13 +115,7 @@ export async function run(): Promise<void> {
 
     core.setOutput('updates', JSON.stringify(result));
   } catch (error: any) {
-    core.error(error);
-    if (error instanceof Error) {
-      if (error.stack) {
-        core.error(error.stack);
-      }
-      core.setFailed(error.message);
-    }
+    handle(error);
   }
 }
 

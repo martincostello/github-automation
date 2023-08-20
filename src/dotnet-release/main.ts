@@ -4,8 +4,9 @@
 import * as core from '@actions/core';
 import { getOctokit } from '@actions/github';
 import { Context } from '@actions/github/lib/context';
-import { getFileContents } from '../shared/github';
 import { isPreview, ReleaseChannel } from '../shared/dotnet';
+import { handle } from '../shared/errors';
+import { getFileContents } from '../shared/github';
 
 /* eslint-disable no-console */
 
@@ -117,13 +118,7 @@ export async function run(): Promise<void> {
       core.notice(`dotnet/core SHA updated to ${updatedSha}`);
     }
   } catch (error: any) {
-    core.error(error);
-    if (error instanceof Error) {
-      if (error.stack) {
-        core.error(error.stack);
-      }
-      core.setFailed(error.message);
-    }
+    handle(error);
   }
 }
 

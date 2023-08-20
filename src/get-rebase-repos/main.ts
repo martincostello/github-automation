@@ -3,6 +3,7 @@
 
 import * as core from '@actions/core';
 import { getOctokit } from '@actions/github';
+import { handle } from '../shared/errors';
 import { getPull, getReposForCurrentUser } from '../shared/github';
 
 export async function run(): Promise<void> {
@@ -83,13 +84,7 @@ export async function run(): Promise<void> {
 
     core.setOutput('repositories', JSON.stringify(result));
   } catch (error: any) {
-    core.error(error);
-    if (error instanceof Error) {
-      if (error.stack) {
-        core.error(error.stack);
-      }
-      core.setFailed(error.message);
-    }
+    handle(error);
   }
 }
 
