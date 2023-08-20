@@ -12,12 +12,8 @@ describe('dotnet-version-report', () => {
     let fixture: ActionFixture;
 
     beforeAll(async () => {
-      await setup('user-repos-owner');
-      await setup('repos/dotnet/core/contents/main/releases-index');
-      await setup('repos/martincostello/adventofcode/contents/main/global');
-      await setup('repos/martincostello/alexa-london-travel/contents/main/global');
-      await setup('repos/martincostello/github-automation/contents/main/global');
-      await setup('repos/martincostello/website/contents/main/global');
+      await setup(`sdk-versions`);
+      await setup('dotnet-version-report/owned-repos');
 
       fixture = new ActionFixture(run);
       await fixture.run({

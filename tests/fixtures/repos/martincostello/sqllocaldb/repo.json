@@ -1,7 +1,0 @@
-{
-  "basePath": "https://api.github.com",
-  "path": "/repos/martincostello/sqllocaldb",
-  "response": {
-    "default_branch": "main"
-  }
-}

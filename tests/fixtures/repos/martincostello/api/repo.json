@@ -1,7 +1,0 @@
-{
-  "basePath": "https://api.github.com",
-  "path": "/repos/martincostello/api",
-  "response": {
-    "default_branch": "main"
-  }
-}

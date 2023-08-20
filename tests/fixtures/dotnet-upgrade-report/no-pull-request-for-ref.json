@@ -1,0 +1,41 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/apple-fitness-workout-mapper",
+      "response": {
+        "default_branch": "main"
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/apple-fitness-workout-mapper/branches/dotnet-vnext",
+      "response": {
+        "name": "dotnet-vnext",
+        "commit": {
+          "sha": "aa895b3bda70ae7595b8a3f3c64a267e37435140"
+        }
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/apple-fitness-workout-mapper/commits/aa895b3bda70ae7595b8a3f3c64a267e37435140/pulls",
+      "response": [
+        {
+          "number": 841,
+          "base": {
+            "ref": "dotnet-vnext"
+          }
+        }
+      ]
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/apple-fitness-workout-mapper/contents/global.json?ref=dotnet-vnext",
+      "response": {
+        "content": "ewogICJzZGsiOiB7CiAgICAidmVyc2lvbiI6ICI4LjAuMTAwLXByZXZpZXcu\nNy4yMzM3Ni4zIiwKICAgICJhbGxvd1ByZXJlbGVhc2UiOiBmYWxzZSwKICAg\nICJyb2xsRm9yd2FyZCI6ICJsYXRlc3RNYWpvciIKICB9Cn0K\n",
+        "encoding": "base64"
+      }
+    }
+  ]
+}

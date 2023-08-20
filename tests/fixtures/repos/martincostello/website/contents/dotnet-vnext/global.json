@@ -1,8 +1,0 @@
-{
-  "basePath": "https://api.github.com",
-  "path": "/repos/martincostello/website/contents/global.json?ref=dotnet-vnext",
-  "response": {
-    "content": "ewogICJzZGsiOiB7CiAgICAidmVyc2lvbiI6ICI4LjAuMTAwLXByZXZpZXcu\nNy4yMzM3Ni4zIiwKICAgICJhbGxvd1ByZXJlbGVhc2UiOiBmYWxzZSwKICAg\nICJyb2xsRm9yd2FyZCI6ICJsYXRlc3RNYWpvciIKICB9Cn0K\n",
-    "encoding": "base64"
-  }
-}

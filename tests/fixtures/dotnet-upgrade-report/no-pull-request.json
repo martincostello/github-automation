@@ -1,0 +1,34 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/api",
+      "response": {
+        "default_branch": "main"
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/api/branches/dotnet-vnext",
+      "response": {
+        "name": "dotnet-vnext",
+        "commit": {
+          "sha": "82579518bfcdf2cb474fd9b140ec7036355fa293"
+        }
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/api/commits/82579518bfcdf2cb474fd9b140ec7036355fa293/pulls",
+      "response": []
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/api/contents/global.json?ref=dotnet-vnext",
+      "response": {
+        "content": "ewogICJzZGsiOiB7CiAgICAidmVyc2lvbiI6ICI4LjAuMTAwLXByZXZpZXcu\nNy4yMzM3Ni4zIiwKICAgICJhbGxvd1ByZXJlbGVhc2UiOiBmYWxzZSwKICAg\nICJyb2xsRm9yd2FyZCI6ICJsYXRlc3RNYWpvciIKICB9Cn0K\n",
+        "encoding": "base64"
+      }
+    }
+  ]
+}

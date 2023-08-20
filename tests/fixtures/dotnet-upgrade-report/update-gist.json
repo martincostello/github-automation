@@ -1,0 +1,13 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "method": "PATCH",
+      "path": "/gists/fake-gist",
+      "response": {
+        "id": "fake-gist",
+        "html_url": "https://gist.github.com/fake-gist"
+      }
+    }
+  ]
+}

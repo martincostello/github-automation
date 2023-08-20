@@ -1,0 +1,95 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "path": "/user/repos?per_page=100&type=owner",
+      "response": [
+        {
+          "name": "adventofcode",
+          "full_name": "martincostello/adventofcode",
+          "private": false,
+          "owner": {
+            "login": "martincostello"
+          },
+          "html_url": "https://github.com/martincostello/adventofcode",
+          "fork": false,
+          "archived": false,
+          "is_template": false,
+          "default_branch": "main"
+        },
+        {
+          "name": "alexa-london-travel",
+          "full_name": "martincostello/alexa-london-travel",
+          "private": false,
+          "owner": {
+            "login": "martincostello"
+          },
+          "html_url": "https://github.com/martincostello/alexa-london-travel",
+          "fork": false,
+          "archived": false,
+          "is_template": false,
+          "default_branch": "main"
+        },
+        {
+          "name": "github-automation",
+          "full_name": "martincostello/github-automation",
+          "private": false,
+          "owner": {
+            "login": "martincostello"
+          },
+          "html_url": "https://github.com/martincostello/github-automation",
+          "fork": false,
+          "archived": false,
+          "is_template": false,
+          "default_branch": "main"
+        },
+        {
+          "name": "website",
+          "full_name": "martincostello/website",
+          "private": false,
+          "owner": {
+            "login": "martincostello"
+          },
+          "html_url": "https://github.com/martincostello/website",
+          "fork": false,
+          "archived": false,
+          "is_template": false,
+          "default_branch": "main"
+        }
+      ]
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/adventofcode/contents/global.json?ref=main",
+      "response": {
+        "content": "ewogICJzZGsiOiB7CiAgICAidmVyc2lvbiI6ICI3LjAuNDAwIiwKICAgICJh\nbGxvd1ByZXJlbGVhc2UiOiBmYWxzZSwKICAgICJyb2xsRm9yd2FyZCI6ICJs\nYXRlc3RNYWpvciIKICB9Cn0K\n",
+        "encoding": "base64"
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/alexa-london-travel/contents/global.json?ref=main",
+      "response": {
+        "content": "ewogICJzZGsiOiB7CiAgICAidmVyc2lvbiI6ICI3LjAuMTAwIiwKICAgICJhbGxvd1ByZXJlbGVhc2UiOiBmYWxzZSwKICAgICJyb2xsRm9yd2FyZCI6ICJsYXRlc3RNYWpvciIKICB9Cn0=",
+        "encoding": "base64"
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/github-automation/contents/global.json?ref=main",
+      "status": 404,
+      "response": {
+        "message": "Not Found",
+        "documentation_url": "https://docs.github.com/rest/repos/contents#get-repository-content"
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/website/contents/global.json?ref=main",
+      "response": {
+        "content": "ewogICJzZGsiOiB7CiAgICAidmVyc2lvbiI6ICI2LjAuNDEzIiwKICAgICJhbGxvd1ByZXJlbGVhc2UiOiBmYWxzZSwKICAgICJyb2xsRm9yd2FyZCI6ICJsYXRlc3RNYWpvciIKICB9Cn0=",
+        "encoding": "base64"
+      }
+    }
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/website",
+      "response": {
+        "default_branch": "main"
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/website/branches/dotnet-vnext",
+      "response": {
+        "name": "dotnet-vnext",
+        "commit": {
+          "sha": "adae44db6c432b2bb67705b0205306ea928735e7"
+        }
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/website/commits/adae44db6c432b2bb67705b0205306ea928735e7/check-runs",
+      "response": {
+        "total_count": 14,
+        "check_runs": [
+          {
+            "name": "codecov/project",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "codecov/patch",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "test-prod",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "name": "production",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "name": "test-dev",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "name": "dev",
+            "status": "completed",
+            "conclusion": "skipped"
+          },
+          {
+            "name": "CodeQL",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "lighthouse",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "windows-latest",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "ubuntu-latest",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "macos-latest",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "dependency-review",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "lint",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "code-ql",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/website/commits/adae44db6c432b2bb67705b0205306ea928735e7/pulls",
+      "response": [
+        {
+          "number": 1514,
+          "base": {
+            "ref": "dotnet-vnext"
+          }
+        },
+        {
+          "number": 1398,
+          "base": {
+            "ref": "main"
+          }
+        }
+      ]
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/website/contents/global.json?ref=dotnet-vnext",
+      "response": {
+        "content": "ewogICJzZGsiOiB7CiAgICAidmVyc2lvbiI6ICI4LjAuMTAwLXByZXZpZXcu\nNy4yMzM3Ni4zIiwKICAgICJhbGxvd1ByZXJlbGVhc2UiOiBmYWxzZSwKICAg\nICJyb2xsRm9yd2FyZCI6ICJsYXRlc3RNYWpvciIKICB9Cn0K\n",
+        "encoding": "base64"
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/website/pulls/1398",
+      "response": {
+        "html_url": "https://github.com/martincostello/website/pull/1398",
+        "number": 1398,
+        "mergeable_state": "clean"
+      }
+    }
+  ]
+}
