@@ -1,0 +1,12 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/github-automation/contents/.github%2Fworkflow-config.json?ref=fake-sha",
+      "response": {
+        "content": "ewogICJjaGVja3NPZkludGVyZXN0IjogWwogICAgImNvZGUtcWwiLAogICAgImNvZGUtcWwgKGNzaGFycCkiLAogICAgImNvZGUtcWwgKGphdmFzY3JpcHQpIiwKICAgICJkZXBlbmRlbmN5LXJldmlldyIsCiAgICAibGlnaHRob3VzZSIsCiAgICAibGludCIsCiAgICAibWFjb3MtbGF0ZXN0IiwKICAgICJ1YnVudHUtbGF0ZXN0IiwKICAgICJ2YWxpZGF0ZS1wYWNrYWdlcyIsCiAgICAid2luZG93cy1sYXRlc3QiCiAgXSwKICAicmVwb3NpdG9yaWVzIjogWwogICAgIm1hcnRpbmNvc3RlbGxvL2FkdmVudG9mY29kZSIsCiAgICAibWFydGluY29zdGVsbG8vYWxleGEtbG9uZG9uLXRyYXZlbCIsCiAgICAibWFydGluY29zdGVsbG8vYXBpIiwKICAgICJtYXJ0aW5jb3N0ZWxsby9hcHBsZS1maXRuZXNzLXdvcmtvdXQtbWFwcGVyIiwKICAgICJtYXJ0aW5jb3N0ZWxsby9jb3N0ZWxsb2JvdCIsCiAgICAibWFydGluY29zdGVsbG8vZGVwZW5kYWJvdC1oZWxwZXIiLAogICAgIm1hcnRpbmNvc3RlbGxvL2dpdGh1Yi1hdXRvbWF0aW9uIiwKICAgICJtYXJ0aW5jb3N0ZWxsby9zcWxsb2NhbGRiIiwKICAgICJtYXJ0aW5jb3N0ZWxsby93ZWJzaXRlIgogIF0KfQ==",
+        "encoding": "base64"
+      }
+    }
+  ]
+}

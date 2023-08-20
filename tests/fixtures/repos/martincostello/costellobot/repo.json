@@ -1,7 +1,0 @@
-{
-  "basePath": "https://api.github.com",
-  "path": "/repos/martincostello/costellobot",
-  "response": {
-    "default_branch": "main"
-  }
-}

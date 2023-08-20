@@ -1,7 +1,0 @@
-{
-  "basePath": "https://api.github.com",
-  "path": "/repos/martincostello/apple-fitness-workout-mapper",
-  "response": {
-    "default_branch": "main"
-  }
-}

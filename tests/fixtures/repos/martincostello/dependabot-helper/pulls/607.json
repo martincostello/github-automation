@@ -1,9 +1,0 @@
-{
-  "basePath": "https://api.github.com",
-  "path": "/repos/martincostello/dependabot-helper/pulls/607",
-  "response": {
-    "html_url": "https://github.com/martincostello/dependabot-helper/pull/607",
-    "number": 607,
-    "mergeable_state": "dirty"
-  }
-}

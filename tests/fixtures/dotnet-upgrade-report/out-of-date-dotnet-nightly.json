@@ -1,0 +1,99 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/sqllocaldb",
+      "response": {
+        "default_branch": "main"
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/sqllocaldb/branches/dotnet-nightly",
+      "response": {
+        "name": "dotnet-nightly",
+        "commit": {
+          "sha": "2f54b0a6c1f01b74f79bedd64d39fe8c09868145"
+        }
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/sqllocaldb/commits/2f54b0a6c1f01b74f79bedd64d39fe8c09868145/check-runs",
+      "response": {
+        "total_count": 8,
+        "check_runs": [
+          {
+            "name": "codecov/project",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "codecov/patch",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "windows-latest",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "ubuntu-latest",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "macos-latest",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "dependency-review",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "lint",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "name": "code-ql",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/sqllocaldb/commits/2f54b0a6c1f01b74f79bedd64d39fe8c09868145/pulls",
+      "response": [
+        {
+          "number": 653,
+          "base": {
+            "ref": "dotnet-vnext"
+          }
+        }
+      ]
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/sqllocaldb/contents/global.json?ref=dotnet-nightly",
+      "response": {
+        "content": "ewogICJzZGsiOiB7CiAgICAidmVyc2lvbiI6ICI4LjAuMTAwLXJjLjEuMjM0\nMTUuMTEiLAogICAgImFsbG93UHJlcmVsZWFzZSI6IGZhbHNlLAogICAgInJv\nbGxGb3J3YXJkIjogImxhdGVzdE1ham9yIgogIH0KfQo=\n",
+        "encoding": "base64"
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/sqllocaldb/pulls/653",
+      "response": {
+        "html_url": "https://github.com/martincostello/sqllocaldb/pull/653",
+        "number": 653,
+        "mergeable_state": "clean"
+      }
+    }
+  ]
+}
