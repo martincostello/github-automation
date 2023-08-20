@@ -9,6 +9,8 @@ import { setup } from '../fixtures';
 
 describe('get-rebase-repos', () => {
   describe.each([
+    ['false', '', 'dotnet-vnext', ''],
+    ['true', '', 'dotnet-vnext', ''],
     ['false', '', 'dotnet-vnext', 'main'],
     ['true', '', 'dotnet-vnext', 'main'],
     ['false', 'martincostello/website', 'dotnet-vnext', 'main'],
