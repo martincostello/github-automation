@@ -1,0 +1,17 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/owner/repo/contents/global.json?ref=main",
+      "response": {
+        "encoding": "none",
+        "download_url": "https://raw.githubusercontent.com/owner/repo/main/global.json"
+      }
+    },
+    {
+      "basePath": "https://raw.githubusercontent.com",
+      "path": "/owner/repo/main/global.json",
+      "response": {"sdk":{"version":"7.0.400","allowPrerelease": false,"rollForward":"latestMajor"}}
+    }
+  ]
+}

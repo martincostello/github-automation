@@ -1,0 +1,22 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/owner/repo/contents/.github%2Fupdate-dotnet-sdk.json?ref=main",
+      "response": {
+        "encoding": "none",
+        "download_url": "https://raw.githubusercontent.com/owner/repo/main/.github/update-dotnet-sdk.json"
+      }
+    },
+    {
+      "basePath": "https://raw.githubusercontent.com",
+      "path": "/owner/repo/main/.github/update-dotnet-sdk.json",
+      "response": {
+        "ignore": true,
+        "exclude-nuget-packages": "excluded",
+        "include-nuget-packages": "included",
+        "update-nuget-packages": true
+      }
+    }
+  ]
+}

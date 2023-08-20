@@ -1,0 +1,11 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/owner/repo/contents/some%2Ffile?ref=main",
+      "response": {
+        "encoding": "foo"
+      }
+    }
+  ]
+}

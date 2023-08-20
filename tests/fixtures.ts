@@ -12,6 +12,7 @@ type Fixture = {
 type Scenario = {
   basePath: string;
   method?: 'GET' | 'PATCH';
+  headers?: Record<string, string>;
   path: string;
   status?: number;
   response: any;
@@ -25,7 +26,13 @@ export async function setup(name: string): Promise<void> {
   const fixture: Fixture = JSON.parse(json);
 
   for (const scenario of fixture.scenarios) {
-    const scope = nock(scenario.basePath);
+    let scope = nock(scenario.basePath);
+
+    if (scenario.headers) {
+      for (const [key, value] of Object.entries(scenario.headers)) {
+        scope = scope.matchHeader(key, value);
+      }
+    }
 
     let interceptor;
 
