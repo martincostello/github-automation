@@ -82,7 +82,7 @@ export async function run(): Promise<void> {
         });
         base_ref = repository.default_branch;
       } else {
-        base_ref = 'dotnet-vnext';
+        base_ref = default_branch;
       }
 
       const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
@@ -112,15 +112,18 @@ export async function run(): Promise<void> {
 
       const statusesOfInterest = checkStatuses.check_runs
         .filter((check) => checksOfInterest.includes(check.name))
-        .map((check) => check.conclusion);
+        .map((check) => ({
+          status: check.status,
+          conclusion: check.conclusion,
+        }));
 
       let combinedStatus = 'success';
 
       for (const status of statusesOfInterest) {
-        if (status === 'failure') {
+        if (status.conclusion === 'failure') {
           combinedStatus = 'failure';
           break;
-        } else if (status === 'neutral') {
+        } else if (status.status !== 'completed') {
           combinedStatus = 'pending';
         }
       }
