@@ -1,0 +1,354 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "path": "/user/repos?per_page=100&type=member",
+      "headers": {
+        "authorization": "token member-token"
+      },
+      "response": [
+        {
+          "full_name": "org/name",
+          "name": "name",
+          "owner": {
+            "login": "org"
+          },
+          "default_branch": "main",
+          "html_url": "https://github.com/org/name",
+          "archived": false,
+          "fork": false,
+          "is_template": false,
+          "language": "C#",
+          "permissions": {
+            "admin": true,
+            "push": true
+          }
+        },
+        {
+          "full_name": "org/archived",
+          "name": "archived",
+          "owner": {
+            "login": "org"
+          },
+          "default_branch": "main",
+          "html_url": "https://github.com/org/archived",
+          "archived": true,
+          "fork": false,
+          "is_template": false,
+          "language": "C#",
+          "permissions": {
+            "admin": true,
+            "push": true
+          }
+        },
+        {
+          "full_name": "org/forked",
+          "name": "forked",
+          "owner": {
+            "login": "org"
+          },
+          "default_branch": "main",
+          "html_url": "https://github.com/org/forked",
+          "archived": false,
+          "fork": true,
+          "is_template": false,
+          "language": "C#",
+          "permissions": {
+            "admin": true,
+            "push": true
+          }
+        },
+        {
+          "full_name": "org/template",
+          "name": "template",
+          "owner": {
+            "login": "org"
+          },
+          "default_branch": "main",
+          "html_url": "https://github.com/org/template",
+          "archived": false,
+          "fork": false,
+          "is_template": true,
+          "language": "C#",
+          "permissions": {
+            "admin": true,
+            "push": true
+          }
+        },
+        {
+          "full_name": "org2/name2",
+          "name": "name2",
+          "owner": {
+            "login": "org2"
+          },
+          "default_branch": "develop",
+          "html_url": "https://github.com/org2/name2",
+          "archived": false,
+          "fork": false,
+          "is_template": false,
+          "language": "C#",
+          "permissions": {
+            "admin": true,
+            "push": true
+          }
+        },
+        {
+          "full_name": "org3/name1",
+          "name": "name1",
+          "owner": {
+            "login": "org3"
+          },
+          "default_branch": "main",
+          "html_url": "https://github.com/org3/name1",
+          "archived": false,
+          "fork": false,
+          "is_template": false,
+          "language": "C#",
+          "permissions": {
+            "admin": false,
+            "push": false
+          }
+        },
+        {
+          "full_name": "org3/name2",
+          "name": "name2",
+          "owner": {
+            "login": "org3"
+          },
+          "default_branch": "main",
+          "html_url": "https://github.com/org3/name2",
+          "archived": false,
+          "fork": false,
+          "is_template": false,
+          "language": "C#",
+          "permissions": {
+            "admin": false,
+            "push": true
+          }
+        },
+        {
+          "full_name": "org3/name3",
+          "name": "name3",
+          "owner": {
+            "login": "org3"
+          },
+          "default_branch": "main",
+          "html_url": "https://github.com/org3/name3",
+          "archived": false,
+          "fork": false,
+          "is_template": false,
+          "language": "C#",
+          "permissions": {
+            "admin": true,
+            "push": true
+          }
+        },
+        {
+          "full_name": "org3/name4",
+          "name": "name4",
+          "owner": {
+            "login": "org3"
+          },
+          "default_branch": "main",
+          "html_url": "https://github.com/org3/name4",
+          "archived": false,
+          "fork": false,
+          "is_template": false,
+          "language": "JavaScript",
+          "permissions": {
+            "admin": true,
+            "push": true
+          }
+        },
+        {
+          "full_name": "org3/name4",
+          "name": "name4",
+          "owner": {
+            "login": "org3"
+          },
+          "default_branch": "main",
+          "html_url": "https://github.com/org3/name4",
+          "archived": false,
+          "fork": false,
+          "is_template": false,
+          "language": "C#"
+        }
+      ]
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/user/repos?per_page=100&type=owner",
+      "headers": {
+        "authorization": "token owner-token"
+      },
+      "response": [
+        {
+          "full_name": "org/name",
+          "name": "name",
+          "owner": {
+            "login": "org"
+          },
+          "default_branch": "main",
+          "html_url": "https://github.com/org/name",
+          "archived": false,
+          "fork": false,
+          "is_template": false,
+          "language": "C#",
+          "permissions": {
+            "admin": true,
+            "push": true
+          }
+        },
+        {
+          "full_name": "org/archived",
+          "name": "archived",
+          "owner": {
+            "login": "org"
+          },
+          "default_branch": "main",
+          "html_url": "https://github.com/org/archived",
+          "archived": true,
+          "fork": false,
+          "is_template": false,
+          "language": "C#",
+          "permissions": {
+            "admin": true,
+            "push": true
+          }
+        },
+        {
+          "full_name": "org/forked",
+          "name": "forked",
+          "owner": {
+            "login": "org"
+          },
+          "default_branch": "main",
+          "html_url": "https://github.com/org/forked",
+          "archived": false,
+          "fork": true,
+          "is_template": false,
+          "language": "C#",
+          "permissions": {
+            "admin": true,
+            "push": true
+          }
+        },
+        {
+          "full_name": "org/template",
+          "name": "template",
+          "owner": {
+            "login": "org"
+          },
+          "default_branch": "main",
+          "html_url": "https://github.com/org/template",
+          "archived": false,
+          "fork": false,
+          "is_template": true,
+          "language": "C#",
+          "permissions": {
+            "admin": true,
+            "push": true
+          }
+        },
+        {
+          "full_name": "org2/name2",
+          "name": "name2",
+          "owner": {
+            "login": "org2"
+          },
+          "default_branch": "develop",
+          "html_url": "https://github.com/org2/name2",
+          "archived": false,
+          "fork": false,
+          "is_template": false,
+          "language": "C#",
+          "permissions": {
+            "admin": true,
+            "push": true
+          }
+        },
+        {
+          "full_name": "org3/name1",
+          "name": "name1",
+          "owner": {
+            "login": "org3"
+          },
+          "default_branch": "main",
+          "html_url": "https://github.com/org3/name1",
+          "archived": false,
+          "fork": false,
+          "is_template": false,
+          "language": "C#",
+          "permissions": {
+            "admin": false,
+            "push": false
+          }
+        },
+        {
+          "full_name": "org3/name2",
+          "name": "name2",
+          "owner": {
+            "login": "org3"
+          },
+          "default_branch": "main",
+          "html_url": "https://github.com/org3/name2",
+          "archived": false,
+          "fork": false,
+          "is_template": false,
+          "language": "C#",
+          "permissions": {
+            "admin": false,
+            "push": true
+          }
+        },
+        {
+          "full_name": "org3/name3",
+          "name": "name3",
+          "owner": {
+            "login": "org3"
+          },
+          "default_branch": "main",
+          "html_url": "https://github.com/org3/name3",
+          "archived": false,
+          "fork": false,
+          "is_template": false,
+          "language": "C#",
+          "permissions": {
+            "admin": true,
+            "push": true
+          }
+        },
+        {
+          "full_name": "org3/name4",
+          "name": "name4",
+          "owner": {
+            "login": "org3"
+          },
+          "default_branch": "main",
+          "html_url": "https://github.com/org3/name4",
+          "archived": false,
+          "fork": false,
+          "is_template": false,
+          "language": "JavaScript",
+          "permissions": {
+            "admin": true,
+            "push": true
+          }
+        },
+        {
+          "full_name": "org3/name4",
+          "name": "name4",
+          "owner": {
+            "login": "org3"
+          },
+          "default_branch": "main",
+          "html_url": "https://github.com/org3/name4",
+          "archived": false,
+          "fork": false,
+          "is_template": false,
+          "language": "C#"
+        }
+      ]
+    }
+  ]
+}

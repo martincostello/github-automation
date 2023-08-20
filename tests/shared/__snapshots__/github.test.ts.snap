@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`getReposForCurrentUser when there are repositories returns the correct repositories for member 1`] = `
+exports[`getReposForCurrentUser when there are repositories for member returns the correct repositories 1`] = `
 [
   {
     "default_branch": "main",
@@ -33,7 +33,7 @@ exports[`getReposForCurrentUser when there are repositories returns the correct 
 ]
 `;
 
-exports[`getReposForCurrentUser when there are repositories returns the correct repositories for owner 1`] = `
+exports[`getReposForCurrentUser when there are repositories for owner returns the correct repositories 1`] = `
 [
   {
     "default_branch": "main",

@@ -1,10 +1,8 @@
 // Copyright (c) Martin Costello, 2023. All rights reserved.
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
-jest.mock('node-fetch');
-
-import fetch from 'node-fetch';
-import { beforeEach, describe, expect, jest, test } from '@jest/globals';
+import { getOctokit as getClient } from '@actions/github';
+import { beforeAll, beforeEach, describe, expect, jest, test } from '@jest/globals';
 import {
   getDotNetSdk,
   getFileContents,
@@ -13,11 +11,13 @@ import {
   getUpdateConfiguration,
   getWorkflowConfig,
 } from '../../src/shared/github';
-import { getOctokitForContent, getOctokitForPulls, getOctokitForRepos } from '../mocks';
+import { setup } from '../fixtures';
 
 const owner = 'owner';
 const repo = 'repo';
 const ref = 'main';
+
+const getOctokit = (token: string = 'fake-token') => getClient(token);
 
 describe('getFileContents', () => {
   const path = 'some/file';
@@ -26,10 +26,8 @@ describe('getFileContents', () => {
     let octokit;
 
     beforeEach(async () => {
-      octokit = getOctokitForContent({
-        content: 'SGVsbG8gd29ybGQh',
-        encoding: 'base64',
-      });
+      await setup('getFileContents/base64');
+      octokit = getOctokit();
     });
 
     test('returns the decoded contents', async () => {
@@ -42,13 +40,8 @@ describe('getFileContents', () => {
     let octokit;
 
     beforeEach(async () => {
-      octokit = getOctokitForContent({
-        download_url: 'https://raw.githubusercontent.com/owner/repo/main/some/file',
-        encoding: 'none',
-      });
-      fetch.mockResolvedValueOnce({
-        text: () => Promise.resolve('Hello world!'),
-      });
+      await setup('getFileContents/url');
+      octokit = getOctokit();
     });
 
     test('returns the contents', async () => {
@@ -61,13 +54,12 @@ describe('getFileContents', () => {
     let octokit;
 
     beforeEach(async () => {
-      octokit = getOctokitForContent({
-        encoding: 'potato',
-      });
+      await setup('getFileContents/unknown');
+      octokit = getOctokit();
     });
 
     test('throws an error', async () => {
-      await expect(getFileContents(octokit, owner, repo, path, ref)).rejects.toThrow('Unexpected encoding for some/file: potato');
+      await expect(getFileContents(octokit, owner, repo, path, ref)).rejects.toThrow('Unexpected encoding for some/file: foo');
     });
   });
 });
@@ -77,12 +69,8 @@ describe('getUpdateConfiguration', () => {
     let octokit;
 
     beforeEach(async () => {
-      octokit = getOctokitForContent({
-        'ignore': true,
-        'exclude-nuget-packages': 'excluded',
-        'include-nuget-packages': 'included',
-        'update-nuget-packages': true,
-      });
+      await setup('getUpdateConfiguration/exists');
+      octokit = getOctokit();
     });
 
     test('returns the configuration', async () => {
@@ -100,14 +88,8 @@ describe('getUpdateConfiguration', () => {
     let octokit;
 
     beforeEach(async () => {
-      const err = new Error('Not found');
-      octokit = {
-        rest: {
-          repos: {
-            getContent: jest.fn().mockRejectedValueOnce(err as never),
-          },
-        },
-      };
+      await setup('getUpdateConfiguration/not-found');
+      octokit = getOctokit();
     });
 
     test('returns null', async () => {
@@ -121,9 +103,8 @@ describe('getWorkflowConfig', () => {
   let octokit;
 
   beforeEach(async () => {
-    octokit = getOctokitForContent({
-      checksOfInterest: ['a', 'b'],
-    });
+    await setup('getWorkflowConfig/exists');
+    octokit = getOctokit();
   });
 
   test('returns the configuration', async () => {
@@ -142,27 +123,12 @@ describe('getWorkflowConfig', () => {
 });
 
 describe('getDotNetSdk', () => {
-  describe.each([
-    [undefined, 1],
-    [2, 3],
-  ])('when there is an SDK version with %s spaces', (space, line) => {
-    let octokit;
+  describe('when the file exists', () => {
     let actual;
 
-    beforeEach(async () => {
-      const json = JSON.stringify(
-        {
-          sdk: {
-            version: '7.0.400',
-          },
-        },
-        null,
-        space
-      );
-      octokit = getOctokitForContent({
-        content: Buffer.from(json).toString('base64'),
-        encoding: 'base64',
-      });
+    beforeAll(async () => {
+      await setup('getDotNetSdk/exists');
+      const octokit = getOctokit();
       actual = await getDotNetSdk(octokit, owner, repo, ref);
     });
 
@@ -171,16 +137,16 @@ describe('getDotNetSdk', () => {
     });
 
     test('returns the line number', () => {
-      expect(actual?.line).toBe(line);
+      expect(actual?.line).toBe(3);
     });
   });
 
   describe('when there is no SDK version', () => {
-    let octokit;
     let actual;
 
-    beforeEach(async () => {
-      octokit = getOctokitForContent({});
+    beforeAll(async () => {
+      await setup('getDotNetSdk/no-version');
+      const octokit = getOctokit();
       actual = await getDotNetSdk(octokit, owner, repo, ref);
     });
 
@@ -197,14 +163,8 @@ describe('getDotNetSdk', () => {
     let octokit;
 
     beforeEach(async () => {
-      const err = new Error('Not found');
-      octokit = {
-        rest: {
-          repos: {
-            getContent: jest.fn().mockRejectedValueOnce(err as never),
-          },
-        },
-      };
+      await setup('getDotNetSdk/not-found');
+      octokit = getOctokit();
     });
 
     test('returns null', async () => {
@@ -215,201 +175,65 @@ describe('getDotNetSdk', () => {
 });
 
 describe('getReposForCurrentUser', () => {
-  describe('when there are no repositories', () => {
-    let octokit;
+  describe.each([['member'], ['owner']])('when there are repositories for %s', (type: string) => {
+    let actual;
 
-    beforeEach(async () => {
-      octokit = getOctokitForRepos([]);
+    beforeAll(async () => {
+      await setup('getReposForCurrentUser/some');
+      const octokit = getOctokit(`${type}-token`);
+      actual = await getReposForCurrentUser({ octokit }, type as any);
+    });
+
+    test('returns the correct repositories', async () => {
+      expect(actual).not.toBeNull();
+      expect(actual.length).not.toBe(0);
+      expect(actual).toMatchSnapshot();
+    });
+  });
+
+  describe.each([['member'], ['owner']])('when there are no repositories for %s', (type: string) => {
+    let actual;
+
+    beforeAll(async () => {
+      await setup('getReposForCurrentUser/none');
+      const octokit = getOctokit();
+      actual = await getReposForCurrentUser({ octokit }, type as any);
     });
 
     test('returns an empty array', async () => {
-      const actual = await getReposForCurrentUser(octokit, 'member');
       expect(actual).not.toBeNull();
       expect(actual.length).toBe(0);
-    });
-  });
-  describe('when there are repositories', () => {
-    let octokit;
-
-    beforeEach(async () => {
-      octokit = getOctokitForRepos([
-        {
-          full_name: 'org/name',
-          name: 'name',
-          owner: {
-            login: 'org',
-          },
-          default_branch: 'main',
-          html_url: 'https://github.com/org/name',
-          archived: false,
-          fork: false,
-          is_template: false,
-          language: 'C#',
-          permissions: {
-            admin: true,
-            push: true,
-          },
-        },
-        {
-          full_name: 'org/archived',
-          name: 'archived',
-          owner: {
-            login: 'org',
-          },
-          default_branch: 'main',
-          html_url: 'https://github.com/org/archived',
-          archived: true,
-          fork: false,
-          is_template: false,
-          language: 'C#',
-          permissions: {
-            admin: true,
-            push: true,
-          },
-        },
-        {
-          full_name: 'org/forked',
-          name: 'forked',
-          owner: {
-            login: 'org',
-          },
-          default_branch: 'main',
-          html_url: 'https://github.com/org/forked',
-          archived: false,
-          fork: true,
-          is_template: false,
-          language: 'C#',
-          permissions: {
-            admin: true,
-            push: true,
-          },
-        },
-        {
-          full_name: 'org/template',
-          name: 'template',
-          owner: {
-            login: 'org',
-          },
-          default_branch: 'main',
-          html_url: 'https://github.com/org/template',
-          archived: false,
-          fork: false,
-          is_template: true,
-          language: 'C#',
-          permissions: {
-            admin: true,
-            push: true,
-          },
-        },
-        {
-          full_name: 'org2/name2',
-          name: 'name2',
-          owner: {
-            login: 'org2',
-          },
-          default_branch: 'develop',
-          html_url: 'https://github.com/org2/name2',
-          archived: false,
-          fork: false,
-          is_template: false,
-          language: 'C#',
-          permissions: {
-            admin: true,
-            push: true,
-          },
-        },
-        {
-          full_name: 'org3/name1',
-          name: 'name1',
-          owner: {
-            login: 'org3',
-          },
-          default_branch: 'main',
-          html_url: 'https://github.com/org3/name1',
-          archived: false,
-          fork: false,
-          is_template: false,
-          language: 'C#',
-          permissions: {
-            admin: false,
-            push: false,
-          },
-        },
-        {
-          full_name: 'org3/name2',
-          name: 'name2',
-          owner: {
-            login: 'org3',
-          },
-          default_branch: 'main',
-          html_url: 'https://github.com/org3/name2',
-          archived: false,
-          fork: false,
-          is_template: false,
-          language: 'C#',
-          permissions: {
-            admin: false,
-            push: true,
-          },
-        },
-        {
-          full_name: 'org3/name3',
-          name: 'name3',
-          owner: {
-            login: 'org3',
-          },
-          default_branch: 'main',
-          html_url: 'https://github.com/org3/name3',
-          archived: false,
-          fork: false,
-          is_template: false,
-          language: 'C#',
-          permissions: {
-            admin: true,
-            push: true,
-          },
-        },
-        {
-          full_name: 'org3/name4',
-          name: 'name4',
-          owner: {
-            login: 'org3',
-          },
-          default_branch: 'main',
-          html_url: 'https://github.com/org3/name4',
-          archived: false,
-          fork: false,
-          is_template: false,
-          language: 'JavaScript',
-          permissions: {
-            admin: true,
-            push: true,
-          },
-        },
-        {
-          full_name: 'org3/name4',
-          name: 'name4',
-          owner: {
-            login: 'org3',
-          },
-          default_branch: 'main',
-          html_url: 'https://github.com/org3/name4',
-          archived: false,
-          fork: false,
-          is_template: false,
-          language: 'C#',
-        },
-      ]);
-    });
-
-    test.each([['member'], ['owner']])('returns the correct repositories for %s', async (type: string) => {
-      const actual = await getReposForCurrentUser(octokit, type as any);
-      expect(actual).toMatchSnapshot();
     });
   });
 });
 
 describe('getPull', () => {
+  const getOctokitForPulls = (responses: any | any[]): any => {
+    let mock = jest.fn();
+
+    if (!Array.isArray(responses)) {
+      responses = [responses];
+    }
+
+    for (const data of responses) {
+      mock = mock.mockReturnValueOnce({
+        data,
+        headers: {
+          'Etag': '42',
+          'Last-Modified': new Date().toUTCString(),
+        },
+      });
+    }
+
+    return {
+      rest: {
+        pulls: {
+          get: mock,
+        },
+      },
+    };
+  };
+
   describe.each([
     [['behind'], 'behind'],
     [['blocked'], 'blocked'],
@@ -421,11 +245,10 @@ describe('getPull', () => {
     [['unknown', 'dirty'], 'dirty'],
     [[null, 'dirty'], 'dirty'],
   ])('when mergeable_state is %s', (mergeable_states: any[], expected: string) => {
-    let octokit;
     let actual;
 
     beforeEach(async () => {
-      octokit = getOctokitForPulls(mergeable_states.map((mergeable_state) => ({ mergeable_state })));
+      const octokit = getOctokitForPulls(mergeable_states.map((mergeable_state) => ({ mergeable_state })));
       actual = await getPull(octokit, owner, repo, 42);
     }, 15000);
 

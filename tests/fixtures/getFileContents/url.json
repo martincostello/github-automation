@@ -1,0 +1,17 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/owner/repo/contents/some%2Ffile?ref=main",
+      "response": {
+        "encoding": "none",
+        "download_url": "https://raw.githubusercontent.com/owner/repo/main/some/file"
+      }
+    },
+    {
+      "basePath": "https://raw.githubusercontent.com",
+      "path": "/owner/repo/main/some/file",
+      "response": "Hello world!"
+    }
+  ]
+}

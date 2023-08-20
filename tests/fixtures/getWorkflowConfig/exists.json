@@ -1,0 +1,19 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/owner/repo/contents/.github%2Fworkflow-config.json?ref=main",
+      "response": {
+        "encoding": "none",
+        "download_url": "https://raw.githubusercontent.com/owner/repo/main/.github/workflow-config.json"
+      }
+    },
+    {
+      "basePath": "https://raw.githubusercontent.com",
+      "path": "/owner/repo/main/.github/workflow-config.json",
+      "response": {
+        "checksOfInterest": ["a", "b"]
+      }
+    }
+  ]
+}
