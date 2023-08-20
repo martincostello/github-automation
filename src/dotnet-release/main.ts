@@ -39,7 +39,7 @@ export async function run(): Promise<void> {
       const { data: diff } = await github.rest.repos.compareCommitsWithBasehead({
         owner,
         repo,
-        basehead: `${previousSha}...${currentSha}`,
+        basehead: `${previousSha || 'main'}...${currentSha}`,
       });
       updatedSha = currentSha;
       if (diff.files) {
