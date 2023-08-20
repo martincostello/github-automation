@@ -1,0 +1,37 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/adventofcode/contents/global.json?ref=dotnet-nightly",
+      "response": {
+        "content": "ewogICJzZGsiOiB7CiAgICAidmVyc2lvbiI6ICI4LjAuMTAwLXByZXZpZXcu\nNy4yMzM3Ni4zIiwKICAgICJhbGxvd1ByZXJlbGVhc2UiOiBmYWxzZSwKICAg\nICJyb2xsRm9yd2FyZCI6ICJsYXRlc3RNYWpvciIKICB9Cn0K\n",
+        "encoding": "base64"
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/alexa-london-travel/contents/global.json?ref=dotnet-nightly",
+      "response": {
+        "content": "ewogICJzZGsiOiB7CiAgICAidmVyc2lvbiI6ICI4LjAuMTAwLXByZXZpZXcu\nNy4yMzM3Ni4zIiwKICAgICJhbGxvd1ByZXJlbGVhc2UiOiBmYWxzZSwKICAg\nICJyb2xsRm9yd2FyZCI6ICJsYXRlc3RNYWpvciIKICB9Cn0K\n",
+        "encoding": "base64"
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/github-automation/branches/dotnet-nightly",
+      "status": 404,
+      "response": {
+        "message": "Not Found",
+        "documentation_url": "https://docs.github.com"
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/website/contents/global.json?ref=dotnet-nightly",
+      "response": {
+        "content": "ewogICJzZGsiOiB7CiAgICAidmVyc2lvbiI6ICI4LjAuMTAwLXByZXZpZXcu\nNy4yMzM3Ni4zIiwKICAgICJhbGxvd1ByZXJlbGVhc2UiOiBmYWxzZSwKICAg\nICJyb2xsRm9yd2FyZCI6ICJsYXRlc3RNYWpvciIKICB9Cn0K\n",
+        "encoding": "base64"
+      }
+    }
+  ]
+}
