@@ -13,6 +13,7 @@ describe('get-sdk-repos', () => {
     ['empty-custom-config', 'dotnet-vnext', 'main', 'false', 'martincostello/website'],
     ['ignored', 'dotnet-vnext', 'main', 'false', 'martincostello/website'],
     ['multiple', 'dotnet-vnext', '', 'false', ''],
+    ['multiple', 'dotnet-vnext', 'main', 'false', ''],
     ['nightly', 'dotnet-nightly', '', 'false', ''],
     ['single', 'dotnet-vnext', 'main', 'false', 'martincostello/website'],
   ])(
