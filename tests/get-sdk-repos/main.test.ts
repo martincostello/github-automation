@@ -13,9 +13,9 @@ describe('get-sdk-repos', () => {
     ['empty-custom-config', 'dotnet-vnext', 'martincostello/website'],
     ['ignored', 'dotnet-vnext', 'martincostello/website'],
     ['multiple', 'dotnet-vnext', ''],
+    ['multiple', 'dotnet-vnext', 'martincostello/website'],
     ['nightly', 'dotnet-nightly', ''],
-    ['single', 'dotnet-vnext', 'martincostello/website'],
-  ])('%s', (name: string, branch: string, repository: string) => {
+  ])('%s on %s for repository "%s"', (name: string, branch: string, repository: string) => {
     let fixture: ActionFixture;
 
     beforeAll(async () => {
