@@ -15,34 +15,31 @@ describe('get-sdk-repos', () => {
     ['multiple', 'dotnet-vnext'],
     ['nightly', 'dotnet-nightly'],
     ['single', 'dotnet-vnext'],
-  ])(
-    '%s',
-    (name: string, branch: string) => {
-      let fixture: ActionFixture;
+  ])('%s', (name: string, branch: string) => {
+    let fixture: ActionFixture;
 
-      beforeAll(async () => {
-        await setup(`get-sdk-repos/${name}`);
-        await setup('get-sdk-repos/member-repos');
+    beforeAll(async () => {
+      await setup(`get-sdk-repos/${name}`);
+      await setup('get-sdk-repos/member-repos');
 
-        fixture = new ActionFixture(run);
-        await fixture.run({
-          'branch': branch,
-          'github-token': 'fake-token',
-        });
+      fixture = new ActionFixture(run);
+      await fixture.run({
+        'branch': branch,
+        'github-token': 'fake-token',
       });
+    });
 
-      afterAll(async () => {
-        await fixture?.destroy();
-      });
+    afterAll(async () => {
+      await fixture?.destroy();
+    });
 
-      test('generates no errors', () => {
-        expect(core.error).toHaveBeenCalledTimes(0);
-        expect(core.setFailed).toHaveBeenCalledTimes(0);
-      });
+    test('generates no errors', () => {
+      expect(core.error).toHaveBeenCalledTimes(0);
+      expect(core.setFailed).toHaveBeenCalledTimes(0);
+    });
 
-      test('outputs the correct repositories', () => {
-        expect(fixture.getOutput('updates')).toMatchSnapshot();
-      });
-    }
-  );
+    test('outputs the correct repositories', () => {
+      expect(fixture.getOutput('updates')).toMatchSnapshot();
+    });
+  });
 });

@@ -55,7 +55,7 @@ export async function run(): Promise<void> {
     const excludePackages = '';
     const includePackages = 'Microsoft.AspNetCore.,Microsoft.EntityFrameworkCore.,Microsoft.Extensions.,System.Text.Json';
     const labels = 'dependencies,.NET';
-    const ref = branch || '';
+    const ref = branch;
     const channel = branch === 'dotnet-nightly' ? '8.0.1xx-rc1' : '';
     const quality = branch === 'dotnet-nightly' ? 'daily' : '';
 
