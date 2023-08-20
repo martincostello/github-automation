@@ -145,7 +145,7 @@
     },
     {
       "basePath": "https://api.github.com",
-      "path": "/repos/martincostello/website/contents/global.json?ref=b8bafcc8b8d88bff55dc301eb9c0080ebde22afb",
+      "path": "/repos/martincostello/website/contents/global.json?ref=dotnet-nightly",
       "response": {
         "content": "ewogICJzZGsiOiB7CiAgICAidmVyc2lvbiI6ICI4LjAuMTAwLXJjLjEuMjM0\nMTcuMTgiLAogICAgImFsbG93UHJlcmVsZWFzZSI6IGZhbHNlLAogICAgInJv\nbGxGb3J3YXJkIjogImxhdGVzdE1ham9yIgogIH0KfQo=\n",
         "encoding": "base64"

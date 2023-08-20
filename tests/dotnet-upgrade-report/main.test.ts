@@ -17,7 +17,8 @@ describe('dotnet-upgrade-report', () => {
     ['no-pull-request-for-ref', 'dotnet-vnext', '8.0'],
     ['out-of-date-dotnet-vnext', 'dotnet-vnext', '8.0'],
     ['up-to-date-dotnet-vnext', 'dotnet-vnext', '8.0'],
-    //['dotnet-nightly', '8.0.1xx-rc1'],
+    ['out-of-date-dotnet-nightly', 'dotnet-nightly', '8.0.1xx-rc1'],
+    ['up-to-date-dotnet-nightly', 'dotnet-nightly', '8.0.1xx-rc1'],
   ])('%s for %s', (name: string, branch: string, channel: string) => {
     let fixture: ActionFixture;
 
