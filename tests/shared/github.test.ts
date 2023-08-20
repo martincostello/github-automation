@@ -386,6 +386,19 @@ describe('getReposForCurrentUser', () => {
             push: true,
           },
         },
+        {
+          full_name: 'org3/name4',
+          name: 'name4',
+          owner: {
+            login: 'org3',
+          },
+          default_branch: 'main',
+          html_url: 'https://github.com/org3/name4',
+          archived: false,
+          fork: false,
+          is_template: false,
+          language: 'C#',
+        },
       ]);
     });
 
