@@ -99,6 +99,11 @@ export async function getReposForCurrentUser({ octokit }: PaginatedApi, type: 'o
     type,
   });
 
+  debug(`Found ${repos.length} repos for ${type} before filtering.`);
+  for (const repo of repos) {
+    debug(`- ${repo.full_name}`);
+  }
+
   return repos
     .filter((repo) => !repo.archived)
     .filter((repo) => !repo.fork)
