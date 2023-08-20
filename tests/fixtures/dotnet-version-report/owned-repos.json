@@ -18,7 +18,7 @@
           "default_branch": "main",
           "language": "C#",
           "permissions": {
-            "admin": true
+            "push": true
           }
         },
         {
@@ -35,7 +35,7 @@
           "default_branch": "main",
           "language": "C#",
           "permissions": {
-            "admin": true
+            "push": true
           }
         },
         {
@@ -52,7 +52,7 @@
           "default_branch": "main",
           "language": "C#",
           "permissions": {
-            "admin": true
+            "push": true
           }
         },
         {
@@ -69,7 +69,7 @@
           "default_branch": "main",
           "language": "C#",
           "permissions": {
-            "admin": true
+            "push": true
           }
         }
       ]

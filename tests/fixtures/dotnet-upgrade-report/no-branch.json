@@ -28,7 +28,7 @@
     },
     {
       "basePath": "https://api.github.com",
-      "path": "/user/repos?per_page=100&type=owner",
+      "path": "/user/repos?per_page=100&type=all",
       "response": [
         {
           "name": "adventofcode",
@@ -44,7 +44,7 @@
           "default_branch": "main",
           "language": "C#",
           "permissions": {
-            "admin": true
+            "push": true
           }
         }
       ]

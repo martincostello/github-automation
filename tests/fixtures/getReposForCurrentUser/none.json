@@ -2,6 +2,11 @@
   "scenarios": [
     {
       "basePath": "https://api.github.com",
+      "path": "/user/repos?per_page=100&type=all",
+      "response": []
+    },
+    {
+      "basePath": "https://api.github.com",
       "path": "/user/repos?per_page=100&type=member",
       "response": []
     },
