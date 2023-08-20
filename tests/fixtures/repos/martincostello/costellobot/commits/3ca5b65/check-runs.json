@@ -1,0 +1,79 @@
+{
+  "basePath": "https://api.github.com",
+  "path": "/repos/martincostello/costellobot/commits/3ca5b65ece98573b7d37b4d7504ed39a27e36a57/check-runs",
+  "response": {
+    "total_count": 14,
+    "check_runs": [
+      {
+        "name": "codecov/project",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "codecov/patch",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "test-prod",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "production",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "test-dev",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "dev",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "CodeQL",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "lighthouse",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "windows-latest",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "ubuntu-latest",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "macos-latest",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "dependency-review",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "lint",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "code-ql",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  }
+}

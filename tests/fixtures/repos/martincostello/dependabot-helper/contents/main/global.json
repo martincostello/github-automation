@@ -1,0 +1,8 @@
+{
+  "basePath": "https://api.github.com",
+  "path": "/repos/martincostello/dependabot-helper/contents/global.json?ref=main",
+  "response": {
+    "content": "ewogICJzZGsiOiB7CiAgICAidmVyc2lvbiI6ICI2LjAuNDEzIiwKICAgICJhbGxvd1ByZXJlbGVhc2UiOiBmYWxzZSwKICAgICJyb2xsRm9yd2FyZCI6ICJsYXRlc3RNYWpvciIKICB9Cn0=",
+    "encoding": "base64"
+  }
+}
