@@ -9,16 +9,15 @@ import { setup } from '../fixtures';
 
 describe('get-sdk-repos', () => {
   describe.each([
-    ['custom-config', 'dotnet-vnext', 'main', 'false', 'martincostello/website'],
-    ['empty-custom-config', 'dotnet-vnext', 'main', 'false', 'martincostello/website'],
-    ['ignored', 'dotnet-vnext', 'main', 'false', 'martincostello/website'],
-    ['multiple', 'dotnet-vnext', '', 'false', ''],
-    ['multiple', 'dotnet-vnext', 'main', 'false', ''],
-    ['nightly', 'dotnet-nightly', '', 'false', ''],
-    ['single', 'dotnet-vnext', 'main', 'false', 'martincostello/website'],
+    ['custom-config', 'dotnet-vnext'],
+    ['empty-custom-config', 'dotnet-vnext'],
+    ['ignored', 'dotnet-vnext'],
+    ['multiple', 'dotnet-vnext'],
+    ['nightly', 'dotnet-nightly'],
+    ['single', 'dotnet-vnext'],
   ])(
     '%s',
-    (name: string, branch: string, base: string, force: string, repository: string) => {
+    (name: string, branch: string) => {
       let fixture: ActionFixture;
 
       beforeAll(async () => {
@@ -27,11 +26,8 @@ describe('get-sdk-repos', () => {
 
         fixture = new ActionFixture(run);
         await fixture.run({
-          'base': base,
           'branch': branch,
-          'force': force,
           'github-token': 'fake-token',
-          'repository': repository,
         });
       });
 
