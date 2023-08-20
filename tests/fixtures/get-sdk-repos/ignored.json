@@ -1,0 +1,19 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/website/contents/.github%2Fupdate-dotnet-sdk.json?ref=dotnet-vnext",
+      "response": {
+        "download_url": "https://raw.githubusercontent.com/martincostello/website/dotnet-vnext/.github/update-dotnet-sdk.json",
+        "encoding": "none"
+      }
+    },
+    {
+      "basePath": "https://raw.githubusercontent.com",
+      "path": "/martincostello/website/dotnet-vnext/.github/update-dotnet-sdk.json",
+      "response": {
+        "ignore": true
+      }
+    }
+  ]
+}
