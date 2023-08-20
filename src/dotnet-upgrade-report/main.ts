@@ -46,6 +46,8 @@ export async function run(): Promise<void> {
       '| :----------- | :---------- | :----------- | :--------: |',
     ];
 
+    let count = 0;
+
     for (const slug of repositories) {
       // eslint-disable-next-line no-console
       console.log(`Fetching data for ${slug}.`);
@@ -138,9 +140,14 @@ export async function run(): Promise<void> {
       const conflictsBadge = getBadge('Conflicts', hasConflicts ? 'Yes' : 'No', conflictsColor, 'git');
       const conflictsUrl = pull.html_url;
 
+      count++;
       report.push(
         `| [${slug}#${pull.number}](${pull.html_url}) | [![.NET SDK version](${sdkBadge})](${sdkUrl}) | [![Build: ${combinedStatus}](${buildBadge})](${buildUrl}) | [![Merge conflicts?](${conflictsBadge})](${conflictsUrl}) |`
       );
+    }
+
+    if (count === 0) {
+      return;
     }
 
     report.push('');
