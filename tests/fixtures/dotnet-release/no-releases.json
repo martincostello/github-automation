@@ -1,0 +1,34 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/dotnet/core/branches/main",
+      "response": {
+        "name": "main",
+        "commit": {
+          "sha": "6dc7506c307ddf3165cdd724ce1a5db4b31040a1"
+        }
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/dotnet/core/compare/53c167c2b0996ece03d56e20ff5977fdd16f3f9a...6dc7506c307ddf3165cdd724ce1a5db4b31040a1",
+      "response": {
+        "files": [
+          {
+            "sha": "c5acc3f5bd6e7c11d3c9ff8f39aa1596b0974c31",
+            "filename": "release-notes/8.0/known-issues.md",
+            "status": "modified",
+            "additions": 5,
+            "deletions": 25,
+            "changes": 30,
+            "blob_url": "https://github.com/dotnet/core/blob/6dc7506c307ddf3165cdd724ce1a5db4b31040a1/release-notes%2F8.0%2Fknown-issues.md",
+            "raw_url": "https://github.com/dotnet/core/raw/6dc7506c307ddf3165cdd724ce1a5db4b31040a1/release-notes%2F8.0%2Fknown-issues.md",
+            "contents_url": "https://api.github.com/repos/dotnet/core/contents/release-notes%2F8.0%2Fknown-issues.md?ref=6dc7506c307ddf3165cdd724ce1a5db4b31040a1",
+            "patch": "@@ -4,34 +4,14 @@ You may encounter the following known issues, which may include workarounds, mit\n \n ## .NET SDK\n \n-### [8.0.100-preview.1.23115.2] analyzer CA2009 throws InvalidCastException at runtime could cause a build failure\n-\n-[CA2009](https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2009): `Do not call ToImmutableCollection on an ImmutableCollection value` analyzer regressed in .NET 8 preview 1, the regression could cause a build failure if:\n-\n- - CA2009 severity is set at `warning` level: `dotnet_diagnostic.CA2009.severity = warning` (by default it is `suggestion`)\n- - And the AD0001 is at `warning` level (by default it is `warning`)\n- - And the .NET 8 preview 1 SDK is being used for build\n- - And the project warns as error `<TreatWarningsAsErrors>true</TreatWarningsAsErrors>` \n- - And the projects have a code section that calls `ToImmutableArray()` on an array instance, for example:\n- \n- ```cs\n-public ImmutableArray<int>  Method(int [] arr)\n-{\n-    return arr.ToImmutableArray();\n-}\n-```\n+### [8.0.100-preview.7] .NET 8 preview 7 SDK is not compatible with Visual Studio 17.6\n \n-Then the build would fail with an error:\n+Please upgrade to 17.7.0 or 17.8-preview1 or use [global.json](https://learn.microsoft.com/dotnet/core/tools/global-json) to pin to the 7.0.400 SDK that is included with 17.6.\n \n-```log\n-error AD0001: Analyzer 'Microsoft.NetCore.Analyzers.ImmutableCollections.DoNotCallToImmutableCollectionOnAnImmutableCollectionValueAnalyzer' threw an exception of type 'System.InvalidCastException' with message 'Unable to cast object of type 'Microsoft.CodeAnalysis.CSharp.Symbols.PublicModel.ArrayTypeSymbol' to type 'Microsoft.CodeAnalysis.INamedTypeSymbol'.\n ```\n-\n-**Resolution**\n-\n-- The regression is [fixed](https://github.com/dotnet/roslyn-analyzers/pull/6476) in .NET 8 preview 2. Could upgrade into .NET 8 preview 2 or above\n-- Lower the CA2009 analyzer severity to `suggestion` or `none` : `dotnet_diagnostic.CA2009.severity = none`\n-- Lower the AD0001 diagnostic severity to `suggestion` or `none` : `dotnet_diagnostic.CA2009.severity = suggestion`\n+SDK Resolver Failure: \"The SDK resolver \"Microsoft.DotNet.MSBuildSdkResolver\" failed while attempting to resolve the SDK \"Microsoft.Net.Sdk\". Exception: \"System.IO.FileNotFoundException: Could not find file '...\\sdk-manifests\\8.0.100-rc.1\\microsoft.net.workload.emscripten.current\\WorkloadManifest.json'.\n+File name: '...\\sdk-manifests\\8.0.100-rc.1\\microsoft.net.workload.emscripten.current\\WorkloadManifest.json'\n+```\n \n ## .NET MAUI\n "
+          }
+        ]
+      }
+    }
+  ]
+}
