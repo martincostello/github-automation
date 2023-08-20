@@ -3,7 +3,7 @@
 
 import { error, setFailed } from '@actions/core';
 
-export function handle(err: Error): void {
+export function handle(err: any): void {
   error(err);
   if (err instanceof Error) {
     if (err.stack) {
