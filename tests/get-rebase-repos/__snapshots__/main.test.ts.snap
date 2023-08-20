@@ -2,8 +2,12 @@
 
 exports[`get-rebase-repos force=false for repository "" outputs the correct repositories 1`] = `"["martincostello/adventofcode"]"`;
 
+exports[`get-rebase-repos force=false for repository "" outputs the correct repositories 2`] = `"["martincostello/adventofcode"]"`;
+
 exports[`get-rebase-repos force=false for repository "martincostello/website" outputs the correct repositories 1`] = `"[]"`;
 
 exports[`get-rebase-repos force=true for repository "" outputs the correct repositories 1`] = `"["martincostello/adventofcode","martincostello/website"]"`;
+
+exports[`get-rebase-repos force=true for repository "" outputs the correct repositories 2`] = `"["martincostello/adventofcode","martincostello/website"]"`;
 
 exports[`get-rebase-repos force=true for repository "martincostello/website" outputs the correct repositories 1`] = `"["martincostello/website"]"`;

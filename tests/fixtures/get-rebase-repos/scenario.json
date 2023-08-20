@@ -76,6 +76,13 @@
     },
     {
       "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/adventofcode",
+      "response": {
+        "default_branch": "main"
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
       "path": "/repos/martincostello/adventofcode/branches/dotnet-vnext",
       "response": {
         "name": "dotnet-vnext",
@@ -133,6 +140,13 @@
       "response": {
         "message": "Not Found",
         "documentation_url": "https://docs.github.com"
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/website",
+      "response": {
+        "default_branch": "main"
       }
     },
     {
