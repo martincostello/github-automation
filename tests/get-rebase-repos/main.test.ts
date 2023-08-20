@@ -9,13 +9,15 @@ import { setup } from '../fixtures';
 
 describe('get-rebase-repos', () => {
   describe.each([
-    ['false', '', 'dotnet-vnext', ''],
-    ['true', '', 'dotnet-vnext', ''],
-    ['false', '', 'dotnet-vnext', 'main'],
-    ['true', '', 'dotnet-vnext', 'main'],
-    ['false', 'martincostello/website', 'dotnet-vnext', 'main'],
-    ['true', 'martincostello/website', 'dotnet-vnext', 'main'],
-  ])('force=%s for repository "%s"', (force: string, repository: string, branch: string, base: string) => {
+    ['false', '', '', 'dotnet-vnext'],
+    ['true', '', '', 'dotnet-vnext'],
+    ['false', '', 'some-other-branch', 'dotnet-vnext'],
+    ['true', '', 'some-other-branch', 'dotnet-vnext'],
+    ['false', '', 'main', 'dotnet-vnext'],
+    ['true', '', 'main', 'dotnet-vnext'],
+    ['false', 'martincostello/website', 'main', 'dotnet-vnext'],
+    ['true', 'martincostello/website', 'main', 'dotnet-vnext'],
+  ])('force=%s for repository "%s" with base=%s', (force: string, repository: string, base: string, branch: string) => {
     let fixture: ActionFixture;
 
     beforeAll(async () => {

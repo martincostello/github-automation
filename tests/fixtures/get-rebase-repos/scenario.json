@@ -39,6 +39,23 @@
           }
         },
         {
+          "name": "api",
+          "full_name": "martincostello/api",
+          "private": false,
+          "owner": {
+            "login": "martincostello"
+          },
+          "html_url": "https://github.com/martincostello/api",
+          "fork": false,
+          "archived": false,
+          "is_template": false,
+          "default_branch": "main",
+          "language": "C#",
+          "permissions": {
+            "admin": true
+          }
+        },
+        {
           "name": "github-automation",
           "full_name": "martincostello/github-automation",
           "private": false,
@@ -132,6 +149,35 @@
       "basePath": "https://api.github.com",
       "path": "/repos/martincostello/alexa-london-travel/commits/9c6d15b21123bfc0174ef0aa2a9950a9f62ca83c/pulls",
       "response": []
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/api",
+      "response": {
+        "default_branch": "main"
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/api/branches/dotnet-vnext",
+      "response": {
+        "name": "dotnet-vnext",
+        "commit": {
+          "sha": "82579518bfcdf2cb474fd9b140ec7036355fa293"
+        }
+      }
+    },
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/api/commits/82579518bfcdf2cb474fd9b140ec7036355fa293/pulls",
+      "response": [
+        {
+          "number": 1514,
+          "base": {
+            "ref": "dotnet-vnext"
+          }
+        }
+      ]
     },
     {
       "basePath": "https://api.github.com",
