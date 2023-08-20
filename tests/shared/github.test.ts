@@ -246,6 +246,11 @@ describe('getReposForCurrentUser', () => {
           archived: false,
           fork: false,
           is_template: false,
+          language: 'C#',
+          permissions: {
+            admin: true,
+            push: true,
+          },
         },
         {
           full_name: 'org/archived',
@@ -258,6 +263,11 @@ describe('getReposForCurrentUser', () => {
           archived: true,
           fork: false,
           is_template: false,
+          language: 'C#',
+          permissions: {
+            admin: true,
+            push: true,
+          },
         },
         {
           full_name: 'org/forked',
@@ -270,6 +280,11 @@ describe('getReposForCurrentUser', () => {
           archived: false,
           fork: true,
           is_template: false,
+          language: 'C#',
+          permissions: {
+            admin: true,
+            push: true,
+          },
         },
         {
           full_name: 'org/template',
@@ -282,6 +297,11 @@ describe('getReposForCurrentUser', () => {
           archived: false,
           fork: false,
           is_template: true,
+          language: 'C#',
+          permissions: {
+            admin: true,
+            push: true,
+          },
         },
         {
           full_name: 'org2/name2',
@@ -294,12 +314,85 @@ describe('getReposForCurrentUser', () => {
           archived: false,
           fork: false,
           is_template: false,
+          language: 'C#',
+          permissions: {
+            admin: true,
+            push: true,
+          },
+        },
+        {
+          full_name: 'org3/name1',
+          name: 'name1',
+          owner: {
+            login: 'org3',
+          },
+          default_branch: 'main',
+          html_url: 'https://github.com/org3/name1',
+          archived: false,
+          fork: false,
+          is_template: false,
+          language: 'C#',
+          permissions: {
+            admin: false,
+            push: false,
+          },
+        },
+        {
+          full_name: 'org3/name2',
+          name: 'name2',
+          owner: {
+            login: 'org3',
+          },
+          default_branch: 'main',
+          html_url: 'https://github.com/org3/name2',
+          archived: false,
+          fork: false,
+          is_template: false,
+          language: 'C#',
+          permissions: {
+            admin: false,
+            push: true,
+          },
+        },
+        {
+          full_name: 'org3/name3',
+          name: 'name3',
+          owner: {
+            login: 'org3',
+          },
+          default_branch: 'main',
+          html_url: 'https://github.com/org3/name3',
+          archived: false,
+          fork: false,
+          is_template: false,
+          language: 'C#',
+          permissions: {
+            admin: true,
+            push: true,
+          },
+        },
+        {
+          full_name: 'org3/name4',
+          name: 'name4',
+          owner: {
+            login: 'org3',
+          },
+          default_branch: 'main',
+          html_url: 'https://github.com/org3/name4',
+          archived: false,
+          fork: false,
+          is_template: false,
+          language: 'JavaScript',
+          permissions: {
+            admin: true,
+            push: true,
+          },
         },
       ]);
     });
 
-    test('returns the correct repositories', async () => {
-      const actual = await getReposForCurrentUser(octokit, 'member');
+    test.each([['member'], ['owner']])('returns the correct repositories for %s', async (type: string) => {
+      const actual = await getReposForCurrentUser(octokit, type as any);
       expect(actual).toMatchSnapshot();
     });
   });

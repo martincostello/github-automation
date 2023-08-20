@@ -103,6 +103,8 @@ export async function getReposForCurrentUser({ octokit }: PaginatedApi, type: 'o
     .filter((repo) => !repo.archived)
     .filter((repo) => !repo.fork)
     .filter((repo) => !repo.is_template)
+    .filter((repo) => (type === 'owner' ? repo.permissions?.admin : repo.permissions?.push))
+    .filter((repo) => repo.language === 'C#')
     .map((repo) => {
       return {
         full_name: repo.full_name,
