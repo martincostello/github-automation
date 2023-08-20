@@ -11,5 +11,4 @@ export type UpdateDotNetSdkConfig = {
 
 export type WorkflowConfig = {
   checksOfInterest: string[];
-  repositories: string[];
 };
