@@ -4,9 +4,7 @@ GitHub automation for my repositories.
 
 [![Build status](https://github.com/martincostello/github-automation/workflows/build/badge.svg?branch=main&event=push)](https://github.com/martincostello/github-automation/actions?query=workflow%3Abuild+branch%3Amain+event%3Apush)
 [![codecov](https://codecov.io/gh/martincostello/github-automation/branch/main/graph/badge.svg)](https://codecov.io/gh/martincostello/github-automation)
-<!--
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/martincostello/github-automation/badge)](https://securityscorecards.dev/viewer/?uri=github.com/martincostello/github-automation)
--->
 
 ## Workflows
 
