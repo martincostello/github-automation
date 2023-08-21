@@ -49,6 +49,7 @@ export async function run(): Promise<void> {
   try {
     const branch = core.getInput('branch', { required: false });
     const token = core.getInput('github-token', { required: false });
+    const nightlyChannel = core.getInput('nightly-channel', { required: false });
     const github = getOctokit(token);
 
     const repositories = await getReposForCurrentUser({ octokit: github }, 'member');
@@ -57,7 +58,7 @@ export async function run(): Promise<void> {
     const includePackages = 'Microsoft.AspNetCore.,Microsoft.EntityFrameworkCore.,Microsoft.Extensions.,System.Text.Json';
     const labels = 'dependencies,.NET';
     const ref = branch;
-    const channel = branch === 'dotnet-nightly' ? '8.0.1xx' : '';
+    const channel = branch === 'dotnet-nightly' && nightlyChannel ? nightlyChannel : '';
     const quality = branch === 'dotnet-nightly' ? 'daily' : '';
 
     const singleRepository = core.getInput('repository', { required: false });

@@ -26,6 +26,7 @@ describe('get-sdk-repos', () => {
       await fixture.run({
         'branch': branch,
         'github-token': 'fake-token',
+        'nightly-channel': '8.0.1xx',
         'repository': repository,
       });
     });

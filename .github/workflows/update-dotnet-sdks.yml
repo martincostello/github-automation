@@ -56,6 +56,7 @@ jobs:
         with:
           branch: ${{ (github.event.client_payload && github.event.client_payload.branch) || inputs.branch || '' }}
           github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
+          nightly-channel: ${{ vars.DOTNET_NIGHTLY_CHANNEL }}
           repository: ${{ inputs.repository || '' }}
 
   update-sdk:
