@@ -32,6 +32,6 @@ jobs:
         uses: ./actions/dotnet-upgrade-report
         with:
           branch: ${{ inputs.branch }}
-          channel: '8.0.1xx-rc1'
+          channel: '8.0.1xx'
           gist-id: ${{ vars.UPGRADE_REPORT_GIST_ID }}
           github-token: ${{ secrets.ACCESS_TOKEN }}
