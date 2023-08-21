@@ -57,7 +57,7 @@ export async function run(): Promise<void> {
     const includePackages = 'Microsoft.AspNetCore.,Microsoft.EntityFrameworkCore.,Microsoft.Extensions.,System.Text.Json';
     const labels = 'dependencies,.NET';
     const ref = branch;
-    const channel = branch === 'dotnet-nightly' ? '8.0.1xx-rc1' : '';
+    const channel = branch === 'dotnet-nightly' ? '8.0.1xx' : '';
     const quality = branch === 'dotnet-nightly' ? 'daily' : '';
 
     const singleRepository = core.getInput('repository', { required: false });
