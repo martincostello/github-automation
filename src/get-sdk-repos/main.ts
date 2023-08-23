@@ -12,8 +12,6 @@ type UpdateConfiguration = {
   'exclude-nuget-packages': string | undefined;
   'include-nuget-packages': string | undefined;
   'labels': string;
-  'owner': string;
-  'name': string;
   'quality': string;
   'ref': string;
   'repo': string;
@@ -104,8 +102,6 @@ export async function run(): Promise<void> {
           'exclude-nuget-packages': valueOrDefault(updateConfig['exclude-nuget-packages'], excludePackages),
           'include-nuget-packages': valueOrDefault(updateConfig['include-nuget-packages'], includePackages),
           labels,
-          owner,
-          'name': repo,
           quality,
           ref,
           'repo': full_name,
