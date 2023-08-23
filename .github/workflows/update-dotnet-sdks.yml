@@ -144,7 +144,7 @@ jobs:
       - name: Close superseded pull requests
         uses: ./actions/tidy-sdk-pulls
         with:
-          base: ${{ matrix.ref }}
+          base: ${{ matrix.ref || 'main' }}
           github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
           repository: ${{ matrix.repo }}
           user: 'costellobot'
