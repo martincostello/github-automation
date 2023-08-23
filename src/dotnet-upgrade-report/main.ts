@@ -164,7 +164,7 @@ export async function run(): Promise<void> {
 
     await core.summary.addRaw(reportText).write();
 
-    if (gist_id && branch === default_branch) {
+    if (gist_id) {
       const { data: gist } = await github.rest.gists.update({
         gist_id,
         files: {

@@ -1,0 +1,16 @@
+name: dotnet-upgrade-report-for-nightly
+
+on:
+  schedule:
+    - cron: '30 08 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  update-from-nightly:
+    uses: ./.github/workflows/dotnet-upgrade-report.yml
+    secrets: inherit
+    with:
+      branch: 'dotnet-nightly'
+      gist-id: ${{ vars.NIGHTLY_UPGRADE_REPORT_GIST_ID }}
