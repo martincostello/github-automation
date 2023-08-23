@@ -1,0 +1,27 @@
+name: 'tidy-sdk-pulls'
+description: 'Closes any pull requests to update the .NET SDK that have been superseded by a newer pull request and deletes the associated branch.'
+author: 'Martin Costello'
+branding:
+  icon: 'delete'
+  color: 'red'
+inputs:
+  base:
+    description: 'The base branch to search for pull requests targeting.'
+    required: true
+  github-token:
+    description: 'The GitHub token to use to manage pull requests.'
+    required: false
+    default: ${{ github.token }}
+  repository:
+    description: 'The repository to search for pull requests in.'
+    required: true
+  user:
+    description: 'The optional GitHub login of the user or bot to search for pull requests from.'
+    required: false
+    default: ''
+outputs:
+  pulls:
+    description: 'A JSON array of the numbers of any pull requests that were closed as superseded.'
+runs:
+  using: 'node16'
+  main: 'dist/index.js'

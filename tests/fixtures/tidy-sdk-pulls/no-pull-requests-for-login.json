@@ -1,0 +1,46 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/website/pulls?base=dotnet-nightly&direction=desc&state=open",
+      "response": [
+        {
+          "url": "https://api.github.com/repos/martincostello/website/pulls/1514",
+          "number": 1514,
+          "state": "open",
+          "title": "Update .NET SDK to 8.0.100-rc.2.23422.1",
+          "user": {
+            "login": "github-actions[bot]"
+          },
+          "head": {
+            "ref": "update-dotnet-sdk-8.0.100-rc.2.23422.1"
+          }
+        },
+        {
+          "url": "https://api.github.com/repos/martincostello/website/pulls/1513",
+          "number": 1513,
+          "state": "open",
+          "title": "Update .NET SDK to 8.0.100-rc.2.23421.1",
+          "user": {
+            "login": "github-actions[bot]"
+          },
+          "head": {
+            "ref": "update-dotnet-sdk-8.0.100-rc.2.23421.1"
+          }
+        },
+        {
+          "url": "https://api.github.com/repos/martincostello/website/pulls/1512",
+          "number": 1512,
+          "state": "open",
+          "title": "Update .NET SDK to 8.0.100-rc.2.23420.1",
+          "user": {
+            "login": "github-actions[bot]"
+          },
+          "head": {
+            "ref": "update-dotnet-sdk-8.0.100-rc.2.23420.1"
+          }
+        }
+      ]
+    }
+  ]
+}
