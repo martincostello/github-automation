@@ -1,0 +1,9 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/martincostello/website/pulls?base=dotnet-nightly&direction=desc&state=open",
+      "response": []
+    }
+  ]
+}

@@ -11,7 +11,7 @@ type Fixture = {
 
 type Scenario = {
   basePath: string;
-  method?: 'GET' | 'PATCH' | 'POST';
+  method?: 'DELETE' | 'GET' | 'PATCH' | 'POST';
   headers?: Record<string, string>;
   path: string;
   body?: any;
@@ -37,7 +37,9 @@ export async function setup(name: string): Promise<void> {
 
     let interceptor;
 
-    if (scenario.method === 'PATCH') {
+    if (scenario.method === 'DELETE') {
+      interceptor = scope.delete(scenario.path, scenario.body);
+    } else if (scenario.method === 'PATCH') {
       interceptor = scope.patch(scenario.path, scenario.body);
     } else if (scenario.method === 'POST') {
       interceptor = scope.post(scenario.path, scenario.body);

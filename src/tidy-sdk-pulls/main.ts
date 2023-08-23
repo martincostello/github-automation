@@ -26,17 +26,19 @@ export async function run(): Promise<void> {
 
     let prs: number[] = [];
 
+    if (login) {
+      pulls = pulls.filter((pull) => pull.user?.login === login);
+    }
+
     if (pulls.length < 2) {
       // eslint-disable-next-line no-console
       console.log('No superseded pull requests found.');
     } else {
       // Filter out the latest open pull request, which may have just been created
-      if (login) {
-        pulls = pulls.filter((pull) => pull.user?.login === login);
-      }
-
       const latest = pulls[0];
+
       const superseded = pulls.slice(1);
+      superseded.reverse();
 
       const body = `Superseded by #${latest.number}.`;
 
