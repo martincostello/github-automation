@@ -19,6 +19,9 @@ inputs:
     description: 'The optional GitHub login of the user or bot to search for pull requests from.'
     required: false
     default: ''
+outputs:
+  pulls:
+    description: 'A JSON array of the numbers of any pull requests that were closed as superseded.'
 runs:
   using: 'node16'
   main: 'dist/index.js'

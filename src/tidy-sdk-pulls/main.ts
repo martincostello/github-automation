@@ -41,6 +41,8 @@ export async function run(): Promise<void> {
     const body = `Superseded by #${latest.number}.`;
 
     for (const pull of superseded) {
+      core.debug(`Closing pull request ${pull.number}.`);
+
       await github.rest.issues.createComment({
         owner,
         repo,
@@ -59,6 +61,8 @@ export async function run(): Promise<void> {
         ref: `heads/${pull.head.ref}`,
       });
     }
+
+    core.setOutput('pulls', JSON.stringify(superseded.map((p) => p.number)));
   } catch (error: any) {
     handle(error);
   }
