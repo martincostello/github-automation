@@ -24,45 +24,48 @@ export async function run(): Promise<void> {
       state: 'open',
     });
 
+    let prs: number[] = [];
+
     if (pulls.length < 2) {
       // eslint-disable-next-line no-console
       console.log('No superseded pull requests found.');
-      return;
+    } else {
+      // Filter out the latest open pull request, which may have just been created
+      if (login) {
+        pulls = pulls.filter((pull) => pull.user?.login === login);
+      }
+
+      const latest = pulls[0];
+      const superseded = pulls.slice(1);
+
+      const body = `Superseded by #${latest.number}.`;
+
+      for (const pull of superseded) {
+        core.debug(`Closing pull request ${pull.number}.`);
+
+        await github.rest.issues.createComment({
+          owner,
+          repo,
+          issue_number: pull.number,
+          body,
+        });
+        await github.rest.pulls.update({
+          owner,
+          repo,
+          pull_number: pull.number,
+          state: 'closed',
+        });
+        await github.rest.git.deleteRef({
+          owner,
+          repo,
+          ref: `heads/${pull.head.ref}`,
+        });
+      }
+
+      prs = superseded.map((p) => p.number);
     }
 
-    // Filter out the latest open pull request, which may have just been created
-    if (login) {
-      pulls = pulls.filter((pull) => pull.user?.login === login);
-    }
-
-    const latest = pulls[0];
-    const superseded = pulls.slice(1);
-
-    const body = `Superseded by #${latest.number}.`;
-
-    for (const pull of superseded) {
-      core.debug(`Closing pull request ${pull.number}.`);
-
-      await github.rest.issues.createComment({
-        owner,
-        repo,
-        issue_number: pull.number,
-        body,
-      });
-      await github.rest.pulls.update({
-        owner,
-        repo,
-        pull_number: pull.number,
-        state: 'closed',
-      });
-      await github.rest.git.deleteRef({
-        owner,
-        repo,
-        ref: `heads/${pull.head.ref}`,
-      });
-    }
-
-    core.setOutput('pulls', JSON.stringify(superseded.map((p) => p.number)));
+    core.setOutput('pulls', JSON.stringify(prs));
   } catch (error: any) {
     handle(error);
   }
