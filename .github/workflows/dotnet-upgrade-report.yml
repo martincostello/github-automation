@@ -3,6 +3,17 @@ name: dotnet-upgrade-report
 on:
   schedule:
     - cron: '30 08 * * *'
+  workflow_call:
+    inputs:
+      branch:
+        description: 'The branch to run the report for.'
+        required: true
+        type: string
+      gist-id:
+        description: 'The optional ID of the Gist to write the report to.'
+        required: false
+        type: string
+        default: ''
   workflow_dispatch:
     inputs:
       branch:
@@ -13,6 +24,11 @@ on:
           - 'dotnet-vnext'
           - 'dotnet-nightly'
         default: 'dotnet-vnext'
+      gist-id:
+        description: 'The optional ID of the Gist to write the report to.'
+        required: false
+        type: string
+        default: ''
 
 permissions: {}
 
@@ -33,5 +49,5 @@ jobs:
         with:
           branch: ${{ inputs.branch }}
           channel: ${{ vars.DOTNET_NIGHTLY_CHANNEL }}
-          gist-id: ${{ vars.UPGRADE_REPORT_GIST_ID }}
+          gist-id: ${{ inputs.gist-id || (inputs.branch == 'dotnet-vnext' && vars.UPGRADE_REPORT_GIST_ID) || '' }}
           github-token: ${{ secrets.ACCESS_TOKEN }}
