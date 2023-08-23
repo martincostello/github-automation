@@ -127,7 +127,7 @@ jobs:
     runs-on: [ ubuntu-latest ]
 
     concurrency:
-      group: ${{ github.workflow }}
+      group: 'close-superseded-prs-${{ matrix.repo }}-${{ matrix.ref }}'
       cancel-in-progress: false
 
     strategy:
