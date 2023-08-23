@@ -122,6 +122,7 @@ jobs:
           exit 0
 
   close-superseded-prs:
+    name: 'close-superseded-prs-${{ matrix.repo }}'
     needs: [get-repos, update-sdk]
     runs-on: [ ubuntu-latest ]
 
