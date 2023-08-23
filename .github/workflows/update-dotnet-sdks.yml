@@ -61,7 +61,7 @@ jobs:
 
   update-sdk:
     name: 'update-${{ matrix.repo }}'
-    needs: get-repos
+    needs: [ get-repos ]
     if: ${{ needs.get-repos.outputs.updates != '[]' }}
     uses: martincostello/update-dotnet-sdk/.github/workflows/update-dotnet-sdk.yml@0290d1d93397c381e491921a95ccc28f28dfa706 # v2.4.0
 
@@ -123,7 +123,7 @@ jobs:
 
   close-superseded-prs:
     name: 'close-superseded-prs-${{ matrix.repo }}'
-    needs: [get-repos, update-sdk]
+    needs: [ get-repos, update-sdk ]
     runs-on: [ ubuntu-latest ]
 
     concurrency:
@@ -138,52 +138,13 @@ jobs:
 
     steps:
 
+      - name: Checkout code
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+
       - name: Close superseded pull requests
-        uses: actions/github-script@v6
+        uses: ./actions/tidy-sdk-pulls
         with:
+          base: ${{ matrix.ref }}
           github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
-          script: |
-            const owner = '${{ matrix.owner }}';
-            const repo = '${{ matrix.name }}';
-
-            // Find all the pull requests that may have been opened for .NET SDK updates
-            let pulls = await github.paginate(github.rest.pulls.list, {
-              owner,
-              repo,
-              base: '${{ matrix.ref }}',
-              direction: 'desc',
-              state: 'open',
-            });
-
-            if (pulls.length < 2) {
-              console.log('No superseded pull requests found.');
-              return;
-            }
-
-            const latest = pulls[0];
-
-            // Filter out the latest open pull request, which may have just been created
-            pulls = pulls
-              .filter((pull) => pull.user.login === 'costellobot')
-              .slice(1);
-
-            // Close each pull request and delete the associated branch
-            for (const pull of pulls) {
-              await github.rest.issues.createComment({
-                owner,
-                repo,
-                issue_number: pull.number,
-                body: `Superseded by #${latest.number}.`,
-              });
-              await github.rest.pulls.update({
-                owner,
-                repo,
-                pull_number: pull.number,
-                state: 'closed',
-              });
-              await github.rest.git.deleteRef({
-                owner,
-                repo,
-                ref: `heads/${pull.head.ref}`,
-              });
-            }
+          repository: ${{ matrix.repo }}
+          user: 'costellobot'
