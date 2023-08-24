@@ -49,5 +49,5 @@ jobs:
         with:
           branch: ${{ inputs.branch }}
           channel: ${{ vars.DOTNET_NIGHTLY_CHANNEL }}
-          gist-id: ${{ inputs.gist-id || (inputs.branch == 'dotnet-vnext' && vars.UPGRADE_REPORT_GIST_ID) || '' }}
+          gist-id: ${{ inputs.gist-id || ((inputs.branch == 'dotnet-vnext' || github.event_name == 'schedule') && vars.UPGRADE_REPORT_GIST_ID) || '' }}
           github-token: ${{ secrets.ACCESS_TOKEN }}
