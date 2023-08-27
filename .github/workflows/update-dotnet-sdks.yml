@@ -120,31 +120,3 @@ jobs:
             Start-Sleep -Seconds 10 # Wait 10 seconds to prevent issues with GitHub secondary rate limits
           }
           exit 0
-
-  close-superseded-prs:
-    name: 'close-superseded-prs-${{ matrix.repo }}'
-    needs: [ get-repos, update-sdk ]
-    runs-on: [ ubuntu-latest ]
-
-    concurrency:
-      group: 'close-superseded-prs-${{ matrix.repo }}-${{ matrix.ref }}'
-      cancel-in-progress: false
-
-    strategy:
-      fail-fast: false
-      max-parallel: 3
-      matrix:
-        include: ${{ fromJSON(needs.get-repos.outputs.updates) }}
-
-    steps:
-
-      - name: Checkout code
-        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
-
-      - name: Close superseded pull requests
-        uses: ./actions/tidy-sdk-pulls
-        with:
-          base: ${{ matrix.ref || 'main' }}
-          github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
-          repository: ${{ matrix.repo }}
-          user: 'costellobot'
