@@ -1,0 +1,27 @@
+name: 'is-dotnet-commit-available'
+description: 'Determines whether the changes from a pull request are available in a .NET installer build'
+author: 'Martin Costello'
+branding:
+  icon: 'help-circle'
+  color: 'purple'
+inputs:
+  github-token:
+    description: 'The GitHub token to use.'
+    required: false
+    default: ${{ github.token }}
+  pull-request:
+    description: 'The number of the pull request to search for.'
+    required: true
+    default: ''
+  repository-name:
+    description: 'The name of the dotnet repository containing the pull request.'
+    required: true
+    default: ''
+outputs:
+  is-available:
+    description: 'Whether the changes from the pull request are available in an artifact from the dotnet/installer repository.'
+  installer-version:
+    description: 'If the changes are available, the latest version of the .NET SDK that contains the changes.'
+runs:
+  using: 'node16'
+  main: 'dist/index.js'

@@ -52,7 +52,7 @@ export async function run(): Promise<void> {
     const nightlyChannel = core.getInput('nightly-channel', { required: false });
     const github = getOctokit(token);
 
-    const repositories = await getReposForCurrentUser({ octokit: github }, 'member');
+    const repositories = await getReposForCurrentUser(github, 'member');
 
     const excludePackages = '';
     const includePackages = 'Microsoft.AspNetCore.,Microsoft.EntityFrameworkCore.,Microsoft.Extensions.,System.Text.Json';

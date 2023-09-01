@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`is-dotnet-commit-available finding a pull request the installer-version output is correct 1`] = `"8.0.100-rc.2.23451.1"`;
+
+exports[`is-dotnet-commit-available finding a pull request the is-available output is correct 1`] = `"true"`;

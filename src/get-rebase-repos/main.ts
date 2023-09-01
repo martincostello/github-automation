@@ -21,7 +21,7 @@ export async function run(): Promise<void> {
     if (specificRepo) {
       repositories = [specificRepo];
     } else {
-      repositories = (await getReposForCurrentUser({ octokit: github }, 'all')).map((repo) => repo.full_name);
+      repositories = (await getReposForCurrentUser(github, 'all')).map((repo) => repo.full_name);
     }
 
     const result: string[] = [];
