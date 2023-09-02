@@ -1,3 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`is-dotnet-commit-available finding a pull request the is-available output is correct 1`] = `"true"`;
+exports[`is-dotnet-commit-available for dotnet/runtime#91218 the is-available output is correct 1`] = `"true"`;
+
+exports[`is-dotnet-commit-available for dotnet/runtime#91359 the is-available output is correct 1`] = `"false"`;

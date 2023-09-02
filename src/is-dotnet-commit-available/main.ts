@@ -208,14 +208,12 @@ export async function run(): Promise<void> {
         const commits = await github.paginate(github.rest.repos.listCommits, {
           owner,
           repo,
-          sha: branch,
+          sha: latest_sha,
           since,
           per_page: 100,
         });
 
-        const exists = commits.find((commit) => commit.sha === merge_commit_sha);
-
-        if (exists) {
+        if (commits.find((commit) => commit.sha === merge_commit_sha)) {
           isAvailable = true;
           installerVersion = sdkVersion.version;
         }
