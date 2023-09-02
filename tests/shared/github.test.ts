@@ -181,7 +181,7 @@ describe('getReposForCurrentUser', () => {
     beforeAll(async () => {
       await setup('getReposForCurrentUser/some');
       const octokit = getOctokit(`${type}-token`);
-      actual = await getReposForCurrentUser({ octokit }, type as any);
+      actual = await getReposForCurrentUser(octokit, type as any);
     });
 
     test('returns the correct repositories', async () => {
@@ -197,7 +197,7 @@ describe('getReposForCurrentUser', () => {
     beforeAll(async () => {
       await setup('getReposForCurrentUser/none');
       const octokit = getOctokit();
-      actual = await getReposForCurrentUser({ octokit }, type as any);
+      actual = await getReposForCurrentUser(octokit, type as any);
     });
 
     test('returns an empty array', async () => {

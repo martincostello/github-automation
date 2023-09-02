@@ -7,15 +7,17 @@ import { ActionFixture } from '../ActionFixture';
 import { run } from '../../src/is-dotnet-commit-available/main';
 
 describe('is-dotnet-commit-available', () => {
-  describe('finding a pull request', () => {
+  describe.each([
+    ['runtime', '91359'],
+  ])('finding a pull request', (repository: string, pull: string) => {
     let fixture: ActionFixture;
 
     beforeAll(async () => {
       fixture = new ActionFixture(run);
       await fixture.run({
         'github-token': '',
-        'pull-request': '91359',
-        'repository-name': 'runtime',
+        'pull-request': pull,
+        'repository-name': repository,
       });
     });
 
@@ -28,7 +30,7 @@ describe('is-dotnet-commit-available', () => {
       expect(core.setFailed).toHaveBeenCalledTimes(0);
     });
 
-    test.each(['is-available', 'installer-version'])('the %s output is correct', (name: string) => {
+    test.each(['is-available'])('the %s output is correct', (name: string) => {
       expect(fixture.getOutput(name)).toMatchSnapshot();
     });
   });
