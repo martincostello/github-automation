@@ -9,12 +9,13 @@
     "format": "prettier --write src/**/*.ts tests/**/*.ts",
     "format-check": "prettier --check src/**/*.ts tests/**/*.ts",
     "lint": "eslint src/**/*.ts",
-    "package": "npm run package:dotnet-release && npm run package:dotnet-upgrade-report && npm run package:dotnet-version-report && npm run package:get-rebase-repos && npm run package:get-sdk-repos",
+    "package": "npm run package:dotnet-release && npm run package:dotnet-upgrade-report && npm run package:dotnet-version-report && npm run package:get-rebase-repos && npm run package:get-sdk-repos && npm run package:is-dotnet-change-available",
     "package:dotnet-release": "ncc build lib/dotnet-release/main.js --out actions/dotnet-release/dist --minify --source-map --license licenses.txt",
     "package:dotnet-upgrade-report": "ncc build lib/dotnet-upgrade-report/main.js --out actions/dotnet-upgrade-report/dist --minify --source-map --license licenses.txt",
     "package:dotnet-version-report": "ncc build lib/dotnet-version-report/main.js --out actions/dotnet-version-report/dist --minify --source-map --license licenses.txt",
     "package:get-rebase-repos": "ncc build lib/get-rebase-repos/main.js --out actions/get-rebase-repos/dist --minify --source-map --license licenses.txt",
     "package:get-sdk-repos": "ncc build lib/get-sdk-repos/main.js --out actions/get-sdk-repos/dist --minify --source-map --license licenses.txt",
+    "package:is-dotnet-change-available": "ncc build lib/is-dotnet-change-available/main.js --out actions/is-dotnet-change-available/dist --minify --source-map --license licenses.txt",
     "test": "jest",
     "all": "npm run build && npm run format && npm run lint && npm run package && npm run test"
   },
@@ -58,8 +59,10 @@
     "@actions/core": "^1.10.0",
     "@actions/exec": "^1.1.1",
     "@actions/github": "^5.1.1",
+    "@actions/http-client": "2.1.1",
     "@actions/io": "^1.1.3",
-    "@octokit/plugin-rest-endpoint-methods": "^5.13.0"
+    "@octokit/plugin-rest-endpoint-methods": "^5.13.0",
+    "fast-xml-parser": "^4.2.6"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.5.0",

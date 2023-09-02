@@ -4,11 +4,9 @@
 import fetch from 'node-fetch';
 import { debug } from '@actions/core';
 import { Context } from '@actions/github/lib/context';
-// eslint-disable-next-line import/no-unresolved
-import { Api } from '@octokit/plugin-rest-endpoint-methods/dist-types/types';
 import { UpdateDotNetSdkConfig, WorkflowConfig } from './config';
 
-export async function getFileContents(octokit: Api, owner: string, repo: string, path: string, ref: string): Promise<string> {
+export async function getFileContents(octokit: Octokit, owner: string, repo: string, path: string, ref: string): Promise<string> {
   const { data: contents } = await octokit.rest.repos.getContent({
     owner,
     repo,
@@ -27,7 +25,7 @@ export async function getFileContents(octokit: Api, owner: string, repo: string,
 }
 
 export async function getPull(
-  octokit: Api,
+  octokit: Octokit,
   owner: string,
   repo: string,
   pull_number: number
@@ -86,13 +84,7 @@ export type Repository = {
   html_url: string;
 };
 
-type PaginatedApi = {
-  octokit: Api & {
-    paginate: import('@octokit/plugin-paginate-rest').PaginateInterface;
-  };
-};
-
-export async function getReposForCurrentUser({ octokit }: PaginatedApi, type: 'all' | 'owner' | 'member'): Promise<Repository[]> {
+export async function getReposForCurrentUser(octokit: Octokit, type: 'all' | 'owner' | 'member'): Promise<Repository[]> {
   const per_page = 100;
   const repos = await octokit.paginate(octokit.rest.repos.listForAuthenticatedUser, {
     per_page,
@@ -122,7 +114,7 @@ export async function getReposForCurrentUser({ octokit }: PaginatedApi, type: 'a
 }
 
 export async function getUpdateConfiguration(
-  octokit: Api,
+  octokit: Octokit,
   owner: string,
   repo: string,
   ref: string
@@ -138,7 +130,7 @@ export async function getUpdateConfiguration(
   return JSON.parse(config);
 }
 
-export async function getWorkflowConfig(octokit: Api, context: Context): Promise<WorkflowConfig> {
+export async function getWorkflowConfig(octokit: Octokit, context: Context): Promise<WorkflowConfig> {
   return JSON.parse(await getFileContents(octokit, context.repo.owner, context.repo.repo, '.github/workflow-config.json', context.sha));
 }
 
@@ -153,7 +145,7 @@ type GlobalJson = {
   };
 };
 
-export async function getDotNetSdk(octokit: Api, owner: string, repo: string, ref: string): Promise<RepositoryDotNetSdk | null> {
+export async function getDotNetSdk(octokit: Octokit, owner: string, repo: string, ref: string): Promise<RepositoryDotNetSdk | null> {
   let globalJsonString: string;
 
   try {
@@ -183,3 +175,7 @@ export async function getDotNetSdk(octokit: Api, owner: string, repo: string, re
     line: lineNumber,
   };
 }
+
+export type Octokit = import('@octokit/plugin-rest-endpoint-methods/dist-types/types').Api & {
+  paginate: import('@octokit/plugin-paginate-rest').PaginateInterface;
+};

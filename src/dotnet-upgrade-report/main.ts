@@ -22,7 +22,7 @@ export async function run(): Promise<void> {
     const context = new Context();
     const github = getOctokit(token);
 
-    const repositories = (await getReposForCurrentUser({ octokit: github }, 'all')).map((repo) => repo.full_name);
+    const repositories = (await getReposForCurrentUser(github, 'all')).map((repo) => repo.full_name);
     const { checksOfInterest } = await getWorkflowConfig(github, context);
 
     let latestVersion: string;

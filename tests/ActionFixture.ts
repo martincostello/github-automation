@@ -55,6 +55,7 @@ export class ActionFixture {
       GITHUB_OUTPUT: this.outputPath,
       GITHUB_REPOSITORY: 'martincostello/github-automation',
       GITHUB_RUN_ID: '42',
+      GITHUB_SERVER_URL: 'https://github.com',
       GITHUB_SHA: 'fake-sha',
       RUNNER_DEBUG: '1',
     };

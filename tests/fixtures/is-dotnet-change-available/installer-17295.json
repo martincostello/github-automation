@@ -1,0 +1,20 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "path": "/repos/dotnet/installer/pulls/17295",
+      "headers": {
+        "authorization": "token github-token"
+      },
+      "response": {
+        "html_url": "https://github.com/dotnet/installer/pull/17295",
+        "merged_at": null,
+        "merge_commit_sha": "dcbb1feaa3a193140f600371d5cfda9aca3c5090",
+        "base": {
+          "ref": "release/8.0.1xx"
+        },
+        "merged": false
+      }
+    }
+  ]
+}

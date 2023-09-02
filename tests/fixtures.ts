@@ -17,6 +17,7 @@ type Scenario = {
   body?: any;
   status?: number;
   response: any;
+  responseHeaders?: Record<string, string>;
 };
 
 nock.disableNetConnect();
@@ -47,6 +48,6 @@ export async function setup(name: string): Promise<void> {
       interceptor = scope.get(scenario.path);
     }
 
-    interceptor.reply(scenario.status ?? 200, scenario.response);
+    interceptor.reply(scenario.status ?? 200, scenario.response, scenario.responseHeaders);
   }
 }
