@@ -7,9 +7,7 @@ import { ActionFixture } from '../ActionFixture';
 import { run } from '../../src/is-dotnet-commit-available/main';
 
 describe('is-dotnet-commit-available', () => {
-  describe.each([
-    ['runtime', '91359'],
-  ])('finding a pull request', (repository: string, pull: string) => {
+  describe.each([['runtime', '91359']])('finding a pull request', (repository: string, pull: string) => {
     let fixture: ActionFixture;
 
     beforeAll(async () => {

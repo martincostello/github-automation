@@ -8,35 +8,36 @@ import { handle } from '../shared/errors';
 import { XMLParser } from 'fast-xml-parser';
 import { Octokit, getFileContents } from '../shared/github';
 
+const defaultVersion = '9.0';
 const owner = 'dotnet';
 const repositoryNames = ['aspnetcore', 'efcore', 'installer', 'runtime', 'sdk'];
 
-function createDependency(name: string, packageName: string | null, dependencies: string[] = []): ProductRepository {
+function createRepository(repo: string, dependencies: string[], packageName: string | null = null): ProductRepository {
   return {
     dependencies,
-    name: `dotnet/${name}`,
+    full_name: `dotnet/${repo}`,
     owner,
     packageName,
-    repo: name,
+    repo,
     sha: '',
   };
 }
 
 function getDependencyGraph(): DependencyGraph {
-  const runtime = createDependency('runtime', 'Microsoft.NETCore.App.Ref');
-  const efcore = createDependency('efcore', 'Microsoft.EntityFrameworkCore', [runtime.name]);
-  const aspnetcore = createDependency('aspnetcore', 'Microsoft.AspNetCore.App.Ref', [runtime.name, efcore.name]);
-  const sdk = createDependency('sdk', 'Microsoft.NET.Sdk', [runtime.name, aspnetcore.name]);
-  const installer = createDependency('installer', null, [sdk.name]);
+  const runtime = createRepository('runtime', [], 'Microsoft.NETCore.App.Ref');
+  const efcore = createRepository('efcore', [runtime.full_name], 'Microsoft.EntityFrameworkCore');
+  const aspnetcore = createRepository('aspnetcore', [runtime.full_name, efcore.full_name], 'Microsoft.AspNetCore.App.Ref');
+  const sdk = createRepository('sdk', [runtime.full_name, aspnetcore.full_name], 'Microsoft.NET.Sdk');
+  const installer = createRepository('installer', [sdk.full_name]);
 
   return {
-    root: installer.name,
-    graph: {
-      [runtime.name]: runtime,
-      [efcore.name]: efcore,
-      [aspnetcore.name]: aspnetcore,
-      [sdk.name]: sdk,
-      [installer.name]: installer,
+    root: installer.full_name,
+    nodes: {
+      [runtime.full_name]: runtime,
+      [efcore.full_name]: efcore,
+      [aspnetcore.full_name]: aspnetcore,
+      [sdk.full_name]: sdk,
+      [installer.full_name]: installer,
     },
   };
 }
@@ -55,7 +56,7 @@ function getDependencySha(name: string, xml: string): string | null {
   const dependencies = versionDetails?.Dependencies?.ProductDependencies?.Dependency;
 
   if (dependencies && 'find' in dependencies) {
-    const dependency = dependencies.find((x: any) => x['@Name'] === name);
+    const dependency = dependencies.find((element: any) => element['@Name'] === name);
     if ('Sha' in dependency) {
       return dependency.Sha;
     }
@@ -66,7 +67,6 @@ function getDependencySha(name: string, xml: string): string | null {
 
 async function getLatestSdkVersion(channel: string): Promise<LatestInstallerVersion | null> {
   const quality = 'Daily';
-
   const versionUrl = `https://aka.ms/dotnet/${channel}/${quality}/sdk-productVersion.txt`;
 
   const httpClient = createHttpClient();
@@ -83,10 +83,10 @@ async function getLatestSdkVersion(channel: string): Promise<LatestInstallerVers
   }
 
   const versionRaw = await response.readBody();
-  const sdkVersion = versionRaw.trim();
+  const version = versionRaw.trim();
 
   const platform = 'win-x64';
-  const commitsUrl = `https://dotnetbuilds.azureedge.net/public/Sdk/${sdkVersion}/productCommit-${platform}.json`;
+  const commitsUrl = `https://dotnetbuilds.azureedge.net/public/Sdk/${version}/productCommit-${platform}.json`;
 
   const commits = (await httpClient.getJson<SdkProductCommits>(commitsUrl)).result;
 
@@ -95,34 +95,38 @@ async function getLatestSdkVersion(channel: string): Promise<LatestInstallerVers
   }
 
   return {
-    version: sdkVersion,
+    version,
     commits,
   };
 }
 
 async function findDependencySha(
-  github: Octokit,
+  octokit: Octokit,
   root: ProductRepository,
   target: ProductRepository,
   ref: string,
   graph: DependencyGraph
 ): Promise<string | null> {
-  if (root.name === target.name) {
+  if (root.full_name === target.full_name) {
     return root.sha;
   }
 
-  const xml = await getFileContents(github, owner, root.repo, 'eng/Version.Details.xml', ref);
+  if (!target.packageName) {
+    return null;
+  }
 
-  for (const dependency of root.dependencies) {
-    const repository = graph.graph[dependency];
-    if (!repository || !target.packageName) {
+  const xml = await getFileContents(octokit, owner, root.repo, 'eng/Version.Details.xml', ref);
+
+  for (const name of root.dependencies) {
+    const dependency = graph.nodes[name];
+    if (!dependency) {
       continue;
     }
 
     let dependencySha = getDependencySha(target.packageName, xml);
 
     if (!dependencySha) {
-      dependencySha = await findDependencySha(github, repository, target, repository.sha, graph);
+      dependencySha = await findDependencySha(octokit, dependency, target, dependency.sha, graph);
     }
 
     if (dependencySha) {
@@ -135,20 +139,20 @@ async function findDependencySha(
 
 export async function run(): Promise<void> {
   try {
-    const token = core.getInput('github-token', { required: false });
-    const pull_number = Number.parseInt(core.getInput('pull-request', { required: true }), 10);
     const repo = core.getInput('repository-name', { required: true });
+    const pull_number = Number.parseInt(core.getInput('pull-request', { required: true }), 10);
+    const token = core.getInput('github-token', { required: false });
 
     if (!repositoryNames.includes(repo)) {
       throw new Error(`The ${repo} repository is not supported.`);
     }
 
-    const github: Octokit = getOctokit(token);
+    const github = getOctokit(token);
 
     const { data: pull } = await github.rest.pulls.get({
       owner,
-      pull_number,
       repo,
+      pull_number,
     });
 
     // - Is it possible to get a reference to a backport PR from a PR to main?
@@ -165,16 +169,26 @@ export async function run(): Promise<void> {
     let isAvailable = false;
     let installerVersion = '';
 
-    if (pull.merged && pull.merge_commit_sha) {
+    if (pull.merged && pull.merge_commit_sha && pull.merged_at) {
       const branch = pull.base.ref;
       const merge_commit_sha = pull.merge_commit_sha;
 
-      const installer = graph.graph[graph.root];
-      let repository: ProductRepository | null = null;
+      const releasePrefix = 'release/';
+      const channel = branch.startsWith(releasePrefix) ? branch.slice(releasePrefix.length) : defaultVersion;
 
-      for (const [, dependency] of Object.entries(graph.graph)) {
-        if (dependency.repo === repo) {
-          repository = dependency;
+      const sdkVersion = await getLatestSdkVersion(channel.slice(0, 3));
+
+      if (!sdkVersion) {
+        throw new Error(`The SDK version could not be determined for the ${branch} branch of the ${repo} repository.`);
+      }
+
+      let repository: ProductRepository | null = null;
+      if (sdkVersion) {
+        for (const [, dependency] of Object.entries(graph.nodes)) {
+          dependency.sha = sdkVersion?.commits[dependency.repo]?.commit;
+          if (dependency.repo === repo) {
+            repository = dependency;
+          }
         }
       }
 
@@ -182,37 +196,28 @@ export async function run(): Promise<void> {
         throw new Error(`The ${repo} repository is not supported.`);
       }
 
-      const releasePrefix = 'release/';
-      const channel = branch.startsWith(releasePrefix) ? branch.slice(releasePrefix.length) : '9.0';
+      const installer = graph.nodes[graph.root];
+      const latest_sha = await findDependencySha(github, installer, repository, installer.sha, graph);
 
-      const sdkVersion = await getLatestSdkVersion(channel.slice(0, 3));
+      if (latest_sha) {
+        const mergedAt = new Date(pull.merged_at);
+        mergedAt.setMinutes(mergedAt.getMinutes() - 5);
 
-      if (sdkVersion) {
-        for (const [, dependency] of Object.entries(graph.graph)) {
-          dependency.sha = sdkVersion?.commits[dependency.repo]?.commit;
-        }
-      }
+        const since = mergedAt.toISOString();
 
-      const product = sdkVersion?.commits[repo];
+        const commits = await github.paginate(github.rest.repos.listCommits, {
+          owner,
+          repo,
+          sha: branch,
+          since,
+          per_page: 100,
+        });
 
-      if (product) {
-        const latest_sha = await findDependencySha(github, installer, repository, installer.sha, graph);
+        const exists = commits.find((commit) => commit.sha === merge_commit_sha);
 
-        if (latest_sha) {
-          const commits = await github.paginate(github.rest.repos.listCommits, {
-            owner,
-            repo,
-            sha: branch,
-            since: pull.created_at,
-            per_page: 100,
-          });
-
-          const exists = commits.find((commit) => commit.sha === merge_commit_sha);
-
-          if (exists) {
-            isAvailable = true;
-            installerVersion = sdkVersion.version;
-          }
+        if (exists) {
+          isAvailable = true;
+          installerVersion = sdkVersion.version;
         }
       }
     }
@@ -229,7 +234,7 @@ if (require.main === module) {
 }
 
 type ProductRepository = {
-  name: string;
+  full_name: string;
   owner: string;
   repo: string;
   dependencies: string[];
@@ -252,7 +257,7 @@ type SdkProductCommits = {
 
 type DependencyGraph = {
   root: string;
-  graph: Record<string, ProductRepository>;
+  nodes: Record<string, ProductRepository>;
 };
 
 type LatestInstallerVersion = {
