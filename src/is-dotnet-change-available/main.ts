@@ -66,7 +66,7 @@ function getDependencySha(name: string, xml: string): string | null {
 }
 
 async function getLatestSdkVersion(channel: string): Promise<LatestInstallerVersion | null> {
-  const quality = 'Daily';
+  const quality = 'daily';
   const versionUrl = `https://aka.ms/dotnet/${channel}/${quality}/sdk-productVersion.txt`;
 
   const httpClient = createHttpClient();
@@ -221,12 +221,10 @@ export async function run(): Promise<void> {
     }
 
     let report: string;
-    const url = `${process.env.GITHUB_SERVER_URL}/${owner}/${repo}/${pull_number}`;
-
     if (isAvailable) {
-      report = `The changes from [${owner}/${repo}#${pull_number}](${url}) are available in version \`${installerVersion}\` of the .NET SDK.`;
+      report = `The changes from [${owner}/${repo}#${pull_number}](${pull.html_url}) are available in version \`${installerVersion}\` of the .NET SDK.`;
     } else {
-      report = `The changes from [${owner}/${repo}#${pull_number}](${url}) are not yet available in a daily build of the .NET SDK.`;
+      report = `The changes from [${owner}/${repo}#${pull_number}](${pull.html_url}) are not yet available in a daily build of the .NET SDK.`;
     }
 
     await core.summary.addRaw(report).write();

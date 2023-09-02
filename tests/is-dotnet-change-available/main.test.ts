@@ -5,6 +5,7 @@ import * as core from '@actions/core';
 import { afterAll, beforeAll, describe, expect, test } from '@jest/globals';
 import { ActionFixture } from '../ActionFixture';
 import { run } from '../../src/is-dotnet-change-available/main';
+import { setup } from '../fixtures';
 
 describe('is-dotnet-change-available', () => {
   describe.each([
@@ -19,9 +20,10 @@ describe('is-dotnet-change-available', () => {
     let fixture: ActionFixture;
 
     beforeAll(async () => {
+      await setup(`is-dotnet-change-available/${repository}-${pull}`);
       fixture = new ActionFixture(run);
       await fixture.run({
-        'github-token': '',
+        'github-token': 'github-token',
         'pull-request': pull,
         'repository-name': repository,
       });
