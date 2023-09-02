@@ -16,6 +16,7 @@ The following workflows are available.
 | [dotnet-release][dotnet-release]                                 | Runs every 15 minutes to check for new official releases of the .NET SDK.                         |
 | [dotnet-upgrade-report][dotnet-upgrade-report]                   | Runs daily to produce a report for a specified branch used for testing .NET vNext.                |
 | [dotnet-version-report][dotnet-version-report]                   | Generates a report of the .NET SDK versions used by the default branch of my repositories.        |
+| [is-dotnet-change-available][is-dotnet-change-available]         | Determines whether the changes from a pull request are available in a .NET installer build        |
 | [issue-metrics][issue-metrics]                                   | Runs monthly to generate a report of metrics for issues and pull requests for my repositories.    |
 | [rebase][rebase]                                                 | Rebases a branch of one or more repositories onto a specified base branch.                        |
 | [update-dotnet-sdks][update-dotnet-sdks]                         | Runs the `update-dotnet-sdk` workflow for one or more repositories for a specified branch.        |
@@ -80,6 +81,12 @@ generates a markdown report that finds all of the repositories owned by the
 configured GitHub Personal Access Token (PAT) and shows which .NET SDK versions
 are used by the default branch of each of the repositories and whether that version
 is the latest official release.
+
+### Is .NET Change Available?
+
+The [is-dotnet-change-available][is-dotnet-change-available] workflow is run manually
+to determine whether the changes from a pull request to a .NET repository have flowed
+into a daily build of the .NET SDK from the [dotnet/installer][dotnet-installer] repository.
 
 ### Issue Metrics
 
@@ -173,9 +180,11 @@ This project is licensed under the [Apache 2.0][license] license.
 [costellobot]: https://github.com/martincostello/costellobot
 [dotnet-core]: https://github.com/dotnet/core
 [dotnet-dependencies-updated]: ./.github/workflows/dotnet-dependencies-updated.yml
+[dotnet-installer]: https://github.com/dotnet/installer
 [dotnet-release]: ./.github/workflows/dotnet-release.yml
 [dotnet-upgrade-report]: ./.github/workflows/dotnet-upgrade-report.yml
 [dotnet-version-report]: ./.github/workflows/dotnet-version-report.yml
+[is-dotnet-change-available]: ./.github/workflows/is-dotnet-change-available.yml
 [issue-metrics]: ./.github/workflows/issue-metrics.yml
 [issue-metrics-action]: https://github.com/github/issue-metrics#readme
 [issues]: https://github.com/martincostello/github-automation/issues "Issues for this project on GitHub.com"
