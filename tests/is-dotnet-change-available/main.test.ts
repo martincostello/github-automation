@@ -4,9 +4,9 @@
 import * as core from '@actions/core';
 import { afterAll, beforeAll, describe, expect, test } from '@jest/globals';
 import { ActionFixture } from '../ActionFixture';
-import { run } from '../../src/is-dotnet-commit-available/main';
+import { run } from '../../src/is-dotnet-change-available/main';
 
-describe('is-dotnet-commit-available', () => {
+describe('is-dotnet-change-available', () => {
   describe.each([
     ['runtime', '91218'],
     ['runtime', '91359'],

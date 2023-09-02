@@ -1,4 +1,4 @@
-name: 'is-dotnet-commit-available'
+name: 'is-dotnet-change-available'
 description: 'Determines whether the changes from a pull request are available in a .NET installer build'
 author: 'Martin Costello'
 branding:
