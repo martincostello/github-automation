@@ -57,7 +57,7 @@ function getDependencySha(name: string, xml: string): string | null {
 
   if (dependencies && 'find' in dependencies) {
     const dependency = dependencies.find((element: any) => element['@Name'] === name);
-    if ('Sha' in dependency) {
+    if (dependency && 'Sha' in dependency) {
       return dependency.Sha;
     }
   }
@@ -221,7 +221,7 @@ export async function run(): Promise<void> {
     }
 
     let report: string;
-    const url = `${process.env.GITHUB_SERVER_URL}/{${owner}/${repo}/${pull_number}`;
+    const url = `${process.env.GITHUB_SERVER_URL}/${owner}/${repo}/${pull_number}`;
 
     if (isAvailable) {
       report = `The changes from [${owner}/${repo}#${pull_number}](${url}) are available in version \`${installerVersion}\` of the .NET SDK.`;

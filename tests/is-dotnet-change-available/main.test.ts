@@ -8,8 +8,13 @@ import { run } from '../../src/is-dotnet-change-available/main';
 
 describe('is-dotnet-change-available', () => {
   describe.each([
+    ['aspnetcore', '50019'],
+    ['efcore', '31453'],
+    ['installer', '17295'],
+    ['runtime', '90349'],
     ['runtime', '91218'],
     ['runtime', '91359'],
+    ['sdk', '35087'],
   ])('for dotnet/%s#%s', (repository: string, pull: string) => {
     let fixture: ActionFixture;
 
