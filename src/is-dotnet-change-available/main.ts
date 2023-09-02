@@ -155,15 +155,6 @@ export async function run(): Promise<void> {
       pull_number,
     });
 
-    // - Is it possible to get a reference to a backport PR from a PR to main?
-    // - From the PR, get the commit in the target branch
-    //
-    // dotnet/runtime#91107
-    // -> dotnet/runtime#91218
-    // -> dotnet/runtime@8ec6101174f841ec455180fba8f08d895e76ef2a in release/8.0
-    // -> flow into dotnet/aspnetcore?
-    // -> flow into dotnet/sdk?
-    // -> flow into dotnet/installer?
     const graph = getDependencyGraph();
 
     let isAvailable = false;
