@@ -1,5 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`is-dotnet-change-available for dotnet/runtime#91218 outputs the Markdown report 1`] = `"The changes from [dotnet/runtime#91218](https://github.com/{dotnet/runtime/91218) are available in version \`8.0.100-rc.2.23451.1\` of the .NET SDK."`;
+
 exports[`is-dotnet-change-available for dotnet/runtime#91218 the is-available output is correct 1`] = `"true"`;
+
+exports[`is-dotnet-change-available for dotnet/runtime#91359 outputs the Markdown report 1`] = `"The changes from [dotnet/runtime#91359](https://github.com/{dotnet/runtime/91359) are not yet available in a daily build of the .NET SDK."`;
 
 exports[`is-dotnet-change-available for dotnet/runtime#91359 the is-available output is correct 1`] = `"false"`;

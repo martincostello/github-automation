@@ -220,6 +220,17 @@ export async function run(): Promise<void> {
       }
     }
 
+    let report: string;
+    const url = `${process.env.GITHUB_SERVER_URL}/{${owner}/${repo}/${pull_number}`;
+
+    if (isAvailable) {
+      report = `The changes from [${owner}/${repo}#${pull_number}](${url}) are available in version \`${installerVersion}\` of the .NET SDK.`;
+    } else {
+      report = `The changes from [${owner}/${repo}#${pull_number}](${url}) are not yet available in a daily build of the .NET SDK.`;
+    }
+
+    await core.summary.addRaw(report).write();
+
     core.setOutput('is-available', isAvailable);
     core.setOutput('installer-version', installerVersion);
   } catch (error: any) {

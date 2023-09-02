@@ -34,5 +34,9 @@ describe('is-dotnet-change-available', () => {
     test.each(['is-available'])('the %s output is correct', (name: string) => {
       expect(fixture.getOutput(name)).toMatchSnapshot();
     });
+
+    test('outputs the Markdown report', () => {
+      expect(fixture.stepSummary).toMatchSnapshot();
+    });
   });
 });
