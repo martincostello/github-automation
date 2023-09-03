@@ -12,18 +12,18 @@ const defaultVersion = '9.0';
 const owner = 'dotnet';
 const repositoryNames = ['aspnetcore', 'efcore', 'installer', 'runtime', 'sdk'];
 
-function createRepository(repo: string, dependencies: string[], packageName: string | null = null): ProductRepository {
-  return {
-    dependencies,
-    full_name: `dotnet/${repo}`,
-    owner,
-    packageName,
-    repo,
-    sha: '',
-  };
-}
-
 function getDependencyGraph(): DependencyGraph {
+  const createRepository = (repo: string, dependencies: string[], packageName: string | null = null): ProductRepository => {
+    return {
+      dependencies,
+      full_name: `dotnet/${repo}`,
+      owner,
+      packageName,
+      repo,
+      sha: '',
+    };
+  };
+
   const runtime = createRepository('runtime', [], 'Microsoft.NETCore.App.Ref');
   const efcore = createRepository('efcore', [runtime.full_name], 'Microsoft.EntityFrameworkCore');
   const aspnetcore = createRepository('aspnetcore', [runtime.full_name, efcore.full_name], 'Microsoft.AspNetCore.App.Ref');
@@ -40,13 +40,6 @@ function getDependencyGraph(): DependencyGraph {
       [installer.full_name]: installer,
     },
   };
-}
-
-function createHttpClient(): HttpClient {
-  return new HttpClient('martincostello/github-automation', [], {
-    allowRetries: true,
-    maxRetries: 3,
-  });
 }
 
 function getDependencySha(name: string, xml: string): string | null {
@@ -69,7 +62,10 @@ async function getLatestSdkVersion(channel: string): Promise<LatestInstallerVers
   const quality = 'daily';
   const versionUrl = `https://aka.ms/dotnet/${channel}/${quality}/sdk-productVersion.txt`;
 
-  const httpClient = createHttpClient();
+  const httpClient = new HttpClient('martincostello/github-automation', [], {
+    allowRetries: true,
+    maxRetries: 3,
+  });
   const response = await httpClient.get(versionUrl);
 
   if (response.message.statusCode && response.message.statusCode >= 400) {
@@ -104,7 +100,6 @@ async function findDependencySha(
   octokit: Octokit,
   root: ProductRepository,
   target: ProductRepository,
-  ref: string,
   graph: DependencyGraph
 ): Promise<string | null> {
   if (root.full_name === target.full_name) {
@@ -115,26 +110,25 @@ async function findDependencySha(
     return null;
   }
 
-  const xml = await getFileContents(octokit, owner, root.repo, 'eng/Version.Details.xml', ref);
+  const xml = await getFileContents(octokit, owner, root.repo, 'eng/Version.Details.xml', root.sha);
+  let sha = getDependencySha(target.packageName, xml);
 
-  for (const name of root.dependencies) {
-    const dependency = graph.nodes[name];
-    if (!dependency) {
-      continue;
-    }
+  if (!sha) {
+    for (const name of root.dependencies) {
+      const dependency = graph.nodes[name];
+      if (!dependency) {
+        continue;
+      }
 
-    let dependencySha = getDependencySha(target.packageName, xml);
+      sha = await findDependencySha(octokit, dependency, target, graph);
 
-    if (!dependencySha) {
-      dependencySha = await findDependencySha(octokit, dependency, target, dependency.sha, graph);
-    }
-
-    if (dependencySha) {
-      return dependencySha;
+      if (sha) {
+        break;
+      }
     }
   }
 
-  return null;
+  return sha;
 }
 
 export async function run(): Promise<void> {
@@ -155,8 +149,6 @@ export async function run(): Promise<void> {
       pull_number,
     });
 
-    const graph = getDependencyGraph();
-
     let isAvailable = false;
     let installerVersion = '';
 
@@ -173,6 +165,8 @@ export async function run(): Promise<void> {
         throw new Error(`The SDK version could not be determined for the ${branch} branch of the ${repo} repository.`);
       }
 
+      const graph = getDependencyGraph();
+
       let repository: ProductRepository | null = null;
       if (sdkVersion) {
         for (const [, dependency] of Object.entries(graph.nodes)) {
@@ -188,18 +182,18 @@ export async function run(): Promise<void> {
       }
 
       const installer = graph.nodes[graph.root];
-      const latest_sha = await findDependencySha(github, installer, repository, installer.sha, graph);
+      const sha = await findDependencySha(github, installer, repository, graph);
 
-      if (latest_sha) {
+      if (sha) {
         const mergedAt = new Date(pull.merged_at);
-        mergedAt.setMinutes(mergedAt.getMinutes() - 5);
+        mergedAt.setMinutes(mergedAt.getMinutes() - 1);
 
         const since = mergedAt.toISOString();
 
         const commits = await github.paginate(github.rest.repos.listCommits, {
           owner,
           repo,
-          sha: latest_sha,
+          sha,
           since,
           per_page: 100,
         });
