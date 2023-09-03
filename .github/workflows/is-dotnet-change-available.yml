@@ -1,4 +1,5 @@
 name: is-dotnet-change-available
+run-name: 'dotnet/${{ inputs.repository }}#${{ inputs.pull }}'
 
 on:
   workflow_dispatch:
