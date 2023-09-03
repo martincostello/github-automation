@@ -7,6 +7,7 @@
     "lighthouse",
     "lint",
     "macos-latest",
+    "typescript",
     "ubuntu-latest",
     "validate-packages",
     "windows-latest"
