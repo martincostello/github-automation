@@ -62,7 +62,7 @@ jobs:
   update-sdk:
     name: 'update-${{ matrix.repo }}'
     needs: [ get-repos ]
-    if: ${{ needs.get-repos.outputs.updates != '[]' }}
+    if: needs.get-repos.outputs.updates != '[]'
     uses: martincostello/update-dotnet-sdk/.github/workflows/update-dotnet-sdk.yml@ef5170e2dbee1235ee754f03a6018794c061c8e5 # v2.5.0
 
     concurrency:
@@ -91,7 +91,7 @@ jobs:
 
   update-sdk-external:
     runs-on: [ ubuntu-latest ]
-    if: ${{ inputs.repository == '' }}
+    if: inputs.repository == ''
 
     concurrency:
       group: '${{ github.workflow }}-external'

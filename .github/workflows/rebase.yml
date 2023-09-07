@@ -85,7 +85,7 @@ jobs:
   rebase:
     name: "rebase-${{ matrix.repo }}"
     needs: get-repos
-    if: ${{ needs.get-repos.outputs.repos != '[]' }}
+    if: needs.get-repos.outputs.repos != '[]'
     runs-on: [ ubuntu-latest ]
 
     concurrency:
