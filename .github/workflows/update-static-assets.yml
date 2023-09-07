@@ -41,7 +41,7 @@ jobs:
     name: 'update-${{ matrix.repo }}'
     needs: get-repos
     runs-on: ubuntu-latest
-    if: ${{ needs.get-repos.outputs.repos != '[]' }}
+    if: needs.get-repos.outputs.repos != '[]'
 
     concurrency:
       group: 'update-assets-${{ matrix.repo }}'
