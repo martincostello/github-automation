@@ -116,13 +116,16 @@ jobs:
           user-name: ${{ vars.REBASE_GIT_COMMIT_USER_NAME }}
 
       - name: Push changes
-        if : ${{ steps.rebase.outputs.result == 'success' }}
+        if: steps.rebase.outputs.result == 'success'
+        env:
+          BRANCH_NAME: ${{ inputs.branch }}
+          REPO_NAME: ${{ matrix.repo }}
         shell: pwsh
         run: |
-          git push --force-with-lease origin "${{ inputs.branch }}"
+          git push --force-with-lease origin "${env:BRANCH_NAME}"
           if ($LASTEXITCODE -eq 0) {
-            Write-Output "::notice::Rebased the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
+            Write-Output "::notice::Rebased the ${env:BRANCH_NAME} branch of ${env:REPO_NAME}."
           }
           else {
-            Write-Output "::error::Could not push changes to the ${{ inputs.branch }} branch of ${{ matrix.repo }}."
+            Write-Output "::error::Could not push changes to the ${env:BRANCH_NAME} branch of ${env:REPO_NAME}."
           }
