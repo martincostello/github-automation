@@ -101,9 +101,10 @@ jobs:
       - name: Update .NET SDKs
         shell: pwsh
         env:
+          BRANCH_NAME: ${{ (github.event.client_payload && github.event.client_payload.branch) || inputs.branch || 'main' }}
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
-          $branch = "${{ (github.event.client_payload && github.event.client_payload.branch) || inputs.branch || 'main' }}"
+          $branch = $env:BRANCH_NAME
           $repos = @(
             "justeattakeaway/ApplePayJSSample",
             "justeattakeaway/httpclient-interception",
