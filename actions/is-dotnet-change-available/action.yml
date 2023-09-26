@@ -23,5 +23,5 @@ outputs:
   installer-version:
     description: 'If the changes are available, the latest version of the .NET SDK that contains the changes.'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'

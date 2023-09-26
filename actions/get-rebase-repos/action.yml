@@ -28,5 +28,5 @@ outputs:
   repositories:
     description: 'A JSON array of the full names of repositories which need rebasing.'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
