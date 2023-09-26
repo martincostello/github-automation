@@ -25,5 +25,5 @@ outputs:
   updates:
     description: 'A JSON array of the repositories for which .NET SDK updates should be performed.'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'

@@ -21,5 +21,5 @@ outputs:
   sdk-versions:
     description: 'A JSON array of the .NET SDK versions that were released.'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
