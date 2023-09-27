@@ -12,9 +12,9 @@ import { getDotNetSdk, getFileContents, getPull, getReposForCurrentUser, getWork
 
 export async function run(): Promise<void> {
   try {
-    const default_branch = 'dotnet-vnext';
+    const dotnetNextBranch = 'dotnet-vnext';
 
-    const branch = (core.getInput('branch', { required: false }) || default_branch).trim();
+    const branch = (core.getInput('branch', { required: false }) || dotnetNextBranch).trim();
     const gist_id = core.getInput('gist-id', { required: false });
     const token = core.getInput('github-token', { required: false });
     const channel = core.getInput('channel', { required: false });
@@ -27,7 +27,7 @@ export async function run(): Promise<void> {
 
     let latestVersion: string;
 
-    if (branch === default_branch || !channel) {
+    if (branch === dotnetNextBranch || !channel) {
       const releasesIndex = await getFileContents(github, 'dotnet', 'core', 'release-notes/releases-index.json', 'main');
       const releases: ReleasesIndex = JSON.parse(releasesIndex);
       if (releases['releases-index']?.length < 0) {
@@ -75,16 +75,17 @@ export async function run(): Promise<void> {
         continue;
       }
 
-      let base_ref;
+      const {
+        data: { default_branch },
+      } = await github.rest.repos.get({
+        owner,
+        repo,
+      });
 
-      if (branch === default_branch) {
-        const { data: repository } = await github.rest.repos.get({
-          owner,
-          repo,
-        });
-        base_ref = repository.default_branch;
-      } else {
-        base_ref = default_branch;
+      const baseRefs = [default_branch];
+
+      if (branch !== dotnetNextBranch) {
+        baseRefs.push(dotnetNextBranch);
       }
 
       const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
@@ -97,9 +98,13 @@ export async function run(): Promise<void> {
         continue;
       }
 
-      const pull_for_ref = prs.find((pull) => pull.base.ref === base_ref);
+      const pull_for_ref = prs.find((pull) => baseRefs.includes(pull.base.ref));
       if (!pull_for_ref) {
-        core.debug(`The ${branch} branch of ${slug} does not have an open pull request targeting ${base_ref}.`);
+        core.debug(
+          `The ${branch} branch of ${slug} does not have an open pull request targeting any of the following branch(es): ${baseRefs.join(
+            ','
+          )}.`
+        );
         continue;
       }
 
