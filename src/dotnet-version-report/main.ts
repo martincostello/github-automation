@@ -7,6 +7,7 @@ import { Context } from '@actions/github/lib/context';
 import { getBadge } from '../shared/badges';
 import { handle } from '../shared/errors';
 import { getFileContents, getDotNetSdk, getReposForCurrentUser } from '../shared/github';
+import { ReleaseChannel } from '../shared/dotnet';
 
 /* eslint-disable no-console */
 
@@ -18,7 +19,9 @@ export async function run(): Promise<void> {
 
     const repos = await getReposForCurrentUser(github, 'owner');
 
-    const releases = JSON.parse(await getFileContents(github, 'dotnet', 'core', 'release-notes/releases-index.json', 'main'));
+    const releases: ReleaseChannel[] = JSON.parse(
+      await getFileContents(github, 'dotnet', 'core', 'release-notes/releases-index.json', 'main')
+    );
 
     const report = ['# .NET SDK Version Report', '', '| Repository | SDK Version |', '| :--------- | :---------- |'];
 
