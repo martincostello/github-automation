@@ -3,10 +3,10 @@
 
 import * as core from '@actions/core';
 import { getOctokit } from '@actions/github';
-import { HttpClient } from '@actions/http-client';
 import { handle } from '../shared/errors';
 import { XMLParser } from 'fast-xml-parser';
 import { Octokit, getFileContents } from '../shared/github';
+import { fetch } from 'undici';
 
 const defaultVersion = '9.0';
 const owner = 'dotnet';
@@ -62,29 +62,32 @@ async function getLatestSdkVersion(channel: string): Promise<LatestInstallerVers
   const quality = 'daily';
   const versionUrl = `https://aka.ms/dotnet/${channel}/${quality}/sdk-productVersion.txt`;
 
-  const httpClient = new HttpClient('martincostello/github-automation', [], {
-    allowRetries: true,
-    maxRetries: 3,
-  });
-  const response = await httpClient.get(versionUrl);
+  const init = {
+    headers: new Headers([['User-Agent', 'martincostello/github-automation']]),
+  };
 
-  if (response.message.statusCode && response.message.statusCode >= 400) {
+  let response = await fetch(versionUrl, init);
+
+  if (response.status && response.status >= 400) {
     return null;
   }
 
-  if (
-    !(response.message.headers['content-type'] === 'text/plain' || response.message.headers['content-type'] === 'application/octet-stream')
-  ) {
+  const contentType = response.headers.get('content-type');
+
+  if (!(contentType === 'text/plain' || contentType === 'application/octet-stream')) {
     return null;
   }
 
-  const versionRaw = await response.readBody();
+  const versionRaw = await response.text();
   const version = versionRaw.trim();
 
   const platform = 'win-x64';
   const commitsUrl = `https://dotnetbuilds.azureedge.net/public/Sdk/${version}/productCommit-${platform}.json`;
 
-  const commits = (await httpClient.getJson<SdkProductCommits>(commitsUrl)).result;
+  response = await fetch(commitsUrl, init);
+
+  const commitsJson = await response.json();
+  const commits = commitsJson as SdkProductCommits;
 
   if (!commits) {
     return null;
