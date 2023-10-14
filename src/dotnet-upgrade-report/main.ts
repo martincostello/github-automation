@@ -4,6 +4,7 @@
 import * as core from '@actions/core';
 import { getOctokit } from '@actions/github';
 import { Context } from '@actions/github/lib/context';
+import { fetch } from 'undici';
 import { getBadge } from '../shared/badges';
 import { ReleasesIndex } from '../shared/dotnet';
 import { handle } from '../shared/errors';

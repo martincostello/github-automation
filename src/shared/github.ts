@@ -3,6 +3,7 @@
 
 import { debug } from '@actions/core';
 import { Context } from '@actions/github/lib/context';
+import { fetch } from 'undici';
 import { UpdateDotNetSdkConfig, WorkflowConfig } from './config';
 
 export async function getFileContents(octokit: Octokit, owner: string, repo: string, path: string, ref: string): Promise<string> {
