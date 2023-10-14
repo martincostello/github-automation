@@ -108,7 +108,7 @@ export async function run(): Promise<void> {
       const stateToken = core.getInput('state-token', { required: false });
       github = getOctokit(stateToken);
 
-      await github.request('PATCH /repos/{owner}/{repo}/actions/variables/{name}', {
+      await github.rest.actions.updateRepoVariable({
         owner: context.repo.owner,
         repo: context.repo.repo,
         name: 'DOTNET_CORE_SHA',
