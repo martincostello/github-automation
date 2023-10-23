@@ -107,6 +107,7 @@ jobs:
           $branch = $env:BRANCH_NAME
           $repos = @(
             "justeattakeaway/ApplePayJSSample",
+            "justeattakeaway/AwsWatchman",
             "justeattakeaway/httpclient-interception",
             "justeattakeaway/JustEat.StatsD",
             "justeattakeaway/JustSaying"
