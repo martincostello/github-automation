@@ -41,14 +41,10 @@ export async function run(): Promise<void> {
       latestVersion = versions.trim();
     }
 
-    const report = [
-      '# .NET vNext Upgrade Report',
-      '',
-      '| Pull Request | SDK Version | Build Status | Conflicts? |',
-      '| :----------- | :---------- | :----------- | :--------: |',
-    ];
+    const report = ['# .NET vNext Upgrade Report', ''];
 
     let count = 0;
+    let wroteHeader = false;
 
     for (const slug of repositories) {
       // eslint-disable-next-line no-console
@@ -151,13 +147,20 @@ export async function run(): Promise<void> {
       const conflictsUrl = pull.html_url;
 
       count++;
+
+      if (!wroteHeader) {
+        report.push('| Pull Request | SDK Version | Build Status | Conflicts? |');
+        report.push('| :----------- | :---------- | :----------- | :--------: |');
+        wroteHeader = true;
+      }
+
       report.push(
         `| [${slug}#${pull.number}](${pull.html_url}) | [![.NET SDK version](${sdkBadge})](${sdkUrl}) | [![Build: ${combinedStatus}](${buildBadge})](${buildUrl}) | [![Merge conflicts?](${conflictsBadge})](${conflictsUrl}) |`
       );
     }
 
     if (count === 0) {
-      return;
+      report.push(`No pull requests found for the \`${branch}\` branch.`);
     }
 
     report.push('');
