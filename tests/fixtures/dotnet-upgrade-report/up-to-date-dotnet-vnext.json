@@ -177,6 +177,7 @@
       "response": {
         "html_url": "https://github.com/martincostello/website/pull/1398",
         "number": 1398,
+        "mergeable": true,
         "mergeable_state": "clean"
       }
     }

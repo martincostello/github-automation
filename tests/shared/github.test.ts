@@ -235,26 +235,21 @@ describe('getPull', () => {
   };
 
   describe.each([
-    [['behind'], 'behind'],
-    [['blocked'], 'blocked'],
-    [['clean'], 'clean'],
-    [['dirty'], 'dirty'],
-    [['draft'], 'draft'],
-    [['has_hooks'], 'has_hooks'],
-    [['unstable'], 'unstable'],
-    [['unknown', 'dirty'], 'dirty'],
-    [[null, 'dirty'], 'dirty'],
-  ])('when mergeable_state is %s', (mergeable_states: any[], expected: string) => {
+    [[false], false],
+    [[true], true],
+    [[null, false], false],
+    [[null, true], true],
+  ])('when mergeable is %s', (mergeables: any[], expected: boolean) => {
     let actual;
 
     beforeEach(async () => {
-      const octokit = getOctokitForPulls(mergeable_states.map((mergeable_state) => ({ mergeable_state })));
+      const octokit = getOctokitForPulls(mergeables.map((mergeable) => ({ mergeable })));
       actual = await getPull(octokit, owner, repo, 42);
     }, 15000);
 
-    test('returns mergeable_state', async () => {
+    test('returns mergeable', async () => {
       expect(actual).not.toBeNull();
-      expect(actual['mergeable_state']).toBe(expected);
+      expect(actual['mergeable']).toBe(expected);
     });
   });
 });

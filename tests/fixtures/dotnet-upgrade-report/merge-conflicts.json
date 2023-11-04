@@ -171,6 +171,7 @@
       "response": {
         "html_url": "https://github.com/martincostello/dependabot-helper/pull/607",
         "number": 607,
+        "mergeable": false,
         "mergeable_state": "dirty"
       }
     }

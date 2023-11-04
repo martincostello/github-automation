@@ -132,6 +132,7 @@
       "response": {
         "html_url": "https://github.com/martincostello/adventofcode/pull/992",
         "number": 1398,
+        "mergeable": false,
         "mergeable_state": "dirty"
       }
     },
@@ -229,6 +230,7 @@
       "response": {
         "html_url": "https://github.com/martincostello/website/pull/1398",
         "number": 1398,
+        "mergeable": true,
         "mergeable_state": "clean"
       }
     }
