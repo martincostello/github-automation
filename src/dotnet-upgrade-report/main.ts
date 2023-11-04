@@ -105,7 +105,7 @@ export async function run(): Promise<void> {
       }
 
       const pull = await getPull(github, owner, repo, pull_for_ref.number);
-      const hasConflicts = pull.mergeable_state === 'dirty';
+      const hasConflicts = pull.mergeable === false;
 
       const { data: checkStatuses } = await github.rest.checks.listForRef({
         owner,

@@ -177,6 +177,7 @@
       "response": {
         "html_url": "https://github.com/martincostello/costellobot/pull/583",
         "number": 583,
+        "mergeable": true,
         "mergeable_state": "clean"
       }
     }

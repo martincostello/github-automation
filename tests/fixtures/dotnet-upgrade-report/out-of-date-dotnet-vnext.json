@@ -171,6 +171,7 @@
       "response": {
         "html_url": "https://github.com/martincostello/sqllocaldb/pull/653",
         "number": 653,
+        "mergeable": true,
         "mergeable_state": "clean"
       }
     }

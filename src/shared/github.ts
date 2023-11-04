@@ -31,7 +31,7 @@ export async function getPull(
   pull_number: number
 ): Promise<{
   html_url: string;
-  mergeable_state: string;
+  mergeable: boolean | null;
   number: number;
 }> {
   let pr = await octokit.rest.pulls.get({
@@ -40,22 +40,22 @@ export async function getPull(
     pull_number,
   });
 
-  const logMergeableState = (): void => {
-    debug(`${owner}/${repo}#${pull_number} mergeable_state: ${pr.data.mergeable_state}.`);
+  const logIfMergeable = (): void => {
+    debug(`${owner}/${repo}#${pull_number} mergeable: ${pr.data.mergeable}.`);
   };
 
-  logMergeableState();
+  logIfMergeable();
 
   // Poll for changes if the mergeable state is not yet known if a push just occurred.
   // The first read above will start a background job to re-calcuate the mergeability, but it may not be ready immediately.
-  // See https://docs.github.com/en/rest/guides/using-the-rest-api-to-interact-with-your-git-database?apiVersion=2022-11-28#checking-mergeability-of-pull-requests
+  // See https://docs.github.com/rest/guides/using-the-rest-api-to-interact-with-your-git-database#checking-mergeability-of-pull-requests
   // and https://github.com/pullreminders/backlog/issues/42#issuecomment-436412823.
   let pollCount = 0;
   const pollDelay = 5000;
   const timeout = 60000;
   const maxPollCount = timeout / pollDelay;
 
-  while ((pr.data.mergeable_state === null || pr.data.mergeable_state === 'unknown') && pollCount < maxPollCount) {
+  while (pr.data.mergeable === null && pollCount < maxPollCount) {
     await new Promise((resolve) => setTimeout(resolve, pollDelay));
     pr = await octokit.rest.pulls.get({
       owner,
@@ -69,7 +69,7 @@ export async function getPull(
       },
     });
 
-    logMergeableState();
+    logIfMergeable();
     pollCount++;
   }
 
