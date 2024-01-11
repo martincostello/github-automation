@@ -21,23 +21,18 @@ type UpdateConfiguration = {
 function getConfiguration(overrides: UpdateDotNetSdkConfig | null): UpdateDotNetSdkConfig {
   const config: UpdateDotNetSdkConfig = {};
 
-  const updateIfDefined = (candidate: UpdateDotNetSdkConfig, key: string): void => {
-    const value = candidate[key];
-    if (value !== undefined) {
-      config[key] = value;
-    }
-  };
-
   if (overrides) {
     core.debug(`Baseline configuration: ${JSON.stringify(config)}`);
     core.debug(`Repository configuration: ${JSON.stringify(overrides)}`);
 
-    updateIfDefined(overrides, 'channel');
-    updateIfDefined(overrides, 'exclude-nuget-packages');
-    updateIfDefined(overrides, 'include-nuget-packages');
-    updateIfDefined(overrides, 'labels');
-    updateIfDefined(overrides, 'quality');
-    updateIfDefined(overrides, 'update-nuget-packages');
+    const keys = ['channel', 'exclude-nuget-packages', 'include-nuget-packages', 'labels', 'quality', 'update-nuget-packages'];
+
+    for (const key of keys) {
+      const value = overrides[key];
+      if (value !== undefined) {
+        config[key] = value;
+      }
+    }
 
     core.debug(`Merged configuration: ${JSON.stringify(config)}`);
   }
