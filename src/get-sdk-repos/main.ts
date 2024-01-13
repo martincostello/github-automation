@@ -59,7 +59,7 @@ export async function run(): Promise<void> {
 
     let singleRepository = core.getInput('repository', { required: false });
 
-    if (!singleRepository.includes('/')) {
+    if (singleRepository && !singleRepository.includes('/')) {
       const context = new Context();
       singleRepository = `${context.repo.owner}/${singleRepository}`;
     }
