@@ -30,6 +30,13 @@ exports[`getReposForCurrentUser when there are repositories for all returns the 
     "owner": "org3",
     "repo": "name3",
   },
+  {
+    "default_branch": "main",
+    "full_name": "org3/name4",
+    "html_url": "https://github.com/org3/name4",
+    "owner": "org3",
+    "repo": "name4",
+  },
 ]
 `;
 
@@ -63,6 +70,13 @@ exports[`getReposForCurrentUser when there are repositories for member returns t
     "owner": "org3",
     "repo": "name3",
   },
+  {
+    "default_branch": "main",
+    "full_name": "org3/name4",
+    "html_url": "https://github.com/org3/name4",
+    "owner": "org3",
+    "repo": "name4",
+  },
 ]
 `;
 
@@ -95,6 +109,13 @@ exports[`getReposForCurrentUser when there are repositories for owner returns th
     "html_url": "https://github.com/org3/name3",
     "owner": "org3",
     "repo": "name3",
+  },
+  {
+    "default_branch": "main",
+    "full_name": "org3/name4",
+    "html_url": "https://github.com/org3/name4",
+    "owner": "org3",
+    "repo": "name4",
   },
 ]
 `;
