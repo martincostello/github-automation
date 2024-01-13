@@ -3,6 +3,7 @@
 
 import * as core from '@actions/core';
 import { getOctokit } from '@actions/github';
+import { Context } from '@actions/github/lib/context';
 import { UpdateDotNetSdkConfig } from '../shared/config';
 import { handle } from '../shared/errors';
 import { getDotNetSdk, getReposForCurrentUser, getUpdateConfiguration } from '../shared/github';
@@ -56,7 +57,12 @@ export async function run(): Promise<void> {
     const channel = branch === 'dotnet-nightly' && nightlyChannel ? nightlyChannel : '';
     const quality = branch === 'dotnet-nightly' ? 'daily' : '';
 
-    const singleRepository = core.getInput('repository', { required: false });
+    let singleRepository = core.getInput('repository', { required: false });
+
+    if (!singleRepository.includes('/')) {
+      const context = new Context();
+      singleRepository = `${context.repo.owner}/${singleRepository}`;
+    }
 
     const result: UpdateConfiguration[] = [];
 

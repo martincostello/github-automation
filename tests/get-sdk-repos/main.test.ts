@@ -9,6 +9,7 @@ import { setup } from '../fixtures';
 
 describe('get-sdk-repos', () => {
   describe.each([
+    ['custom-config', 'dotnet-vnext', 'website'],
     ['custom-config', 'dotnet-vnext', 'martincostello/website'],
     ['empty-custom-config', 'dotnet-vnext', 'martincostello/website'],
     ['ignored', 'dotnet-vnext', 'martincostello/website'],

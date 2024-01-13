@@ -2,6 +2,8 @@
 
 exports[`get-sdk-repos custom-config on dotnet-vnext for repository "martincostello/website" outputs the correct repositories 1`] = `"[{"channel":"","exclude-nuget-packages":"SomeExcludedPackage","include-nuget-packages":"SomeIncludedPackage","labels":"dependencies,.NET","quality":"","ref":"dotnet-vnext","repo":"martincostello/website","update-nuget-packages":false}]"`;
 
+exports[`get-sdk-repos custom-config on dotnet-vnext for repository "website" outputs the correct repositories 1`] = `"[{"channel":"","exclude-nuget-packages":"SomeExcludedPackage","include-nuget-packages":"SomeIncludedPackage","labels":"dependencies,.NET","quality":"","ref":"dotnet-vnext","repo":"martincostello/website","update-nuget-packages":false}]"`;
+
 exports[`get-sdk-repos empty-custom-config on dotnet-vnext for repository "martincostello/website" outputs the correct repositories 1`] = `"[{"channel":"","exclude-nuget-packages":"","include-nuget-packages":"Microsoft.AspNetCore.,Microsoft.EntityFrameworkCore.,Microsoft.Extensions.,System.Text.Json","labels":"dependencies,.NET","quality":"","ref":"dotnet-vnext","repo":"martincostello/website","update-nuget-packages":true}]"`;
 
 exports[`get-sdk-repos ignored on dotnet-vnext for repository "martincostello/website" outputs the correct repositories 1`] = `"[]"`;
