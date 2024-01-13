@@ -101,7 +101,6 @@ export async function getReposForCurrentUser(octokit: Octokit, type: 'all' | 'ow
     .filter((repo) => !repo.fork)
     .filter((repo) => !repo.is_template)
     .filter((repo) => repo.permissions?.push)
-    .filter((repo) => repo.language === 'C#')
     .map((repo) => {
       return {
         full_name: repo.full_name,
