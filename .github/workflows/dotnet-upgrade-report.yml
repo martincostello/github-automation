@@ -1,8 +1,8 @@
 name: dotnet-upgrade-report
 
 on:
-  #schedule:
-  #  - cron: '30 08 * * *'
+  schedule:
+    - cron: '30 08 * * *'
   workflow_call:
     inputs:
       branch:
