@@ -1,0 +1,166 @@
+name: update-dotnet-sdks
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'The branch to check for the presence of .NET in.'
+        required: false
+        type: choice
+        options:
+          - 'main'
+        default: 'main'
+      repository:
+        description: 'An optional single repository to check.'
+        required: false
+        type: string
+        default: ''
+
+permissions: {}
+
+jobs:
+  get-repos:
+    runs-on: [ ubuntu-latest ]
+
+    concurrency:
+      group: ${{ github.workflow }}
+      cancel-in-progress: false
+
+    outputs:
+      repositories: ${{ steps.get-repos.outputs.repositories }}
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Get repositories to upgrade
+        uses: ./actions/get-dotnet-repos
+        id: get-repos
+        with:
+          branch: ${{ inputs.branch || '' }}
+          github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
+          repository: ${{ inputs.repository || '' }}
+
+  upgrade-dotnet:
+    name: 'upgrade-${{ matrix.repo }}'
+    needs: [ get-repos ]
+    runs-on: [ ubuntu-latest ]
+    if: needs.get-repos.outputs.repositories != '[]'
+
+    concurrency:
+      group: 'upgrade-dotnet-${{ matrix.repo }}'
+      cancel-in-progress: false
+
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        include: ${{ fromJSON(needs.get-repos.outputs.repositories) }}
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          ref: ${{ matrix.ref }}
+          repository: ${{ matrix.repo }}
+          token: ${{ secrets.COSTELLOBOT_TOKEN }}
+
+      - name: Install .NET SDKs
+        uses: actions/setup-dotnet@4d6c8fcf3c8f7a60068d26b594648e99df24cee3 # v4.0.0
+        with:
+          dotnet-version: |
+            6.0.x
+            7.0.x
+            8.0.x
+            9.0.x
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@4d6c8fcf3c8f7a60068d26b594648e99df24cee3 # v4.0.0
+
+      - name: Install .NET tools
+        shell: pwsh
+        env:
+          DOTNET_OUTDATED_VERSION: '4.6.0'
+        run: |
+          dotnet tool install --global dotnet-outdated-tool --version "$env:DOTNET_OUTDATED_VERSION"
+          dotnet tool install --global MartinCostello.DotNetBumper --add-source https://f.feedz.io/martincostello/dotnet-bumper/nuget/index.json --prerelease
+
+      - name: Run .NET Bumper
+        shell: pwsh
+        env:
+          NoWarn: 'CA1515' # HACK See https://github.com/dotnet/roslyn-analyzers/issues/7192
+        run: |
+          dotnet bumper . --upgrade=type Preview --test
+
+      - name: Push changes to GitHub
+        id: push-changes
+        shell: pwsh
+        env:
+          BRANCH_NAME: 'dotnet-vnext'
+          GIT_COMMIT_USER_EMAIL: ${{ vars.GIT_COMMIT_USER_EMAIL }}
+          GIT_COMMIT_USER_NAME: ${{ vars.GIT_COMMIT_USER_NAME }}
+        run: |
+          $GitStatus = (git status --porcelain)
+
+          if ([string]::IsNullOrEmpty($GitStatus)) {
+            Write-Host "No changes to commit."
+            exit 0
+          }
+
+          git config user.email "${env:GIT_COMMIT_USER_EMAIL}" | Out-Null
+          git config user.name "${env:GIT_COMMIT_USER_NAME}" | Out-Null
+          git remote set-url "${env:GITHUB_SERVER_URL}/${env:GITHUB_REPOSITORY}.git" | Out-Null
+          git fetch origin | Out-Null
+          git rev-parse --verify --quiet "remotes/origin/${env:BRANCH_NAME}" | Out-Null
+
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "Branch ${env:BRANCH_NAME} already exists."
+            exit 0
+          }
+
+          $GlobalJson = Join-Path . "global.json"
+          $DotNetSdkVersion = (Get-Content $GlobalJson | Out-String | ConvertFrom-Json).sdk.version
+          $DotNetVersion = $DotNetSdkVersion.Split('.')[0]
+
+          git checkout -b $env:BRANCH_NAME
+          git add .
+          git commit -m "Update to .NET ${DotNetVersion}`n`nUpdate to .NET ${DotNetVersion} with .NET SDK version ${DotNetSdkVersion}."
+          #git push -u origin $env:BRANCH_NAME
+
+          "branch-name=${env:BRANCH_NAME}" >> $env:GITHUB_OUTPUT
+          "dotnet-version=${DotNetVersion}" >> $env:GITHUB_OUTPUT
+          #"upgraded-dotnet=true" >> $env:GITHUB_OUTPUT
+
+      - name: Create pull request
+        if: steps.push-changes.outputs.upgraded-dotnet == 'true'
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        env:
+          DOTNET_VERSION: ${{ steps.push-changes.outputs.dotnet-version }}
+          BASE_BRANCH: ${{ matrix.ref }}
+          HEAD_BRANCH: ${{ steps.push-changes.outputs.branch-name }}
+        with:
+          github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+
+            const bumperUrl = 'https://github.com/martincostello/dotnet-bumper';
+            const workflowUrl = `${process.env.GITHUB_SERVER_URL}/${owner}/${repo}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+
+            const { data: repository } = await github.rest.repos.get({ owner, repo });
+            const draft = repository.private === false;
+
+            await github.rest.pulls.create({
+              title: 'Update to .NET ${process.env.DOTNET_VERSION}',
+              owner,
+              repo,
+              head: process.env.HEAD_BRANCH,
+              base: process.env.BASE_BRANCH,
+              draft,
+              body: [
+                '- Update to .NET ${process.env.DOTNET_VERSION}.',
+                '',
+                `<sub>:robot: This pull request was generated by [GitHub Actions](${workflowUrl}) using [.NET Bumper](${bumperUrl}).</sub>`
+              ].join('\n')
+            });
