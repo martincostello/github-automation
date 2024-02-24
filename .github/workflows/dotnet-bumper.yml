@@ -114,6 +114,7 @@ jobs:
             exit 0
           }
 
+          git config color.diff always
           git --no-pager diff
 
           git config user.email "${env:GIT_COMMIT_USER_EMAIL}" | Out-Null
