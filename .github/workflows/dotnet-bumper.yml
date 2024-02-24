@@ -109,6 +109,8 @@ jobs:
             exit 0
           }
 
+          git --no-pager diff
+
           git config user.email "${env:GIT_COMMIT_USER_EMAIL}" | Out-Null
           git config user.name "${env:GIT_COMMIT_USER_NAME}" | Out-Null
           git remote set-url "${env:GITHUB_SERVER_URL}/${env:GITHUB_REPOSITORY}.git" | Out-Null
