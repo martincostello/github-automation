@@ -97,7 +97,7 @@ jobs:
         env:
           NoWarn: 'CA1515' # HACK See https://github.com/dotnet/roslyn-analyzers/issues/7192
         run: |
-          dotnet bumper . --upgrade-type Preview --test
+          dotnet bumper . --upgrade-type Preview --test --log-format GitHubActions
 
       - name: Push changes to GitHub
         id: push-changes
