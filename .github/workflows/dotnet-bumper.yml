@@ -270,6 +270,10 @@ jobs:
                 bodyLines.push('');
                 bodyLines.push('#### Remaining References :grey_question:');
                 bodyLines.push('');
+                bodyLines.push('The references below could not be updated automatically.');
+                bodyLines.push('');
+                bodyLines.push('Please review them in case they need to be manually updated. :detective:');
+                bodyLines.push('');
                 bodyLines.push('| **Location** | **Text** |');
                 bodyLines.push('|:-------------|:---------|');
 
