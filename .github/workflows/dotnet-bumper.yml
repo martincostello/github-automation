@@ -188,13 +188,21 @@ jobs:
               '',
               '#### Changes :memo:',
               '',
-              `- Update to .NET SDK \`${bumperLog.sdkVersion}\``,
-              '',
-              '#### Further Reading :book:',
-              '',
-              `- [What's new in .NET ${process.env.DOTNET_VERSION}](https://learn.microsoft.com/dotnet/core/whats-new/dotnet-${process.env.DOTNET_VERSION}/overview)`,
-              `- [Breaking changes in .NET ${process.env.DOTNET_VERSION}](https://learn.microsoft.com/dotnet/core/compatibility/${process.env.DOTNET_VERSION}.0)`,
             ];
+
+            if (bumperLog['changelog'] && bumperLog['changelog'].length > 0) {
+              for (const entry of bumperLog['changelog']) {
+                bodyLines.push(`- ${entry}`.trim());
+              }
+            } else {
+              bodyLines.push(`- Update to .NET SDK \`${bumperLog.sdkVersion}\``);
+              bodyLines.push('');
+            }
+
+            bodyLines.push('#### Further Reading :book:');
+            bodyLines.push('');
+            bodyLines.push(`- [What's new in .NET ${process.env.DOTNET_VERSION}](https://learn.microsoft.com/dotnet/core/whats-new/dotnet-${process.env.DOTNET_VERSION}/overview)`);
+            bodyLines.push(`- [Breaking changes in .NET ${process.env.DOTNET_VERSION}](https://learn.microsoft.com/dotnet/core/compatibility/${process.env.DOTNET_VERSION}.0)`);
 
             if (bumperLog['build'] && bumperLog['build']['summary']) {
               const categories = Object.entries(bumperLog['build']['summary']);
