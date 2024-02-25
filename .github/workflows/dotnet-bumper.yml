@@ -246,7 +246,7 @@ jobs:
               }
             }
 
-            if (bumperLog['warnings']) {
+            if (bumperLog['warnings'] && bumperLog['warnings'].length > 0) {
               bodyLines.push('');
               bodyLines.push('#### Warnings');
               bodyLines.push('');
@@ -258,7 +258,7 @@ jobs:
               bodyLines.push(bumperLog['warnings'].join('\n'));
               bodyLines.push('```');
               bodyLines.push('');
-              bodyLines.push('/<details>');
+              bodyLines.push('</details>');
             }
 
             bodyLines.push('');
