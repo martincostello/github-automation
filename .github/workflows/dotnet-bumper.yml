@@ -222,11 +222,11 @@ jobs:
               bodyLines.push('| **Location** | **Text** |');
               bodyLines.push('|:-------------|:---------|');
 
-              for (const [project, edits] of Object.entries(bumperLog['remainingReferences'])) {
+              for (const [relativePath, edits] of Object.entries(bumperLog['remainingReferences'])) {
                 for (const edit of edits) {
-                  const linkText = `${project.relativePath}:${edit.line}`;
-                  const linkUrl = `${process.env.GITHUB_SERVER_URL}/${theirOwner}/${theirRepo}/tree/${process.env.HEAD_BRANCH}/${project.relativePath}#L${edit.line}`;
-                  bodyLines.push(`| [\`${linkText}\`](${linkUrl}) | \`${edit.Text}\` |`);
+                  const linkText = `${relativePath}:${edit.line}`;
+                  const linkUrl = `${process.env.GITHUB_SERVER_URL}/${theirOwner}/${theirRepo}/tree/${process.env.HEAD_BRANCH}/${relativePath}#L${edit.line}`;
+                  bodyLines.push(`| [\`${linkText}\`](${linkUrl}) | \`${edit.text}\` |`);
                 }
               }
             }
