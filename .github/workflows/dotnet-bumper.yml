@@ -156,6 +156,7 @@ jobs:
         with:
           github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
           script: |
+            const fs = require('fs');
             const { thisOwner, thisRepo } = context.repo;
             const [ theirOwner, theirRepo ] = process.env.UPGRADE_REPO.split('/');
 
