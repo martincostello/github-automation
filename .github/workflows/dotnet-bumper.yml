@@ -176,7 +176,12 @@ jobs:
               '',
               '#### Changes',
               '',
-              `- Update to .NET SDK \`${bumperLog.sdkVersion}\`.`,
+              `- Update to .NET SDK \`${bumperLog.sdkVersion}\``,
+              '',
+              '#### Further Reading',
+              '',
+              `- [What's new in .NET ${process.env.DOTNET_VERSION}](https://learn.microsoft.com/dotnet/core/whats-new/dotnet-${process.env.DOTNET_VERSION}/overview)`,
+              `- [Breaking changes in .NET ${process.env.DOTNET_VERSION}](https://learn.microsoft.com/dotnet/core/compatibility/${process.env.DOTNET_VERSION}.0)`,
             ];
 
             if (bumperLog['build'] && bumperLog['build']['summary']) {
