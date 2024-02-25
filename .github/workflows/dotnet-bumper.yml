@@ -233,7 +233,7 @@ jobs:
                 const skipped = entries['Skipped'] || 0;
 
                 if (passed > 0 || failed > 0 || skipped > 0) {
-                  bodyLines.push(`| ${container} | ${passed} | ${failed} | ${skipped} |`);
+                  rows.push(`| ${container} | ${passed} | ${failed} | ${skipped} |`);
                 }
               }
               if (rows.length > 0) {
@@ -266,7 +266,7 @@ jobs:
                 bodyLines.push('|:-------------|:---------|');
 
                 for (const row of rows) {
-                  rows.push(row);
+                  bodyLines.push(row);
                 }
               }
             }
