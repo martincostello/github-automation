@@ -266,7 +266,7 @@ jobs:
                 bodyLines.push('|:-------------|:---------|');
 
                 for (const row of rows) {
-                  rows.push(`| [\`${linkText}\`](${linkUrl}) | \`${edit.text}\` |`);
+                  rows.push(row);
                 }
               }
             }
