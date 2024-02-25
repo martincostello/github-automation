@@ -182,15 +182,15 @@ jobs:
             const bumperLog = JSON.parse(json);
 
             const bodyLines = [
-              '#### Summary',
+              '#### Summary :rocket:',
               '',
               `Update to .NET ${process.env.DOTNET_VERSION}.`,
               '',
-              '#### Changes',
+              '#### Changes :memo:',
               '',
               `- Update to .NET SDK \`${bumperLog.sdkVersion}\``,
               '',
-              '#### Further Reading',
+              '#### Further Reading :book:',
               '',
               `- [What's new in .NET ${process.env.DOTNET_VERSION}](https://learn.microsoft.com/dotnet/core/whats-new/dotnet-${process.env.DOTNET_VERSION}/overview)`,
               `- [Breaking changes in .NET ${process.env.DOTNET_VERSION}](https://learn.microsoft.com/dotnet/core/compatibility/${process.env.DOTNET_VERSION}.0)`,
@@ -200,7 +200,7 @@ jobs:
               const categories = Object.entries(bumperLog['build']['summary']);
               if (categories.length > 0) {
                 bodyLines.push('');
-                bodyLines.push('#### Build Summary');
+                bodyLines.push('#### Build Summary :wrench:');
                 bodyLines.push('');
                 bodyLines.push('| **Type** | **ID** | **Count** |');
                 bodyLines.push('|:---------|:-------|----------:|');
@@ -238,7 +238,7 @@ jobs:
               }
               if (rows.length > 0) {
                 bodyLines.push('');
-                bodyLines.push('#### Test Summary');
+                bodyLines.push('#### Test Summary :test_tube:');
                 bodyLines.push('');
                 bodyLines.push('| **Container** | **Passed** :white_check_mark: | **Failed** :x: | **Skipped** :zzz: |');
                 bodyLines.push('|:--------------|------------------------------:|---------------:|------------------:|');
@@ -260,7 +260,7 @@ jobs:
               }
               if (rows.length > 0) {
                 bodyLines.push('');
-                bodyLines.push('#### Remaining References');
+                bodyLines.push('#### Remaining References :grey_question:');
                 bodyLines.push('');
                 bodyLines.push('| **Location** | **Text** |');
                 bodyLines.push('|:-------------|:---------|');
@@ -273,7 +273,7 @@ jobs:
 
             if (bumperLog['warnings'] && bumperLog['warnings'].length > 0) {
               bodyLines.push('');
-              bodyLines.push('#### Warnings');
+              bodyLines.push('#### Warnings :warning:');
               bodyLines.push('');
               bodyLines.push('<details>');
               bodyLines.push('');
