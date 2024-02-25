@@ -157,7 +157,7 @@ jobs:
           github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
           script: |
             const fs = require('fs');
-            const { thisOwner, thisRepo } = context.repo;
+            const { owner: thisOwner, repo: thisRepo } = context.repo;
             const [ theirOwner, theirRepo ] = process.env.UPGRADE_REPO.split('/');
 
             const bumperUrl = 'https://github.com/martincostello/dotnet-bumper';
