@@ -250,20 +250,23 @@ jobs:
             }
 
             if (bumperLog['remainingReferences']) {
-              const references = bumperLog['remainingReferences'];
-              if (references.length > 0) {
+              const rows = [];
+              for (const [relativePath, edits] of Object.entries(bumperLog['remainingReferences'])) {
+                for (const edit of edits) {
+                  const linkText = `${relativePath}:${edit.line}`;
+                  const linkUrl = `${process.env.GITHUB_SERVER_URL}/${theirOwner}/${theirRepo}/tree/${process.env.HEAD_BRANCH}/${relativePath}#L${edit.line}`;
+                  rows.push(`| [\`${linkText}\`](${linkUrl}) | \`${edit.text}\` |`);
+                }
+              }
+              if (rows.length > 0) {
                 bodyLines.push('');
                 bodyLines.push('#### Remaining References');
                 bodyLines.push('');
                 bodyLines.push('| **Location** | **Text** |');
                 bodyLines.push('|:-------------|:---------|');
 
-                for (const [relativePath, edits] of references) {
-                  for (const edit of edits) {
-                    const linkText = `${relativePath}:${edit.line}`;
-                    const linkUrl = `${process.env.GITHUB_SERVER_URL}/${theirOwner}/${theirRepo}/tree/${process.env.HEAD_BRANCH}/${relativePath}#L${edit.line}`;
-                    bodyLines.push(`| [\`${linkText}\`](${linkUrl}) | \`${edit.text}\` |`);
-                  }
+                for (const row of rows) {
+                  rows.push(`| [\`${linkText}\`](${linkUrl}) | \`${edit.text}\` |`);
                 }
               }
             }
