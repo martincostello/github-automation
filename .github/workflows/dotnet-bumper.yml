@@ -174,59 +174,68 @@ jobs:
             ];
 
             if (bumperLog['build'] && bumperLog['build']['summary']) {
-              bodyLines.push('');
-              bodyLines.push('### Build Summary');
-              bodyLines.push('');
-              bodyLines.push('| **Type** | **ID** | **Count** |');
-              bodyLines.push('|:---------|:-------|----------:|');
+              const categories = Object.entries(bumperLog['build']['summary']);
+              if (categories.length > 0) {
+                bodyLines.push('');
+                bodyLines.push('### Build Summary');
+                bodyLines.push('');
+                bodyLines.push('| **Type** | **ID** | **Count** |');
+                bodyLines.push('|:---------|:-------|----------:|');
 
-              for (const [type, entries] of Object.entries(bumperLog['build']['summary'])) {
-                let emoji;
-                switch (type) {
-                  case 'errors':
-                    Error = ':x:';
-                    break;
-                  case 'Warning':
-                    emoji = ':warning:';
-                    break;
-                  default:
-                    emoji = ':information_source:';
-                    break;
-                }
-                for (const [id, count] of Object.entries(entries)) {
-                  bodyLines.push(`| ${emoji} ${type} | ${id} | ${count} |`);
+                for (const [type, entries] of categories) {
+                  let emoji;
+                  switch (type) {
+                    case 'errors':
+                      Error = ':x:';
+                      break;
+                    case 'Warning':
+                      emoji = ':warning:';
+                      break;
+                    default:
+                      emoji = ':information_source:';
+                      break;
+                  }
+                  for (const [id, count] of Object.entries(entries)) {
+                    bodyLines.push(`| ${emoji} ${type} | ${id} | ${count} |`);
+                  }
                 }
               }
             }
 
             if (bumperLog['test'] && bumperLog['test']['summary']) {
-              bodyLines.push('');
-              bodyLines.push('### Test Summary');
-              bodyLines.push('');
-              bodyLines.push('| **Container** | **Passed** :white_check_mark: | **Failed** :x: | **Skipped** :zzz: |');
-              bodyLines.push('|:--------------|------------------------------:|---------------:|------------------:|');
+              const containers = Object.entries(bumperLog['test']['summary']);
+              if (containers.length > 0) {
+                bodyLines.push('');
+                bodyLines.push('### Test Summary');
+                bodyLines.push('');
+                bodyLines.push('| **Container** | **Passed** :white_check_mark: | **Failed** :x: | **Skipped** :zzz: |');
+                bodyLines.push('|:--------------|------------------------------:|---------------:|------------------:|');
 
-              for (const [container, entries] of Object.entries(bumperLog['test']['summary'])) {
-                const passed = entries['Passed'] || 0;
-                const failed = entries['Failed'] || 0;
-                const skipped = entries['Skipped'] || 0;
+                for (const [container, entries] of containers) {
+                  const passed = entries['Passed'] || 0;
+                  const failed = entries['Failed'] || 0;
+                  const skipped = entries['Skipped'] || 0;
 
-                bodyLines.push(`| ${container} | ${passed} | ${failed} | ${skipped} |`);
+                  bodyLines.push(`| ${container} | ${passed} | ${failed} | ${skipped} |`);
+                }
               }
             }
 
             if (bumperLog['remainingReferences']) {
-              bodyLines.push('');
-              bodyLines.push('### Remaining References');
-              bodyLines.push('');
-              bodyLines.push('| **Location** | **Text** |');
-              bodyLines.push('|:-------------|:---------|');
+              const references = bumperLog['remainingReferences'];
+              if (references.length > 0) {
+                bodyLines.push('');
+                bodyLines.push('### Remaining References');
+                bodyLines.push('');
+                bodyLines.push('| **Location** | **Text** |');
+                bodyLines.push('|:-------------|:---------|');
 
-              for (const [relativePath, edits] of Object.entries(bumperLog['remainingReferences'])) {
-                for (const edit of edits) {
-                  const linkText = `${relativePath}:${edit.line}`;
-                  const linkUrl = `${process.env.GITHUB_SERVER_URL}/${theirOwner}/${theirRepo}/tree/${process.env.HEAD_BRANCH}/${relativePath}#L${edit.line}`;
-                  bodyLines.push(`| [\`${linkText}\`](${linkUrl}) | \`${edit.text}\` |`);
+                for (const [relativePath, edits] of references) {
+                  for (const edit of edits) {
+                    const linkText = `${relativePath}:${edit.line}`;
+                    const linkUrl = `${process.env.GITHUB_SERVER_URL}/${theirOwner}/${theirRepo}/tree/${process.env.HEAD_BRANCH}/${relativePath}#L${edit.line}`;
+                    bodyLines.push(`| [\`${linkText}\`](${linkUrl}) | \`${edit.text}\` |`);
+                  }
                 }
               }
             }
