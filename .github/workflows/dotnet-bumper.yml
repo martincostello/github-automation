@@ -104,7 +104,7 @@ jobs:
           NoWarn: 'CA1515' # HACK See https://github.com/dotnet/roslyn-analyzers/issues/7192
         run: |
           $tempFile = [System.IO.Path]::GetTempFileName()
-          dotnet bumper . --upgrade-type Preview --test --log-format Json --log-path $tempFile
+          dotnet bumper . --log-format Json --log-path $tempFile --test --upgrade-type Preview
           "dotnet-bumper-log=${tempFile}" >> $env:GITHUB_OUTPUT
 
       - name: Push changes to GitHub
