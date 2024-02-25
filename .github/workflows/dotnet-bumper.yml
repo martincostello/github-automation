@@ -310,6 +310,7 @@ jobs:
             return body;
 
       - name: Output the report
+        if: steps.create-pr.outputs.result != ''
         shell: bash
         env:
           SUMMARY: ${{ steps.create-pr.outputs.result }}
