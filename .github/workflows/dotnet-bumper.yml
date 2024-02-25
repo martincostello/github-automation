@@ -93,11 +93,14 @@ jobs:
           dotnet tool install --global MartinCostello.DotNetBumper --add-source https://f.feedz.io/martincostello/dotnet-bumper/nuget/index.json --prerelease
 
       - name: Run .NET Bumper
+        id: upgrade-dotnet
         shell: pwsh
         env:
           NoWarn: 'CA1515' # HACK See https://github.com/dotnet/roslyn-analyzers/issues/7192
         run: |
-          dotnet bumper . --upgrade-type Preview --test --log-format GitHubActions
+          $tempFile = [System.IO.Path]::GetTempFileName()
+          dotnet bumper . --upgrade-type Preview --test --log-format Json --log-path $tempFile
+          "dotnet-bumper-log=${tempFile}" >> $env:GITHUB_OUTPUT
 
       - name: Push changes to GitHub
         id: push-changes
@@ -139,36 +142,122 @@ jobs:
 
           "branch-name=${env:BRANCH_NAME}" >> $env:GITHUB_OUTPUT
           "dotnet-version=${DotNetVersion}" >> $env:GITHUB_OUTPUT
-          #"upgraded-dotnet=true" >> $env:GITHUB_OUTPUT
+          "upgraded-dotnet=true" >> $env:GITHUB_OUTPUT
 
       - name: Create pull request
         if: steps.push-changes.outputs.upgraded-dotnet == 'true'
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
         env:
+          DOTNET_BUMPER_LOG: ${{ steps.upgrade-dotnet.outputs.dotnet-bumper-log }}
           DOTNET_VERSION: ${{ steps.push-changes.outputs.dotnet-version }}
           BASE_BRANCH: ${{ matrix.ref }}
           HEAD_BRANCH: ${{ steps.push-changes.outputs.branch-name }}
+          UPGRADE_REPO: ${{ matrix.repo }}
         with:
           github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
           script: |
-            const { owner, repo } = context.repo;
+            const { thisOwner, thisRepo } = context.repo;
+            const [ theirOwner, theirRepo ] = process.env.UPGRADE_REPO.split('/');
 
             const bumperUrl = 'https://github.com/martincostello/dotnet-bumper';
-            const workflowUrl = `${process.env.GITHUB_SERVER_URL}/${owner}/${repo}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const workflowUrl = `${process.env.GITHUB_SERVER_URL}/${thisOwner}/${thisRepo}/actions/runs/${process.env.GITHUB_RUN_ID}`;
 
-            const { data: repository } = await github.rest.repos.get({ owner, repo });
+            const { data: repository } = await github.rest.repos.get({ owner: theirOwner, repo: theirRepo });
             const draft = repository.private === false;
 
+            const json = fs.readFileSync(process.env.DOTNET_BUMPER_LOG, 'utf8');
+            const bumperLog = JSON.parse(json);
+
+            const bodyLines = [
+              '- Update to .NET ${process.env.DOTNET_VERSION}.',
+            ];
+
+            if (bumperLog['build'] && bumperLog['build']['summary']) {
+              bodyLines.push('');
+              bodyLines.push('### Build Summary');
+              bodyLines.push('');
+              bodyLines.push('| **Type** | **ID** | **Count** |');
+              bodyLines.push('|:---------|:-------|----------:|');
+
+              for (const [type, entries] of Object.entries(bumperLog['build']['summary'])) {
+                let emoji;
+                switch (type) {
+                  case 'errors':
+                    Error = ':x:';
+                    break;
+                  case 'Warning':
+                    emoji = ':warning:';
+                    break;
+                  default:
+                    emoji = ':information_source:';
+                    break;
+                }
+                for (const [id, count] of Object.entries(entries)) {
+                  bodyLines.push(`| ${emoji} ${type} | ${id} | ${count} |`);
+                }
+              }
+            }
+
+            if (bumperLog['test'] && bumperLog['test']['summary']) {
+              bodyLines.push('');
+              bodyLines.push('### Test Summary');
+              bodyLines.push('');
+              bodyLines.push('| **Container** | **Passed** :white_check_mark: | **Failed** :x: | **Skipped** :zzz: |');
+              bodyLines.push('|:--------------|------------------------------:|---------------:|------------------:|');
+
+              for (const [container, entries] of Object.entries(bumperLog['test']['summary'])) {
+                const passed = entries['Passed'] || 0;
+                const failed = entries['Failed'] || 0;
+                const skipped = entries['Skipped'] || 0;
+
+                bodyLines.push(`| ${container} | ${passed} | ${failed} | ${skipped} |`);
+              }
+            }
+
+            if (bumperLog['remainingReferences']) {
+              bodyLines.push('');
+              bodyLines.push('### Remaining References');
+              bodyLines.push('');
+              bodyLines.push('| **Location** | **Text** |');
+              bodyLines.push('|:-------------|:---------|');
+
+              for (const [project, edits] of Object.entries(bumperLog['remainingReferences'])) {
+                for (const edit of edits) {
+                  const linkText = `${project.relativePath}:${edit.line}`;
+                  const linkUrl = `${process.env.GITHUB_SERVER_URL}/${theirOwner}/${theirRepo}/tree/${process.env.HEAD_BRANCH}/${project.relativePath}#L${edit.line}`;
+                  bodyLines.push(`| [\`${linkText}\`](${linkUrl}) | \`${edit.Text}\` |`);
+                }
+              }
+            }
+
+            if (bumperLog['warnings']) {
+              bodyLines.push('');
+              bodyLines.push('### Warnings');
+              bodyLines.push('');
+              bodyLines.push('<details>');
+              bodyLines.push('');
+              bodyLines.push('<summary>Warnings</summary>');
+              bodyLines.push('');
+              bodyLines.push('```text');
+              bodyLines.push(bumperLog['warnings'].join('\n'));
+              bodyLines.push('```');
+              bodyLines.push('');
+              bodyLines.push('/<details>');
+            }
+
+            bodyLines.push('');
+            bodyLines.push(`<sub>:robot: This pull request was generated by [GitHub Actions](${workflowUrl}) using [.NET Bumper](${bumperUrl}).</sub>`);
+
+            console.log(bodyLines.join('\n'));
+
+            /*
             await github.rest.pulls.create({
               title: 'Update to .NET ${process.env.DOTNET_VERSION}',
-              owner,
-              repo,
+              owner: theirOwner,
+              repo: theirRepo,
               head: process.env.HEAD_BRANCH,
               base: process.env.BASE_BRANCH,
               draft,
-              body: [
-                '- Update to .NET ${process.env.DOTNET_VERSION}.',
-                '',
-                `<sub>:robot: This pull request was generated by [GitHub Actions](${workflowUrl}) using [.NET Bumper](${bumperUrl}).</sub>`
-              ].join('\n')
+              body: bodyLines.join('\n')
             });
+            */
