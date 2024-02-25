@@ -292,7 +292,7 @@ jobs:
               });
 
               try {
-                await octokit.rest.issues.addLabels({
+                await github.rest.issues.addLabels({
                   owner: theirOwner,
                   repo: theirRepo,
                   issue_number: pr.number,
