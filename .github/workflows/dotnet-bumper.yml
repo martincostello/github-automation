@@ -170,7 +170,13 @@ jobs:
             const bumperLog = JSON.parse(json);
 
             const bodyLines = [
-              `- Update to .NET ${process.env.DOTNET_VERSION}.`,
+              '#### Summary',
+              '',
+              `Update to .NET ${process.env.DOTNET_VERSION}.`,
+              '',
+              '#### Changes',
+              '',
+              `- Update to .NET SDK \`${bumperLog.sdkVersion}\`.`,
             ];
 
             if (bumperLog['build'] && bumperLog['build']['summary']) {
