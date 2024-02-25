@@ -226,20 +226,25 @@ jobs:
             }
 
             if (bumperLog['test'] && bumperLog['test']['summary']) {
-              const containers = Object.entries(bumperLog['test']['summary']);
-              if (containers.length > 0) {
+              const rows = [];
+              for (const [container, entries] of Object.entries(bumperLog['test']['summary'])) {
+                const passed = entries['Passed'] || 0;
+                const failed = entries['Failed'] || 0;
+                const skipped = entries['Skipped'] || 0;
+
+                if (passed > 0 || failed > 0 || skipped > 0) {
+                  bodyLines.push(`| ${container} | ${passed} | ${failed} | ${skipped} |`);
+                }
+              }
+              if (rows.length > 0) {
                 bodyLines.push('');
                 bodyLines.push('#### Test Summary');
                 bodyLines.push('');
                 bodyLines.push('| **Container** | **Passed** :white_check_mark: | **Failed** :x: | **Skipped** :zzz: |');
                 bodyLines.push('|:--------------|------------------------------:|---------------:|------------------:|');
 
-                for (const [container, entries] of containers) {
-                  const passed = entries['Passed'] || 0;
-                  const failed = entries['Failed'] || 0;
-                  const skipped = entries['Skipped'] || 0;
-
-                  bodyLines.push(`| ${container} | ${passed} | ${failed} | ${skipped} |`);
+                for (const row of rows) {
+                  bodyLines.push(row);
                 }
               }
             }
