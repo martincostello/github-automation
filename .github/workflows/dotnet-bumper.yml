@@ -216,7 +216,7 @@ jobs:
                   let emoji;
                   switch (type) {
                     case 'Error':
-                      Error = ':x:';
+                      emoji = ':x:';
                       break;
                     case 'Warning':
                       emoji = ':warning:';
