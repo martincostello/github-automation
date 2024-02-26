@@ -115,6 +115,7 @@ jobs:
           DRY_RUN: ${{ inputs.dry-run }}
           GIT_COMMIT_USER_EMAIL: ${{ vars.GIT_COMMIT_USER_EMAIL }}
           GIT_COMMIT_USER_NAME: ${{ vars.GIT_COMMIT_USER_NAME }}
+          TARGET_REPO: ${{ matrix.repo }}
         run: |
           $GitStatus = (git status --porcelain)
 
@@ -128,7 +129,7 @@ jobs:
 
           git config user.email "${env:GIT_COMMIT_USER_EMAIL}" | Out-Null
           git config user.name "${env:GIT_COMMIT_USER_NAME}" | Out-Null
-          git remote set-url "${env:GITHUB_SERVER_URL}/${env:GITHUB_REPOSITORY}.git" | Out-Null
+          git remote set-url "${env:GITHUB_SERVER_URL}/${env:TARGET_REPO}.git" | Out-Null
           git fetch origin | Out-Null
           git rev-parse --verify --quiet "remotes/origin/${env:BRANCH_NAME}" | Out-Null
 
