@@ -215,7 +215,7 @@ jobs:
                 for (const [type, entries] of categories) {
                   let emoji;
                   switch (type) {
-                    case 'errors':
+                    case 'Error':
                       Error = ':x:';
                       break;
                     case 'Warning':
