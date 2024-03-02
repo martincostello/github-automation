@@ -4,22 +4,34 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'The branch to check for the presence of .NET in.'
+        description: 'The branch to upgrade the version of .NET in.'
         required: false
         type: choice
         options:
           - 'main'
         default: 'main'
       repository:
-        description: 'An optional single repository to check.'
+        description: 'An optional single repository to upgrade.'
         required: false
         type: string
         default: ''
+      upgrade-type:
+        description: 'The type of .NET upgrade to perform.'
+        required: false
+        type: choice
+        options:
+          - 'LTS'
+          - 'Latest'
+          - 'Preview'
+        default: 'LTS'
       dry-run:
-        description: 'If true, the workflow will not push changes to GitHub.'
+        description: 'If true, the workflow will not push any changes to GitHub.'
         required: false
         type: boolean
         default: false
+
+env:
+  DOTNET_BUMPER_UPGRADE_TYPE: ${{ inputs.upgrade-type || 'LTS' }}
 
 permissions: {}
 
@@ -65,6 +77,24 @@ jobs:
 
     steps:
 
+      - name: Install .NET SDKs
+        uses: actions/setup-dotnet@4d6c8fcf3c8f7a60068d26b594648e99df24cee3 # v4.0.0
+        with:
+          dotnet-version: |
+            6.0.x
+            7.0.x
+            8.0.x
+            9.0.x
+
+      - name: Install .NET tools
+        shell: pwsh
+        env:
+          DOTNET_BUMPER_VERSION: '0.2.1'
+          DOTNET_OUTDATED_VERSION: '4.6.0'
+        run: |
+          dotnet tool install --global dotnet-outdated-tool --version "$env:DOTNET_OUTDATED_VERSION"
+          dotnet tool install --global MartinCostello.DotNetBumper --version "$env:DOTNET_BUMPER_VERSION"
+
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
@@ -77,41 +107,31 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install .NET SDKs
-        uses: actions/setup-dotnet@4d6c8fcf3c8f7a60068d26b594648e99df24cee3 # v4.0.0
-        with:
-          dotnet-version: |
-            6.0.x
-            7.0.x
-            8.0.x
-            9.0.x
-
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@4d6c8fcf3c8f7a60068d26b594648e99df24cee3 # v4.0.0
-
-      - name: Install .NET tools
-        shell: pwsh
-        env:
-          DOTNET_OUTDATED_VERSION: '4.6.0'
-        run: |
-          dotnet tool install --global dotnet-outdated-tool --version "$env:DOTNET_OUTDATED_VERSION"
-          dotnet tool install --global MartinCostello.DotNetBumper --add-source https://f.feedz.io/martincostello/dotnet-bumper/nuget/index.json --prerelease
 
       - name: Run .NET Bumper
         id: upgrade-dotnet
         shell: pwsh
         env:
           NoWarn: 'CA1515' # HACK See https://github.com/dotnet/roslyn-analyzers/issues/7192
+          DOTNET_CLI_TELEMETRY_OPTOUT: true
+          DOTNET_GENERATE_ASPNET_CERTIFICATE: false
+          DOTNET_NOLOGO: true
+          DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+          DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION: 1
+          FORCE_COLOR: 3
+          NUGET_XMLDOC_MODE: skip
+          TERM: xterm
         run: |
           $tempFile = [System.IO.Path]::GetTempFileName()
-          dotnet bumper . --log-format Json --log-path $tempFile --test --upgrade-type Preview
+          dotnet bumper . --log-format Json --log-path $tempFile --test --upgrade-type ${env:DOTNET_BUMPER_UPGRADE_TYPE}
           "dotnet-bumper-log=${tempFile}" >> $env:GITHUB_OUTPUT
 
       - name: Push changes to GitHub
         id: push-changes
         shell: pwsh
         env:
-          BRANCH_NAME: 'dotnet-vnext'
           DRY_RUN: ${{ inputs.dry-run }}
           GIT_COMMIT_USER_EMAIL: ${{ vars.GIT_COMMIT_USER_EMAIL }}
           GIT_COMMIT_USER_NAME: ${{ vars.GIT_COMMIT_USER_NAME }}
@@ -123,38 +143,40 @@ jobs:
             exit 0
           }
 
-          git config color.diff always
-          git --no-pager diff
-
-          git config user.email "${env:GIT_COMMIT_USER_EMAIL}" | Out-Null
-          git config user.name "${env:GIT_COMMIT_USER_NAME}" | Out-Null
-          git fetch origin | Out-Null
-          git rev-parse --verify --quiet "remotes/origin/${env:BRANCH_NAME}" | Out-Null
-
-          if ($LASTEXITCODE -eq 0) {
-            Write-Host "Branch ${env:BRANCH_NAME} already exists."
-            exit 0
-          }
-
           $GlobalJson = Join-Path . "global.json"
           $DotNetSdkVersion = (Get-Content $GlobalJson | Out-String | ConvertFrom-Json).sdk.version
           $DotNetVersion = $DotNetSdkVersion.Split('.')[0]
 
-          git checkout -b $env:BRANCH_NAME
+          $BranchName = $env:DOTNET_BUMPER_UPGRADE_TYPE -eq "Preview" ? "dotnet-vnext" : "dotnet-${DotNetVersion}-upgrade"
+
+          git config user.email "${env:GIT_COMMIT_USER_EMAIL}" | Out-Null
+          git config user.name "${env:GIT_COMMIT_USER_NAME}" | Out-Null
+          git fetch origin --no-tags | Out-Null
+          git rev-parse --verify --quiet "remotes/origin/${BranchName}" | Out-Null
+
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "Branch ${BranchName} already exists."
+            exit 0
+          }
+
+          git config color.diff always
+          git --no-pager diff
+
+          git checkout -b $BranchName
           git add .
           git commit -m "Update to .NET ${DotNetVersion}`n`nUpdate to .NET ${DotNetVersion} with .NET SDK version ${DotNetSdkVersion}."
 
           if ($env:DRY_RUN -ne "true") {
-            git push -u origin $env:BRANCH_NAME
+            git push -u origin $BranchName
           }
 
-          "branch-name=${env:BRANCH_NAME}" >> $env:GITHUB_OUTPUT
+          "branch-name=${BranchName}" >> $env:GITHUB_OUTPUT
           "dotnet-version=${DotNetVersion}" >> $env:GITHUB_OUTPUT
-          "upgraded-dotnet=true" >> $env:GITHUB_OUTPUT
+          "updated-dotnet=true" >> $env:GITHUB_OUTPUT
 
       - name: Create pull request
         id: create-pr
-        if: steps.push-changes.outputs.upgraded-dotnet == 'true'
+        if: steps.push-changes.outputs.updated-dotnet == 'true'
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
         env:
           DOTNET_BUMPER_LOG: ${{ steps.upgrade-dotnet.outputs.dotnet-bumper-log }}
@@ -171,11 +193,19 @@ jobs:
             const { owner: thisOwner, repo: thisRepo } = context.repo;
             const [ theirOwner, theirRepo ] = process.env.UPGRADE_REPO.split('/');
 
+            const isPreview = process.env.DOTNET_BUMPER_UPGRADE_TYPE === 'Preview';
+            const dotnetVersion = process.env.DOTNET_VERSION;
+            const isDryRun = process.env.DRY_RUN === 'true';
             const bumperUrl = 'https://github.com/martincostello/dotnet-bumper';
             const workflowUrl = `${process.env.GITHUB_SERVER_URL}/${thisOwner}/${thisRepo}/actions/runs/${process.env.GITHUB_RUN_ID}`;
 
-            const { data: repository } = await github.rest.repos.get({ owner: theirOwner, repo: theirRepo });
-            const draft = repository.private === false;
+            let draft = isPreview;
+
+            if (draft) {
+              // Private personal repositories do not support drafts
+              const { data: repository } = await github.rest.repos.get({ owner: theirOwner, repo: theirRepo });
+              draft = repository.private === false;
+            }
 
             const json = fs.readFileSync(process.env.DOTNET_BUMPER_LOG, 'utf8');
             const bumperLog = JSON.parse(json);
@@ -183,11 +213,19 @@ jobs:
             const bodyLines = [
               '#### Summary :rocket:',
               '',
-              `Update to .NET ${process.env.DOTNET_VERSION}.`,
-              '',
-              '#### Changes :memo:',
+              `Update to .NET ${dotnetVersion}.`,
               '',
             ];
+
+            if (isPreview) {
+              bodyLines.push('This pull request is targeting a **preview** version of .NET.');
+              bodyLines.push('');
+              bodyLines.push(`These changes should not be merged before .NET ${dotnetVersion} reaches the release candidate stage.`);
+              bodyLines.push('');
+            }
+
+            bodyLines.push('#### Changes :memo:');
+            bodyLines.push('');
 
             if (bumperLog['changelog'] && bumperLog['changelog'].length > 0) {
               for (const entry of bumperLog['changelog']) {
@@ -195,18 +233,18 @@ jobs:
               }
             } else {
               bodyLines.push(`- Update to .NET SDK \`${bumperLog.sdkVersion}\``);
-              bodyLines.push('');
             }
 
+            bodyLines.push('');
             bodyLines.push('#### Further Reading :book:');
             bodyLines.push('');
-            bodyLines.push(`- [What's new in .NET ${process.env.DOTNET_VERSION}](https://learn.microsoft.com/dotnet/core/whats-new/dotnet-${process.env.DOTNET_VERSION}/overview)`);
-            bodyLines.push(`- [Breaking changes in .NET ${process.env.DOTNET_VERSION}](https://learn.microsoft.com/dotnet/core/compatibility/${process.env.DOTNET_VERSION}.0)`);
+            bodyLines.push(`- [What's new in .NET ${dotnetVersion}](https://learn.microsoft.com/dotnet/core/whats-new/dotnet-${dotnetVersion}/overview)`);
+            bodyLines.push(`- [Breaking changes in .NET ${dotnetVersion}](https://learn.microsoft.com/dotnet/core/compatibility/${dotnetVersion}.0)`);
+            bodyLines.push('');
 
             if (bumperLog['build'] && bumperLog['build']['summary']) {
               const categories = Object.entries(bumperLog['build']['summary']);
               if (categories.length > 0) {
-                bodyLines.push('');
                 bodyLines.push('#### Build Summary :wrench:');
                 bodyLines.push('');
                 bodyLines.push('| **Type** | **ID** | **Count** |');
@@ -229,6 +267,8 @@ jobs:
                     bodyLines.push(`| ${emoji} ${type} | ${id} | ${count} |`);
                   }
                 }
+
+                bodyLines.push('');
               }
             }
 
@@ -244,7 +284,6 @@ jobs:
                 }
               }
               if (rows.length > 0) {
-                bodyLines.push('');
                 bodyLines.push('#### Test Summary :test_tube:');
                 bodyLines.push('');
                 bodyLines.push('| **Container** | **Passed** :white_check_mark: | **Failed** :x: | **Skipped** :zzz: |');
@@ -253,6 +292,8 @@ jobs:
                 for (const row of rows) {
                   bodyLines.push(row);
                 }
+
+                bodyLines.push('');
               }
             }
 
@@ -260,13 +301,17 @@ jobs:
               const rows = [];
               for (const [relativePath, edits] of Object.entries(bumperLog['remainingReferences'])) {
                 for (const edit of edits) {
-                  const linkText = `${relativePath}:${edit.line}`;
-                  const linkUrl = `${process.env.GITHUB_SERVER_URL}/${theirOwner}/${theirRepo}/tree/${process.env.HEAD_BRANCH}/${relativePath}#L${edit.line}`;
-                  rows.push(`| [\`${linkText}\`](${linkUrl}) | \`${edit.text}\` |`);
+                  let location = `\`${relativePath}:${edit.line}\``;
+
+                  if (!isDryRun) {
+                    const linkUrl = `${process.env.GITHUB_SERVER_URL}/${theirOwner}/${theirRepo}/tree/${process.env.HEAD_BRANCH}/${relativePath}#L${edit.line}`;
+                    location = `[${location}](${linkUrl})`;
+                  }
+
+                  rows.push(`| ${location} | \`${edit.text}\` |`);
                 }
               }
               if (rows.length > 0) {
-                bodyLines.push('');
                 bodyLines.push('#### Remaining References :grey_question:');
                 bodyLines.push('');
                 bodyLines.push('The references below could not be updated automatically.');
@@ -279,11 +324,12 @@ jobs:
                 for (const row of rows) {
                   bodyLines.push(row);
                 }
+
+                bodyLines.push('');
               }
             }
 
             if (bumperLog['warnings'] && bumperLog['warnings'].length > 0) {
-              bodyLines.push('');
               bodyLines.push('#### Warnings :warning:');
               bodyLines.push('');
               bodyLines.push('<details>');
@@ -295,17 +341,19 @@ jobs:
               bodyLines.push('```');
               bodyLines.push('');
               bodyLines.push('</details>');
+              bodyLines.push('');
+              bodyLines.push('');
             }
 
             bodyLines.push('');
-            bodyLines.push(`<sub>:robot: This pull request was generated by [GitHub Actions](${workflowUrl}) using [.NET Bumper](${bumperUrl}).</sub>`);
+            bodyLines.push(`<sub>:robot: This pull request was generated by [GitHub Actions](${workflowUrl}) using _[.NET Bumper](${bumperUrl})_.</sub>`);
             bodyLines.push('');
 
             const body = bodyLines.join('\n');
 
-            if (process.env.DRY_RUN !== 'true') {
+            if (!isDryRun) {
               const { data: pr } = await github.rest.pulls.create({
-                title: `Update to .NET ${process.env.DOTNET_VERSION}`,
+                title: `Update to .NET ${dotnetVersion}`,
                 owner: theirOwner,
                 repo: theirRepo,
                 head: process.env.HEAD_BRANCH,
@@ -313,6 +361,8 @@ jobs:
                 draft,
                 body,
               });
+
+              core.notice(`Created pull request ${theirOwner}/${theirRepo}#${pr.number}: ${pr.html_url}`);
 
               try {
                 await github.rest.issues.addLabels({
