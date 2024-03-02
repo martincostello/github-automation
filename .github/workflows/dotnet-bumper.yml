@@ -204,7 +204,7 @@ jobs:
             if (draft) {
               // Private personal repositories do not support drafts
               const { data: repository } = await github.rest.repos.get({ owner: theirOwner, repo: theirRepo });
-              draft = repository.private === false;
+              draft = repository.owner.type !== 'User' || repository.private === false;
             }
 
             const json = fs.readFileSync(process.env.DOTNET_BUMPER_LOG, 'utf8');
