@@ -304,7 +304,8 @@ jobs:
                   let location = `\`${relativePath}:${edit.line}\``;
 
                   if (!isDryRun) {
-                    const linkUrl = `${process.env.GITHUB_SERVER_URL}/${theirOwner}/${theirRepo}/tree/${process.env.HEAD_BRANCH}/${relativePath}#L${edit.line}`;
+                    const query = relativePath.endsWith('.md') ? '?plain=1' : '';
+                    const linkUrl = `${process.env.GITHUB_SERVER_URL}/${theirOwner}/${theirRepo}/tree/${process.env.HEAD_BRANCH}/${relativePath}${query}#L${edit.line}`;
                     location = `[${location}](${linkUrl})`;
                   }
 
