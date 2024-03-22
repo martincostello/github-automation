@@ -305,7 +305,7 @@ jobs:
 
                   if (!isDryRun) {
                     const query = relativePath.endsWith('.md') ? '?plain=1' : '';
-                    const linkUrl = `${process.env.GITHUB_SERVER_URL}/${theirOwner}/${theirRepo}/tree/${process.env.HEAD_BRANCH}/${relativePath}${query}#L${edit.line}`;
+                    const linkUrl = `${process.env.GITHUB_SERVER_URL}/${theirOwner}/${theirRepo}/tree/${process.env.HEAD_BRANCH}/${encodeURIComponent(relativePath)}${query}#L${edit.line}`;
                     location = `[${location}](${linkUrl})`;
                   }
 
