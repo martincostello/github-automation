@@ -89,7 +89,7 @@ jobs:
       - name: Install .NET tools
         shell: pwsh
         env:
-          DOTNET_BUMPER_VERSION: '0.4.0'
+          DOTNET_BUMPER_VERSION: '0.4.1'
           DOTNET_OUTDATED_VERSION: '4.6.0'
         run: |
           dotnet tool install --global dotnet-outdated-tool --version "$env:DOTNET_OUTDATED_VERSION"
