@@ -147,6 +147,9 @@ jobs:
             exit 0
           }
 
+          git config color.diff always
+          git --no-pager diff
+
           $GlobalJson = Join-Path . "global.json"
           $DotNetSdkVersion = (Get-Content $GlobalJson | Out-String | ConvertFrom-Json).sdk.version
           $DotNetVersion = $DotNetSdkVersion.Split('.')[0]
@@ -162,9 +165,6 @@ jobs:
             Write-Host "Branch ${BranchName} already exists."
             exit 0
           }
-
-          git config color.diff always
-          git --no-pager diff
 
           git checkout -b $BranchName
           git add .

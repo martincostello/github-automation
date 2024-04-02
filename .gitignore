@@ -1,8 +1,10 @@
 .DS_Store/
 .idea/
 .vs/
+bin/
 coverage/
 lib/
 node_modules/
+obj/
 
 *.sln
