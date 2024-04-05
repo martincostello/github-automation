@@ -118,7 +118,6 @@ jobs:
         id: upgrade-dotnet
         shell: pwsh
         env:
-          NoWarn: 'CA1515' # HACK See https://github.com/dotnet/roslyn-analyzers/issues/7192
           DOTNET_CLI_TELEMETRY_OPTOUT: true
           DOTNET_GENERATE_ASPNET_CERTIFICATE: false
           DOTNET_NOLOGO: true
