@@ -22,4 +22,4 @@ outputs:
     description: 'A JSON array of the .NET SDK versions that were released.'
 runs:
   using: 'node20'
-  main: 'dist/index.js'
+  main: 'dist/main.js'

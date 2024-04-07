@@ -24,4 +24,4 @@ outputs:
     description: 'If the changes are available, the latest version of the .NET SDK that contains the changes.'
 runs:
   using: 'node20'
-  main: 'dist/index.js'
+  main: 'dist/main.js'
