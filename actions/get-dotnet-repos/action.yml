@@ -22,4 +22,4 @@ outputs:
     description: 'A JSON array of the repositories for which .NET is present that can be pushed to by github-token.'
 runs:
   using: 'node20'
-  main: 'dist/index.js'
+  main: 'dist/main.js'
