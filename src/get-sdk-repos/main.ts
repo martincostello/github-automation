@@ -13,6 +13,7 @@ type UpdateConfiguration = {
   'exclude-nuget-packages': string | undefined;
   'include-nuget-packages': string | undefined;
   'labels': string;
+  'nuget-packages-prerelease-label': string | undefined;
   'quality': string;
   'ref': string;
   'repo': string;
@@ -46,16 +47,18 @@ export async function run(): Promise<void> {
     const branch = core.getInput('branch', { required: false });
     const token = core.getInput('github-token', { required: false });
     const nightlyChannel = core.getInput('nightly-channel', { required: false });
+    const prereleaseLabel = core.getInput('prerelease-label', { required: false });
     const github = getOctokit(token);
 
     const repositories = await getReposForCurrentUser(github, 'member');
 
     const excludePackages = '';
-    const includePackages = 'Microsoft.AspNetCore.,Microsoft.EntityFrameworkCore.,Microsoft.Extensions.,System.Text.Json';
+    const includePackages = 'Microsoft.AspNetCore.,Microsoft.EntityFrameworkCore,Microsoft.Extensions.,System.Text.Json';
     const labels = 'dependencies,.NET';
     const ref = branch;
     const channel = branch === 'dotnet-nightly' && nightlyChannel ? nightlyChannel : '';
     const quality = branch === 'dotnet-nightly' ? 'daily' : '';
+    const packagePrereleaseLabel = branch === 'dotnet-nightly' && prereleaseLabel ? prereleaseLabel : '';
 
     let singleRepository = core.getInput('repository', { required: false });
 
@@ -103,6 +106,7 @@ export async function run(): Promise<void> {
           'exclude-nuget-packages': valueOrDefault(updateConfig['exclude-nuget-packages'], excludePackages),
           'include-nuget-packages': valueOrDefault(updateConfig['include-nuget-packages'], includePackages),
           labels,
+          'nuget-packages-prerelease-label': packagePrereleaseLabel,
           quality,
           ref,
           'repo': full_name,

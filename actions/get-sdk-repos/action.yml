@@ -17,6 +17,10 @@ inputs:
     description: 'The channel to use when the branch is dotnet-nightly.'
     required: false
     default: ''
+  prerelease-label:
+    description: 'The pre-release label to use when the branch is dotnet-nightly.'
+    required: false
+    default: ''
   repository:
     description: 'An optional single repository to update.'
     required: false

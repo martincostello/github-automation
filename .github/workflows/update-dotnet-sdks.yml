@@ -57,13 +57,14 @@ jobs:
           branch: ${{ (github.event.client_payload && github.event.client_payload.branch) || inputs.branch || '' }}
           github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
           nightly-channel: ${{ vars.DOTNET_NIGHTLY_CHANNEL }}
+          prerelease-label: ${{ vars.DOTNET_PRERELEASE_LABEL }}
           repository: ${{ inputs.repository || '' }}
 
   update-sdk:
     name: 'update-${{ matrix.repo }}'
     needs: [ get-repos ]
     if: needs.get-repos.outputs.updates != '[]'
-    uses: martincostello/update-dotnet-sdk/.github/workflows/update-dotnet-sdk.yml@b5684309b4d6dd59ee955b150f5632c5f3a59f79 # v3.1.4
+    uses: martincostello/update-dotnet-sdk/.github/workflows/update-dotnet-sdk.yml@dotnet-outdated-prerelease-label
 
     concurrency:
       group: 'update-sdk-${{ matrix.repo }}'
@@ -80,6 +81,7 @@ jobs:
       exclude-nuget-packages: ${{ matrix.exclude-nuget-packages }}
       include-nuget-packages: ${{ matrix.include-nuget-packages }}
       labels: ${{ matrix.labels }}
+      nuget-packages-prerelease-label: ${{ matrix.nuget-packages-prerelease-label }}
       quality: ${{ matrix.quality }}
       ref: ${{ matrix.ref }}
       repo: ${{ matrix.repo }}
