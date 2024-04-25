@@ -108,6 +108,10 @@ jobs:
         run: |
           $branch = $env:BRANCH_NAME
           $repos = @(
+            "App-vNext/Polly",
+            "aspnet-contrib/AspNet.Security.OAuth.Providers",
+            "aspnet-contrib/AspNet.Security.OpenId.Providers",
+            "domaindrivendev/Swashbuckle.AspNetCore",
             "justeattakeaway/ApplePayJSSample",
             "justeattakeaway/AwsWatchman",
             "justeattakeaway/httpclient-interception",
