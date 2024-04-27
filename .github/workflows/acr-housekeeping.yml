@@ -32,8 +32,6 @@ jobs:
 
     - name: Purge old images
       shell: pwsh
-      env:
-        CONTAINER_REGISTRY: '${{ github.repository_owner }}.azurecr.io'
       run: |
-        $purgeCommand = "acr purge --filter '.*:.*' --ago 1d --keep 2 --untagged --dry-run"
-        az acr run --cmd $purgeCommand --registry ${env:CONTAINER_REGISTRY} /dev/null
+        $purgeCommand = "acr purge --filter '.*:.*' --ago 0d --keep 2 --untagged --dry-run"
+        az acr run --cmd $purgeCommand --registry ${env:GITHUB_REPOSITORY_OWNER} /dev/null
