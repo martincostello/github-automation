@@ -15,6 +15,9 @@ jobs:
   purge:
     runs-on: ubuntu-latest
 
+    permissions:
+      id-token: write
+
     steps:
 
     - name: Azure log in
