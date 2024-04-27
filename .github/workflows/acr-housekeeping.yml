@@ -25,7 +25,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        repository: [ api ]
+        repository:
+          - api
+          - website
 
     steps:
 
