@@ -33,5 +33,5 @@ jobs:
     - name: Purge old images
       shell: pwsh
       run: |
-        $purgeCommand = "acr purge --filter '.*:.*' --ago 0d --keep 2 --untagged --dry-run"
+        $purgeCommand = "acr purge --filter '.*:.*' --ago 0d --untagged --dry-run"
         az acr run --cmd $purgeCommand --registry ${env:GITHUB_REPOSITORY_OWNER} /dev/null
