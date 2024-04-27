@@ -13,6 +13,7 @@ env:
 
 jobs:
   purge:
+    name: 'purge-${{ matrix.repository }}'
     runs-on: ubuntu-latest
 
     environment:
@@ -20,6 +21,11 @@ jobs:
 
     permissions:
       id-token: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        repository: [ api ]
 
     steps:
 
@@ -32,6 +38,8 @@ jobs:
 
     - name: Purge old images
       shell: pwsh
+      env:
+        REPOSITORY: '${{ github.repository_owner }}/${{ matrix.repository }}'
       run: |
-        $purgeCommand = "acr purge --filter '.*:.*' --ago 0d --untagged --dry-run"
+        $purgeCommand = "acr purge --filter '${env:REPOSITORY}:.*' --ago 0d --keep 2 --untagged --dry-run"
         az acr run --cmd $purgeCommand --registry ${env:GITHUB_REPOSITORY_OWNER} /dev/null
