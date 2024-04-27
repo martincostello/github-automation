@@ -41,5 +41,5 @@ jobs:
       env:
         REPOSITORY: '${{ github.repository_owner }}/${{ matrix.repository }}'
       run: |
-        $purgeCommand = "acr purge --filter '${env:REPOSITORY}:.*' --ago 0d --keep 2 --untagged --dry-run"
+        $purgeCommand = "acr purge --filter '${env:REPOSITORY}:.*' --ago 1d --keep 2 --untagged"
         az acr run --cmd $purgeCommand --registry ${env:GITHUB_REPOSITORY_OWNER} /dev/null
