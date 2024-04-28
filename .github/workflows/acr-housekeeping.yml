@@ -30,6 +30,7 @@ jobs:
           - adventofcode
           - api
           - applepayjssample
+          - dependabot-helper
           - home
           - signinwithapplesample
           - website
