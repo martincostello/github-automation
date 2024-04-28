@@ -28,6 +28,7 @@ jobs:
         repository:
           - adventofcode
           - api
+          - signinwithapplesample
           - website
 
     steps:
