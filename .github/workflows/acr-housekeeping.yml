@@ -28,6 +28,7 @@ jobs:
       matrix:
         repository:
           - adventofcode
+          - alexa-london-travel-site
           - api
           - applepayjssample
           - costellobot
