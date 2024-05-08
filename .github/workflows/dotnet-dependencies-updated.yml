@@ -16,5 +16,5 @@ jobs:
     secrets: inherit
     with:
       base: ${{ github.event.client_payload.ref_name }}
-      branch: ${{ github.event.client_payload.ref_name == 'dotnet-vnext' && 'dotnet-nightly' || 'main' }}
+      branch: ${{ github.event.client_payload.ref_name == 'dotnet-vnext' && 'dotnet-nightly' || 'dotnet-vnext' }}
       repository: ${{ github.event.client_payload.repository }}
