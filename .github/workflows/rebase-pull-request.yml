@@ -1,0 +1,20 @@
+name: rebase-pull-request
+run-name: '${{ github.event.client_payload.repository }}#${{ github.event.client_payload.number }}'
+
+on:
+  repository_dispatch:
+    types: [ rebase_pull_request ]
+
+permissions: {}
+
+jobs:
+  rebase:
+    uses: ./.github/workflows/rebase.yml
+    permissions:
+      contents: read
+    secrets: inherit
+    with:
+      base: ${{ github.event.client_payload.base }}
+      branch: ${{ github.event.client_payload.head }}
+      force: true
+      repository: ${{ github.event.client_payload.repository }}
