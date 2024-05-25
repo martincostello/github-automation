@@ -1,4 +1,5 @@
 name: nuget-packages-published
+run-name: '${{ github.event.client_payload.repository }}@${{ github.event.client_payload.version }}'
 
 on:
   repository_dispatch:
@@ -13,7 +14,7 @@ jobs:
     timeout-minutes: 30
 
     concurrency:
-      group: ${{ github.workflow }}
+      group: '${{ github.workflow }}-${{ github.event.client_payload.repository }}-${{ github.event.client_payload.version }}'
       cancel-in-progress: false
 
     env:
@@ -44,12 +45,9 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@4d6c8fcf3c8f7a60068d26b594648e99df24cee3 # v4.0.0
 
-      - name: Get WaitForNuGetPackage version
-        id: get-tool-version
+      - name: Restore .NET tools
         shell: pwsh
-        run: |
-          $toolVersion = (Get-Content "./.config/dotnet-tools.json" | Out-String | ConvertFrom-Json).tools.'MartinCostello.WaitForNuGetPackage'.version
-          "tool-version=${toolVersion}" >> $env:GITHUB_OUTPUT
+        run: dotnet tool restore
 
       - name: Wait for NuGet packages to be published
         id: wait-for-publish
@@ -59,7 +57,6 @@ jobs:
           PACKAGE_VERSION: ${{ github.event.client_payload.version }}
           PUBLISH_TIMEOUT: '00:25:00'
           REPOSITORY_NAME: ${{ github.event.client_payload.repository }}
-          TOOL_VERSION: ${{ steps.get-tool-version.outputs.tool-version }}
         run: |
           $packageNames = ${env:PACKAGE_NAMES} -Split ','
           $packageVersion = ${env:PACKAGE_VERSION}.TrimStart('v')
@@ -70,7 +67,6 @@ jobs:
             $packages += "${packageName}@${packageVersion}"
           }
 
-          dotnet tool install MartinCostello.WaitForNuGetPackage --global --version ${env:TOOL_VERSION}
           dotnet wait-for-package $packages --timeout ${env:PUBLISH_TIMEOUT}
 
           if ($LASTEXITCODE -ne 0) {
