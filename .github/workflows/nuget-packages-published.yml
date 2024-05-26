@@ -79,7 +79,7 @@ jobs:
   notify-release:
     runs-on: [ ubuntu-latest ]
     needs: [wait-for-publish]
-    if: ${{ needs.wait-for-publish.outputs.published == 'true' }}
+    if: needs.wait-for-publish.outputs.published == 'true'
 
     concurrency:
       group: '${{ github.workflow }}-${{ github.event.client_payload.repository }}-notify'
@@ -201,4 +201,157 @@ jobs:
               } catch (err) {
                 core.warning(`Failed to add comment to issue #${issue_number}: ${err}`);
               }
+            }
+
+  gpg-sign-release-assets:
+    runs-on: [ ubuntu-latest ]
+
+    concurrency:
+      group: '${{ github.workflow }}-${{ github.event.client_payload.repository }}-gpg-sign'
+      cancel-in-progress: false
+
+    steps:
+
+      - name: Get names of assets to sign
+        id: find-assets
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        env:
+          REPOSITORY_NAME: ${{ github.event.client_payload.repository }}
+          VERSION: ${{ github.event.client_payload.version }}
+        with:
+          github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
+          script: |
+            const [ owner, repo ] = process.env.REPOSITORY_NAME.split('/');
+            const version = process.env.VERSION;
+
+            const releases = await github.paginate(github.rest.repos.listReleases, {
+              owner,
+              repo,
+            });
+
+            core.debug(`Found ${releases.length} releases.`);
+
+            const release =
+              releases.find((p) => p.tag_name === version) ||
+              releases.find((p) => p.tag_name === `v${version}`);
+
+            if (!release) {
+              console.log(`Release for version ${version} not found.`);
+              return;
+            }
+
+            const release_id = release.id;
+            core.debug(`Found release ${release.tag_name} (${release_id}).`);
+
+            const allAssets = await github.paginate(github.rest.repos.listReleaseAssets, {
+              owner,
+              repo,
+              release_id,
+            });
+
+            core.debug(`Found ${allAssets.length} assets.`);
+
+            const assets = allAssets.filter((p) => !p.name.endsWith('.sig'));
+            const signatures = allAssets.filter((p) => p.name.endsWith('.sig'));
+            const assetsToSign = allAssets.filter((p) => !signatures.some((q) => q.name === `${p.name}.sig`));
+
+            if (assetsToSign.length === 0) {
+              console.log('No assets to sign.');
+              return;
+            }
+
+            core.debug(`Found ${assetsToSign.length} assets to sign.`);
+
+            const fs = require('fs');
+            const path = require('path');
+
+            const assetsPath = path.join(process.env.GITHUB_WORKSPACE, 'artifacts');
+            if (!fs.existsSync(assetsPath)) {
+              fs.mkdirSync(assetsPath);
+            }
+
+            for (const asset of assetsToSign) {
+              const response = await github.rest.repos.getReleaseAsset({
+                owner,
+                repo,
+                asset_id: asset.id,
+                headers: {
+                  Accept: 'application/octet-stream',
+                },
+              });
+
+              if (response.status !== 200 && response.status !== 302) {
+                core.warning(`Failed to download asset ${asset.name}: ${response.status} ${response.statusText}`);
+                continue;
+              }
+
+              const fileName = path.join(assetsPath, asset.name);
+              fs.writeFileSync(fileName, response.data);
+
+              core.debug(`Downloaded asset ${asset.name} to ${fileName}.`);
+            }
+
+            core.setOutput('release-id', release_id);
+            return assetsPath;
+
+      - name: GPG sign assets
+        if: steps.find-assets.outputs.result != ''
+        env:
+          ASSETS_PATH: ${{ steps.find-assets.outputs.result }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        shell: bash
+        run: |
+          curl -s "${GITHUB_API_URL}/users/${GITHUB_REPOSITORY_OWNER}/gpg_keys" | jq -r '.[].raw_key' | gpg --import
+          gpg --list-keys --with-colons | awk -F: '/^fpr:/ { print $10 }' | while read -r key; do
+            echo "${key}:6:" | gpg --import-ownertrust
+          done
+          echo "${GPG_PRIVATE_KEY}" | gpg --import --batch --yes --passphrase "${GPG_PASSPHRASE}"
+          find "${ASSETS_PATH}" -type f -name '*' | while read -r fname; do
+            echo "Signing ${fname}"
+            gpg --batch --yes --pinentry-mode loopback --passphrase "${GPG_PASSPHRASE}" --detach-sig "${fname}"
+            gpg --verify "${fname}.sig" "${fname}"
+          done
+
+      - name: Upload asset signatures
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        if: |
+          steps.find-assets.outputs.result != '' &&
+          steps.find-assets.outputs.release-id != ''
+        env:
+          ASSETS_PATH: ${{ steps.find-assets.outputs.result }}
+          RELEASE_ID: ${{ steps.find-assets.outputs.release-id }}
+          REPOSITORY_NAME: ${{ github.event.client_payload.repository }}
+        with:
+          github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
+          script: |
+            const [ owner, repo ] = process.env.REPOSITORY_NAME.split('/');
+            const release_id = process.env.RELEASE_ID;
+            const assetsPath = process.env.ASSETS_PATH;
+
+            const fs = require('fs');
+            const path = require('path');
+
+            const fileNames = fs.readdirSync(assetsPath).filter((p) => p.endsWith('.sig'));
+
+            if (fileNames.length === 0) {
+              console.log('No asset signatures to upload.');
+              return;
+            }
+
+            core.debug(`Found ${fileNames.length} asset signatures.`);
+
+            for (const name of fileNames) {
+              const data = fs.readFileSync(path.join(assetsPath, name));
+
+              console.log(`Uploading signature for ${name}.`);
+              core.debug(`Uploading signature for ${name} (${data.length} bytes).`);
+
+              await github.rest.repos.uploadReleaseAsset({
+                owner,
+                repo,
+                release_id,
+                name,
+                data,
+              });
             }
