@@ -292,11 +292,12 @@ jobs:
               core.debug(`Downloaded asset ${asset.name} to ${fileName}.`);
             }
 
+            core.setOutput('assets-to-sign', 'true');
             core.setOutput('release-id', release_id);
             return assetsPath;
 
       - name: GPG sign assets
-        if: steps.find-assets.outputs.result != ''
+        if: steps.find-assets.outputs.assets-to-sign == 'true'
         env:
           ASSETS_PATH: ${{ steps.find-assets.outputs.result }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
@@ -316,9 +317,7 @@ jobs:
 
       - name: Upload asset signatures
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
-        if: |
-          steps.find-assets.outputs.result != '' &&
-          steps.find-assets.outputs.release-id != ''
+        if: steps.find-assets.outputs.assets-to-sign == 'true'
         env:
           ASSETS_PATH: ${{ steps.find-assets.outputs.result }}
           RELEASE_ID: ${{ steps.find-assets.outputs.release-id }}
