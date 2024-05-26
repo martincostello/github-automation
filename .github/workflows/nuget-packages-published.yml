@@ -168,7 +168,7 @@ jobs:
                 const comments = await github.paginate(github.rest.issues.listComments, {
                   owner,
                   repo,
-                  issue_number: issue.number,
+                  issue_number,
                 });
 
                 comment = comments.find((p) => p.body.includes(watermark));
@@ -186,8 +186,8 @@ jobs:
                 `Thanks for your contribution @${userLogin} - the changes from this pull request have been published as part of version ${version} :package:, which is now available from NuGet.org :rocket:` :
                 `Thanks for creating this issue @${userLogin} - the associated changes have been published as part of version ${version} :package:, which is now available from NuGet.org :rocket:`;
 
-              console.log(`Adding comment to ${isPullRequest ? 'pull request' : 'issue'} #${issue.number}.`);
-              core.debug(`#${issue.number}: ${body}`);
+              console.log(`Adding comment to ${isPullRequest ? 'pull request' : 'issue'} #${issue_number}.`);
+              core.debug(`#${issue_number}: ${body}`);
 
               body += watermark;
 
@@ -195,10 +195,10 @@ jobs:
                 await github.rest.issues.createComment({
                   owner,
                   repo,
-                  issue_number: issue.number,
+                  issue_number,
                   body,
                 });
               } catch (err) {
-                core.warning(`Failed to add comment to issue #${issue.number}: ${err}`);
+                core.warning(`Failed to add comment to issue #${issue_number}: ${err}`);
               }
             }
