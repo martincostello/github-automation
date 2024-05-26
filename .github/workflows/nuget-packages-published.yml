@@ -118,9 +118,9 @@ jobs:
               return;
             }
 
-            core.debug(`Found ${milestone.title} (${milestone.number}).`);
+            core.debug(`Found milestone ${milestone.title} (${milestone.number}).`);
 
-            const { data: issues } = await github.paginate(github.rest.issues.listForRepo, {
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
               owner,
               repo,
               milestone: milestone.number,
@@ -165,7 +165,7 @@ jobs:
               let comment = null;
 
               try {
-                const { data: comments } = await github.paginate(github.rest.issues.listComments, {
+                const comments = await github.paginate(github.rest.issues.listComments, {
                   owner,
                   repo,
                   issue_number: issue.number,
