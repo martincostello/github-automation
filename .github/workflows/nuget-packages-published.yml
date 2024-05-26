@@ -186,9 +186,10 @@ jobs:
                 `Thanks for your contribution @${userLogin} - the changes from this pull request have been published as part of version ${version} :package:, which is now available from NuGet.org :rocket:` :
                 `Thanks for creating this issue @${userLogin} - the associated changes have been published as part of version ${version} :package:, which is now available from NuGet.org :rocket:`;
 
-              body += watermark;
+              console.log(`Adding comment to ${isPullRequest ? 'pull request' : 'issue'} #${issue.number}.`);
+              core.debug(`#${issue.number}: ${body}`);
 
-              console.log(`Adding comment to issue #${issue.number}: ${body}`);
+              body += watermark;
 
               try {
                 /*
