@@ -254,7 +254,7 @@ jobs:
 
             const assets = allAssets.filter((p) => !p.name.endsWith('.sig'));
             const signatures = allAssets.filter((p) => p.name.endsWith('.sig'));
-            const assetsToSign = allAssets.filter((p) => !signatures.some((q) => q.name === `${p.name}.sig`));
+            const assetsToSign = assets.filter((p) => !signatures.some((q) => q.name === `${p.name}.sig`));
 
             if (assetsToSign.length === 0) {
               console.log('No assets to sign.');
