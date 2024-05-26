@@ -220,6 +220,7 @@ jobs:
           VERSION: ${{ github.event.client_payload.version }}
         with:
           github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
+          result-encoding: string
           script: |
             const [ owner, repo ] = process.env.REPOSITORY_NAME.split('/');
             const version = process.env.VERSION;
