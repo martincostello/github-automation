@@ -192,15 +192,12 @@ jobs:
               body += watermark;
 
               try {
-                /*
-                // TODO Enable once tested
                 await github.rest.issues.createComment({
                   owner,
                   repo,
                   issue_number: issue.number,
                   body,
                 });
-                */
               } catch (err) {
                 core.warning(`Failed to add comment to issue #${issue.number}: ${err}`);
               }
