@@ -286,7 +286,7 @@ jobs:
               }
 
               const fileName = path.join(assetsPath, asset.name);
-              fs.writeFileSync(fileName, response.data);
+              fs.writeFileSync(fileName, Buffer.from(response.data));
 
               core.debug(`Downloaded asset ${asset.name} to ${fileName}.`);
             }
