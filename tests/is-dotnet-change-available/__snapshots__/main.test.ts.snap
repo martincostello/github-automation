@@ -4,6 +4,10 @@ exports[`is-dotnet-change-available for dotnet/aspnetcore#50019 outputs the Mark
 
 exports[`is-dotnet-change-available for dotnet/aspnetcore#50019 the is-available output is correct 1`] = `"true"`;
 
+exports[`is-dotnet-change-available for dotnet/aspnetcore#56105 outputs the Markdown report 1`] = `"The changes from [dotnet/aspnetcore#56105](https://github.com/dotnet/aspnetcore/pull/50019) are available in version \`9.0.100-preview.6.24318.4\` of the .NET SDK."`;
+
+exports[`is-dotnet-change-available for dotnet/aspnetcore#56105 the is-available output is correct 1`] = `"true"`;
+
 exports[`is-dotnet-change-available for dotnet/efcore#31453 outputs the Markdown report 1`] = `"The changes from [dotnet/efcore#31453](https://github.com/dotnet/efcore/pull/31453) are available in version \`9.0.100-alpha.1.23451.3\` of the .NET SDK."`;
 
 exports[`is-dotnet-change-available for dotnet/efcore#31453 the is-available output is correct 1`] = `"true"`;

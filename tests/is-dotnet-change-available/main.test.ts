@@ -10,6 +10,7 @@ import { setup } from '../fixtures';
 describe('is-dotnet-change-available', () => {
   describe.each([
     ['aspnetcore', '50019'],
+    ['aspnetcore', '56105'],
     ['efcore', '31453'],
     ['installer', '17295'],
     ['runtime', '90349'],
