@@ -12,7 +12,7 @@ const defaultVersion = '9.0';
 const owner = 'dotnet';
 const repositoryNames = ['aspnetcore', 'efcore', 'installer', 'runtime', 'sdk'];
 
-function getDependencyGraph(): DependencyGraph {
+function getDependencyGraph(version: LatestInstallerVersion): DependencyGraph {
   const createRepository = (repo: string, dependencies: string[], packageName: string | null = null): ProductRepository => {
     return {
       dependencies,
@@ -28,7 +28,7 @@ function getDependencyGraph(): DependencyGraph {
   const efcore = createRepository('efcore', [runtime.full_name], 'Microsoft.EntityFrameworkCore');
   const aspnetcore = createRepository('aspnetcore', [runtime.full_name, efcore.full_name], 'Microsoft.AspNetCore.App.Ref');
   const sdk = createRepository('sdk', [runtime.full_name, aspnetcore.full_name], 'Microsoft.NET.Sdk');
-  const installer = createRepository('installer', [sdk.full_name]);
+  const installer = version.commits.installer ? createRepository('installer', [sdk.full_name]) : sdk;
 
   return {
     root: installer.full_name,
@@ -168,7 +168,7 @@ export async function run(): Promise<void> {
         throw new Error(`The SDK version could not be determined for the ${branch} branch of the ${repo} repository.`);
       }
 
-      const graph = getDependencyGraph();
+      const graph = getDependencyGraph(sdkVersion);
 
       let repository: ProductRepository | null = null;
       if (sdkVersion) {
@@ -243,7 +243,7 @@ type ProductCommit = {
 };
 
 type SdkProductCommits = {
-  installer: ProductCommit;
+  installer: ProductCommit | null;
   runtime: ProductCommit;
   aspnetcore: ProductCommit;
   windowsdesktop: ProductCommit;
