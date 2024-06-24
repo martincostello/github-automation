@@ -2,7 +2,7 @@ name: dotnet-upgrade-report
 
 on:
   schedule:
-    - cron: '30 08 * * *'
+    - cron: '30 07 * * *'
     - cron: '00 13 * * *'
   workflow_call:
     inputs:
