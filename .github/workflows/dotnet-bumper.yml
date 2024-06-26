@@ -63,6 +63,7 @@ jobs:
     name: 'upgrade-${{ matrix.repo }}'
     needs: [ get-repos ]
     runs-on: [ ubuntu-latest ]
+    timeout-minutes: 60
     if: needs.get-repos.outputs.repositories != '[]'
 
     concurrency:
