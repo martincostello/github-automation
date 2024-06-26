@@ -127,6 +127,12 @@ jobs:
           NUGET_XMLDOC_MODE: skip
           TERM: xterm
         run: |
+          $toolsManifest = (Join-Path "." ".config" "dotnet-tools.json")
+          if (Test-Path $toolsManifest) {
+            Write-Host "Restoring .NET tools..."
+            dotnet tool restore
+          }
+
           $tempFile = [System.IO.Path]::GetTempFileName()
           dotnet bumper . --log-format Json --log-path $tempFile --test --upgrade-type ${env:DOTNET_BUMPER_UPGRADE_TYPE}
           "dotnet-bumper-log=${tempFile}" >> $env:GITHUB_OUTPUT
