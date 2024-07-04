@@ -44,6 +44,7 @@ export async function run(): Promise<void> {
       updatedSha = currentSha;
       if (diff.files) {
         releaseNotesFiles = diff.files
+          .filter((file) => file.status !== 'removed')
           .map((file) => file.filename)
           .filter((file) => file.startsWith('release-notes/') && file.endsWith('/releases.json'));
       }
