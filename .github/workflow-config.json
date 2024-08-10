@@ -19,6 +19,7 @@
     "martincostello/benchmarks",
     "martincostello/costellobot",
     "martincostello/dependabot-helper",
+    "martincostello/openapi-extensions",
     "martincostello/SignInWithAppleSample",
     "martincostello/website"
   ]
