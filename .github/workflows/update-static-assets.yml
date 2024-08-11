@@ -62,7 +62,7 @@ jobs:
         token: ${{ secrets.COSTELLOBOT_TOKEN }}
 
     - name: Update static assets
-      uses: martincostello/update-static-assets@adb768f545bcf5a4389166c046335553ee2b225d # v2.2.3
+      uses: martincostello/update-static-assets@f5b13a4b106eb2a05b59145fb7c004c4de08766c # v2.2.4
       with:
         labels: dependencies
         repo: ${{ matrix.repo }}
