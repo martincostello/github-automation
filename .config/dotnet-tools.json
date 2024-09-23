@@ -10,7 +10,7 @@
       "rollForward": false
     },
     "MartinCostello.DotNetBumper": {
-      "version": "0.8.2",
+      "version": "0.8.3",
       "commands": [
         "dotnet-bumper"
       ],
