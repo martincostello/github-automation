@@ -81,10 +81,11 @@ jobs:
       exclude-nuget-packages: ${{ matrix.exclude-nuget-packages }}
       include-nuget-packages: ${{ matrix.include-nuget-packages }}
       labels: ${{ matrix.labels }}
-      nuget-packages-prerelease-label: ${{ matrix.nuget-packages-prerelease-label }}
+      nuget-packages-prerelease-label: ${{ matrix.dotnet-prerelease-label }}
       quality: ${{ matrix.quality }}
       ref: ${{ matrix.ref }}
       repo: ${{ matrix.repo }}
+      sdk-prerelease-label: ${{ matrix.dotnet-prerelease-label }}
       update-nuget-packages: ${{ matrix.update-nuget-packages }}
       user-email: ${{ vars.GIT_COMMIT_USER_EMAIL }}
       user-name: ${{ vars.GIT_COMMIT_USER_NAME }}
