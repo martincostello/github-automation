@@ -64,7 +64,7 @@ jobs:
     name: 'update-${{ matrix.repo }}'
     needs: [ get-repos ]
     if: needs.get-repos.outputs.updates != '[]'
-    uses: martincostello/update-dotnet-sdk/.github/workflows/update-dotnet-sdk.yml@67d6e2b14939c06978a7f80444157296c3defe14 # v3.2.3
+    uses: martincostello/update-dotnet-sdk/.github/workflows/update-dotnet-sdk.yml@prerelease-filter # v3.3.0
 
     concurrency:
       group: 'update-sdk-${{ matrix.repo }}'
@@ -85,6 +85,7 @@ jobs:
       quality: ${{ matrix.quality }}
       ref: ${{ matrix.ref }}
       repo: ${{ matrix.repo }}
+      sdk-prerelease-label: ${{ matrix.nuget-packages-prerelease-label }}
       update-nuget-packages: ${{ matrix.update-nuget-packages }}
       user-email: ${{ vars.GIT_COMMIT_USER_EMAIL }}
       user-name: ${{ vars.GIT_COMMIT_USER_NAME }}
