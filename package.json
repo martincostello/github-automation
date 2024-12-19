@@ -65,7 +65,7 @@
     "@octokit/plugin-paginate-rest": "^11.3.6",
     "@octokit/plugin-rest-endpoint-methods": "^11.0.1",
     "fast-xml-parser": "^4.5.1",
-    "undici": "^7.1.1"
+    "undici": "^7.2.0"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^2.12.1",
