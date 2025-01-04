@@ -25,7 +25,7 @@
       }
     },
     {
-      "basePath": "https://dotnetbuilds.azureedge.net",
+      "basePath": "https://ci.dot.net",
       "path": "/public/Sdk/9.0.100-preview.6.24318.4/productCommit-win-x64.json",
       "response": {
         "runtime": {

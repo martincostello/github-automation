@@ -82,7 +82,7 @@ async function getLatestSdkVersion(channel: string): Promise<LatestInstallerVers
   const version = versionRaw.trim();
 
   const platform = 'win-x64';
-  const commitsUrl = `https://dotnetbuilds.azureedge.net/public/Sdk/${version}/productCommit-${platform}.json`;
+  const commitsUrl = `https://ci.dot.net/public/Sdk/${version}/productCommit-${platform}.json`;
 
   response = await fetch(commitsUrl, init);
 
