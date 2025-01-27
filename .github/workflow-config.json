@@ -6,10 +6,13 @@
     "dependency-review",
     "lighthouse",
     "lint",
+    "linux",
+    "macos",
     "macos-latest",
     "typescript",
     "ubuntu-latest",
     "validate-packages",
+    "windows",
     "windows-latest"
   ],
   "update-static-assets": [
