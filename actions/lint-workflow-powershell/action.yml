@@ -41,8 +41,6 @@ runs:
         $workflows += Get-ChildItem -Path $workflowsPath -Filter *.yml
         $workflows += Get-ChildItem -Path $workflowsPath -Filter *.yaml
 
-        Write-Host "This should raise a lint warning"
-
         $hasIssues = $false
 
         foreach ($file in $workflows) {
