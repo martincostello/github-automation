@@ -29,7 +29,8 @@ runs:
           $additionalArgs += "-MaximumVersion"
           $additionalArgs += ${env:POWERSHELL_YAML_VERSION}
         }
-        Install-Module -Name powershell-yaml -Force $additionalArgs
+        Install-Module -Name powershell-yaml -Force `
+          $additionalArgs
 
     - name: Install PSScriptAnalyzer
       shell: pwsh
@@ -41,7 +42,8 @@ runs:
           $additionalArgs += "-MaximumVersion"
           $additionalArgs += ${env:PSSCRIPTANALYZER_VERSION}
         }
-        Install-Module -Name PSScriptAnalyzer -Force $additionalArgs
+        Install-Module -Name PSScriptAnalyzer -Force `
+          $additionalArgs
 
     - name: Lint workflow PowerShell steps
       shell: pwsh
