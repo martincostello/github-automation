@@ -9,41 +9,24 @@ branding:
 inputs:
   powershell-yaml-version:
     description: 'The version of the powershell-yaml module to install.'
-    required: false
+    required: true
   psscriptanalyzer-version:
     description: 'The version of the PSScriptAnalyzer module to install.'
-    required: false
+    required: true
 
 runs:
   using: 'composite'
 
   steps:
 
-    - name: Install powershell-yaml
+    - name: Install PowerShell modules
       shell: pwsh
       env:
         POWERSHELL_YAML_VERSION: ${{ inputs.powershell-yaml-version || '' }}
-      run: |
-        $additionalArgs = @()
-        if (-Not [string]::IsNullOrWhiteSpace(${env:POWERSHELL_YAML_VERSION})) {
-          $additionalArgs += "-MaximumVersion"
-          $additionalArgs += ${env:POWERSHELL_YAML_VERSION}
-        }
-        Install-Module -Name powershell-yaml -Force `
-          $additionalArgs
-
-    - name: Install PSScriptAnalyzer
-      shell: pwsh
-      env:
         PSSCRIPTANALYZER_VERSION: ${{ inputs.psscriptanalyzer-version || '' }}
       run: |
-        $additionalArgs = @()
-        if (-Not [string]::IsNullOrWhiteSpace(${env:PSSCRIPTANALYZER_VERSION})) {
-          $additionalArgs += "-MaximumVersion"
-          $additionalArgs += ${env:PSSCRIPTANALYZER_VERSION}
-        }
-        Install-Module -Name PSScriptAnalyzer -Force `
-          $additionalArgs
+        Install-Module powershell-yaml -Force -MaximumVersion ${env:POWERSHELL_YAML_VERSION}
+        Install-Module PSScriptAnalyzer -Force -MaximumVersion ${env:PSSCRIPTANALYZER_VERSION}
 
     - name: Lint workflow PowerShell steps
       shell: pwsh
