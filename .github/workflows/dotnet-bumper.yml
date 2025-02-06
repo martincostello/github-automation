@@ -135,7 +135,7 @@ jobs:
         run: |
           $toolsManifest = (Join-Path "." ".config" "dotnet-tools.json")
           if (Test-Path $toolsManifest) {
-            Write-Host "Restoring .NET tools..."
+            Write-Output "Restoring .NET tools..."
             dotnet tool restore
           }
 
@@ -154,7 +154,7 @@ jobs:
           $GitStatus = (git status --porcelain)
 
           if ([string]::IsNullOrEmpty($GitStatus)) {
-            Write-Host "No changes to commit."
+            Write-Output "No changes to commit."
             exit 0
           }
 
@@ -173,7 +173,7 @@ jobs:
           git rev-parse --verify --quiet "remotes/origin/${BranchName}" | Out-Null
 
           if ($LASTEXITCODE -eq 0) {
-            Write-Host "Branch ${BranchName} already exists."
+            Write-Output "Branch ${BranchName} already exists."
             exit 0
           }
 
