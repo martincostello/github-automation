@@ -141,7 +141,7 @@ jobs:
 
           $tempFile = [System.IO.Path]::GetTempFileName()
           dotnet bumper . --log-format Json --log-path $tempFile --test --upgrade-type ${env:DOTNET_BUMPER_UPGRADE_TYPE}
-          "dotnet-bumper-log=${tempFile}" >> $env:GITHUB_OUTPUT
+          "dotnet-bumper-log=${tempFile}" >> ${env:GITHUB_OUTPUT}
 
       - name: Push changes to GitHub
         id: push-changes
@@ -165,7 +165,7 @@ jobs:
           $DotNetSdkVersion = (Get-Content $GlobalJson | Out-String | ConvertFrom-Json).sdk.version
           $DotNetVersion = $DotNetSdkVersion.Split('.')[0]
 
-          $BranchName = $env:DOTNET_BUMPER_UPGRADE_TYPE -eq "Preview" ? "dotnet-vnext" : "dotnet-${DotNetVersion}-upgrade"
+          $BranchName = ${env:DOTNET_BUMPER_UPGRADE_TYPE} -eq "Preview" ? "dotnet-vnext" : "dotnet-${DotNetVersion}-upgrade"
 
           git config user.email "${env:GIT_COMMIT_USER_EMAIL}" | Out-Null
           git config user.name "${env:GIT_COMMIT_USER_NAME}" | Out-Null
@@ -181,13 +181,13 @@ jobs:
           git add .
           git commit -m "Update to .NET ${DotNetVersion}`n`nUpdate to .NET ${DotNetVersion} with .NET SDK version ${DotNetSdkVersion}."
 
-          if ($env:DRY_RUN -ne "true") {
+          if (${env:DRY_RUN} -ne "true") {
             git push -u origin $BranchName
           }
 
-          "branch-name=${BranchName}" >> $env:GITHUB_OUTPUT
-          "dotnet-version=${DotNetVersion}" >> $env:GITHUB_OUTPUT
-          "updated-dotnet=true" >> $env:GITHUB_OUTPUT
+          "branch-name=${BranchName}" >> ${env:GITHUB_OUTPUT}
+          "dotnet-version=${DotNetVersion}" >> ${env:GITHUB_OUTPUT}
+          "updated-dotnet=true" >> ${env:GITHUB_OUTPUT}
 
       - name: Create pull request
         id: create-pr
