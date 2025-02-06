@@ -34,4 +34,5 @@ jobs:
       shell: pwsh
       run: |
         $ErrorActionPreference = "Stop"
+        Install-Module -Name powershell-yaml -Force -MaximumVersion '0.4.12'
         ./lint.ps1
