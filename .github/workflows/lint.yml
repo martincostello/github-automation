@@ -46,7 +46,7 @@ jobs:
           **/*.md
 
     - name: Lint PowerShell in workflows
-      uses: martincostello/lint-actions-powershell@fix-annotations
+      uses: martincostello/lint-actions-powershell@main
       with:
         powershell-yaml-version: '0.4.12'
         psscriptanalyzer-version: '1.23.0'
