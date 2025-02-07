@@ -46,10 +46,11 @@ jobs:
           **/*.md
 
     - name: Lint PowerShell in workflows
-      uses: ./actions/lint-workflow-powershell
+      uses: martincostello/lint-actions-powershell@main
       with:
         powershell-yaml-version: '0.4.12'
         psscriptanalyzer-version: '1.23.0'
+        treat-warnings-as-errors: true
 
     - name: Lint PowerShell scripts
       shell: pwsh
