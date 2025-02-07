@@ -16,6 +16,8 @@ permissions:
 
 env:
   FORCE_COLOR: 3
+  POWERSHELL_YAML_VERSION: '0.4.12'
+  PSSCRIPTANALYZER_VERSION: '1.23.0'
   TERM: xterm
 
 jobs:
@@ -48,8 +50,8 @@ jobs:
     - name: Lint PowerShell in workflows
       uses: martincostello/lint-actions-powershell@5942e3350ee5bd8f8933cec4e1185d13f0ea688f # v1.0.0
       with:
-        powershell-yaml-version: '0.4.12'
-        psscriptanalyzer-version: '1.23.0'
+        powershell-yaml-version: ${{ env.POWERSHELL_YAML_VERSION }}
+        psscriptanalyzer-version: ${{ env.PSSCRIPTANALYZER_VERSION }}
         treat-warnings-as-errors: true
 
     - name: Lint PowerShell scripts
