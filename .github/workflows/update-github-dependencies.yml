@@ -26,7 +26,6 @@ jobs:
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
         with:
           github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
-          result-encoding: string
           script: |
             const query = `
               {
@@ -57,7 +56,11 @@ jobs:
               .filter((p) => p.owner.login === process.env.GITHUB_REPOSITORY_OWNER)
               .map((p) => p.name);
 
-            return JSON.stringify(repoNames);
+            const result = JSON.stringify(repoNames);
+
+            console.log(result);
+
+            return result;
 
   update-github-dependencies:
     name: 'update-github-dependencies-${{ matrix.repo }}'
