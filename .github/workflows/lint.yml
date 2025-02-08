@@ -58,4 +58,16 @@ jobs:
       shell: pwsh
       run: |
         $ErrorActionPreference = "Stop"
-        Invoke-ScriptAnalyzer -Path . -Recurse -IncludeDefaultRules -ReportSummary -Severity @('Error','Warning') -EnableExit
+        $settings = @{
+          IncludeDefaultRules = $true
+          Severity = @("Error", "Warning")
+        }
+        $issues = Invoke-ScriptAnalyzer -Path ${env:GITHUB_WORKSPACE} -Recurse -ReportSummary -Settings $settings
+        foreach ($issue in $issues) {
+          $severity = $issue.Severity.ToString()
+          $level = $severity.Contains("Error") ? "error" : $severity.Contains("Warning") ? "warning" : "notice"
+          Write-Output "::${level} file=$($issue.ScriptName),line=$($issue.Line),title=PSScriptAnalyzer::$($issue.Message)"
+        }
+        if ($issues.Count -gt 0) {
+          exit 1
+        }
