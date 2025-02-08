@@ -51,21 +51,18 @@ jobs:
 
             const repos = await github.graphql(query, {});
 
-            const repoNames repos.viewer.repositories.nodes
+            const repoNames = repos.viewer.repositories.nodes
               .filter((p) => !p.isArchived)
               .filter((p) => !p.isFork)
-              .filter((p) => !p.owner.login === process.env.GITHUB_REPOSITORY_OWNER)
+              .filter((p) => p.owner.login === process.env.GITHUB_REPOSITORY_OWNER)
               .map((p) => p.name);
 
-            console.log(JSON.stringify(repoNames));
-
-            return repoNames;
+            return JSON.stringify(repoNames);
 
   update-github-dependencies:
     name: 'update-github-dependencies-${{ matrix.repo }}'
     needs: [ get-repos ]
     runs-on: [ ubuntu-latest ]
-    if: false # TODO Enable once repo query tested
 
     concurrency:
       group: 'update-github-dependencies-${{ matrix.repo }}'
@@ -75,15 +72,32 @@ jobs:
       fail-fast: false
       max-parallel: 5
       matrix:
-        include: ${{ fromJSON(needs.get-repos.outputs.repos) }}
+        repo: ${{ fromJSON(needs.get-repos.outputs.repos) }}
 
     steps:
+
+    - name: Get default branch
+      id: get-default-branch
+      uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+      env:
+        REPO_OWNER: ${{ github.repository_owner }}
+        REPO_NAME: ${{ matrix.repo }}
+      with:
+        github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
+        result-encoding: string
+        script: |
+          const { data: repo } = await github.rest.repos.get({
+            owner: process.env.REPO_OWNER,
+            repo: process.env.REPO_NAME
+          });
+          return repo.default_branch;
 
     - name: Checkout code
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         filter: 'tree:0'
         show-progress: false
+        ref: ${{ steps.get-default-branch.outputs.result }}
         repository: ${{ format('{0}/{1}', github.repository_owner, matrix.repo) }}
         submodules: 'recursive'
         token: ${{ secrets.COSTELLOBOT_TOKEN }}
