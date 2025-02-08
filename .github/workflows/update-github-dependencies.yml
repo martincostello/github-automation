@@ -54,7 +54,7 @@ jobs:
               .filter((p) => !p.isArchived)
               .filter((p) => !p.isFork)
               .filter((p) => p.owner.login === process.env.GITHUB_REPOSITORY_OWNER)
-              .map((p) => p.name);
+              .map((p) => { p.name });
 
             const result = JSON.stringify(repoNames);
 
