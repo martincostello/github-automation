@@ -1,0 +1,254 @@
+name: update-github-dependencies
+
+on:
+  schedule:
+    - cron: '0 5 * * MON'
+  workflow_dispatch:
+
+env:
+  FORCE_COLOR: 3
+  TERM: xterm
+
+permissions: {}
+
+jobs:
+  get-repos:
+    runs-on: [ ubuntu-latest ]
+    if: github.event.repository.fork == false
+
+    outputs:
+      repos: ${{ steps.get-repos.outputs.result }}
+
+    steps:
+
+      - name: Get repositories
+        id: get-repos
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
+          result-encoding: string
+          script: |
+            const query = `
+              {
+                viewer {
+                  repositories(
+                    affiliations: [COLLABORATOR],
+                    ownerAffiliations: [COLLABORATOR],
+                    orderBy: { field:NAME, direction:ASC },
+                    first: 100) {
+                    nodes {
+                      name,
+                      isArchived,
+                      isFork,
+                      owner {
+                        login
+                      }
+                    }
+                  }
+                }
+              }
+            `;
+
+            const repos = await github.graphql(query, {});
+
+            const repoNames repos.viewer.repositories.nodes
+              .filter((p) => !p.isArchived)
+              .filter((p) => !p.isFork)
+              .filter((p) => !p.owner.login === process.env.GITHUB_REPOSITORY_OWNER)
+              .map((p) => p.name);
+
+            console.log(JSON.stringify(repoNames));
+
+            return repoNames;
+
+  update-github-dependencies:
+    name: 'update-github-dependencies-${{ matrix.repo }}'
+    needs: [ get-repos ]
+    runs-on: [ ubuntu-latest ]
+    if: false # TODO Enable once repo query tested
+
+    concurrency:
+      group: 'update-github-dependencies-${{ matrix.repo }}'
+      cancel-in-progress: false
+
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        include: ${{ fromJSON(needs.get-repos.outputs.repos) }}
+
+    steps:
+
+    - name: Checkout code
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        filter: 'tree:0'
+        show-progress: false
+        repository: ${{ format('{0}/{1}', github.repository_owner, matrix.repo) }}
+        submodules: 'recursive'
+        token: ${{ secrets.COSTELLOBOT_TOKEN }}
+
+    - name: Update GitHub dependencies
+      id: update-dependencies
+      shell: pwsh
+      env:
+        GH_TOKEN: ${{ secrets.COSTELLOBOT_TOKEN }}
+        GIT_COMMIT_USER_EMAIL: ${{ vars.GIT_COMMIT_USER_EMAIL }}
+        GIT_COMMIT_USER_NAME: ${{ vars.GIT_COMMIT_USER_NAME }}
+      run: |
+        $ErrorActionPreference = "Stop"
+        $ProgressPreference = "SilentlyContinue"
+
+        $dependencies = @(
+          @{
+            name="cloudbase/powershell-yaml";
+            target="POWERSHELL_YAML_VERSION";
+          },
+          @{
+            name="lindell/multi-gitter";
+            target="MULTI_GITTER_VERSION";
+          },
+          @{
+            name="pester/Pester";
+            target="PESTER_VERSION";
+          },
+          @{
+            name="PowerShell/PSScriptAnalyzer";
+            target="PSSCRIPTANALYZER_VERSION";
+          }
+        )
+
+        foreach ($dependency in $dependencies) {
+          $dependencyName = $dependency.name
+          $latestRelease = (gh api "/repos/$dependencyName/releases/latest" | ConvertFrom-Json)
+          $dependencyVersion = $latestRelease.tag_name.Trim().TrimStart('v')
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Failed to get the latest version for ${dependencyName}."
+            exit $LASTEXITCODE
+          }
+          $dependency.version = $dependencyVersion
+          $dependency.repo = "https://github.com/${dependencyName}"
+          $dependency.url = $latestRelease.html_url
+        }
+
+        $updates = @()
+
+        $workflowsPath = (Join-Path -Path ${env:GITHUB_WORKSPACE} ".github" "workflows")
+        $workflows = @()
+
+        if (Test-Path $workflowsPath) {
+          $workflows += Get-ChildItem -Path $workflowsPath -Filter "*.yml"
+          $workflows += Get-ChildItem -Path $workflowsPath -Filter "*.yaml"
+        }
+
+        #$workflows = $workflows | Where-Object { $_.FullName -notlike "*${env:GITHUB_WORKSPACE}/.git/modules/*" }
+
+        foreach ($workflow in $workflows) {
+          $workflowPath = $workflow.FullName
+          $workflowContent = Get-Content -Path $workflowPath -Raw
+
+          $dirty = $false
+          $previous = $workflowContent
+
+          foreach ($dependency in $dependencies) {
+            $dependencyName = $dependency.name
+            $dependencyVersion = $dependency.version
+            $target = $dependency.target
+
+            $previous = $workflowContent
+            $workflowContent = $previous -Replace "${target}\:\s\`'([0-9\.]+)\`'", "${target}: `'${dependencyVersion}`'"
+
+            if ($previous -ne $workflowContent) {
+              $updates += $dependency
+              $dirty = $true
+            }
+          }
+
+          if ($dirty) {
+            Set-Content -Path $workflowPath -Value $workflowContent.Trim()
+          }
+        }
+
+        $GitStatus = (git status --porcelain)
+
+        if ([string]::IsNullOrEmpty($GitStatus)) {
+          Write-Output "No changes to commit."
+          exit 0
+        }
+
+        $BranchName = "update-github-dependencies"
+
+        git config user.email "${env:GIT_COMMIT_USER_EMAIL}" | Out-Null
+        git config user.name "${env:GIT_COMMIT_USER_NAME}" | Out-Null
+        git remote set-url "${env:GITHUB_SERVER_URL}/${env:GITHUB_REPOSITORY}.git" | Out-Null
+        git fetch origin | Out-Null
+        git rev-parse --verify --quiet "remotes/origin/${BranchName}" | Out-Null
+
+        if ($LASTEXITCODE -eq 0) {
+          Write-Output "Branch ${BranchName} already exists."
+          exit 0
+        }
+
+        $PullRequestTitle = "Update workflow GitHub dependencies"
+
+        $CommitMessage = @()
+        $CommitMessage += $PullRequestTitle
+        $CommitMessage += ""
+        $CommitMessage += ""
+        $CommitMessage += "Updates GitHub dependencies for the GitHub Actions workflows."
+        $CommitMessage += ""
+        foreach ($update in $updates) {
+          $CommitMessage += "- Bumps $($update.name) to version $($update.version)."
+        }
+
+        $workflowUrl = "${env:GITHUB_SERVER_URL}/${env:GITHUB_REPOSITORY}/actions/runs/${env:GITHUB_RUN_ID}"
+
+        $PullRequestBody = @()
+        $PullRequestBody += "This pull request updates the GitHub dependencies for the GitHub Actions workflows."
+        $PullRequestBody += ""
+        $PullRequestBody += "The following dependencies have been updated:"
+        $PullRequestBody += ""
+        foreach ($update in $updates) {
+          $PullRequestBody += "- [$($update.name)]($($update.repo)) to version [$($update.version)]($($update.url))."
+        }
+        $PullRequestBody += ""
+        $PullRequestBody += "This pull request was generated by [GitHub Actions]($workflowUrl)."
+
+        $CommitMessage = $CommitMessage -Join "`n"
+        $PullRequestBody = $PullRequestBody -Join "`n"
+
+        git checkout -b $BranchName
+        git add .
+        git commit -m $CommitMessage
+        git push -u origin $BranchName
+
+        "branch-name=${BranchName}" >> ${env:GITHUB_OUTPUT}
+        "pr-title=${PullRequestTitle}" >> ${env:GITHUB_OUTPUT}
+        "updated-dependencies=true" >> ${env:GITHUB_OUTPUT}
+
+        $EOF = (New-Guid).Guid
+        "pr-body<<${EOF}" >> ${env:GITHUB_OUTPUT}
+        ${PullRequestBody} >> ${env:GITHUB_OUTPUT}
+        "${EOF}" >> ${env:GITHUB_OUTPUT}
+
+    - name: Create pull request
+      if: steps.update-dependencies.outputs.updated-dependencies == 'true'
+      uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+      env:
+        REPO_OWNER: ${{ github.repository_owner }}
+        REPO_NAME: ${{ matrix.repo }}
+        BASE_BRANCH: ${{ github.event.repository.default_branch }}
+        HEAD_BRANCH: ${{ steps.update-dependencies.outputs.branch-name }}
+        PR_BODY: ${{ steps.update-dependencies.outputs.pr-body }}
+        PR_TITLE: ${{ steps.update-dependencies.outputs.pr-title }}
+      with:
+        github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
+        script: |
+          await github.rest.pulls.create({
+            owner: process.env.REPO_OWNER,
+            repo: process.env.REPO_NAME,
+            title: process.env.PR_TITLE,
+            head: process.env.HEAD_BRANCH,
+            base: process.env.BASE_BRANCH,
+            body: process.env.PR_BODY
+          });
