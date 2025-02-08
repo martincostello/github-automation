@@ -57,11 +57,7 @@ jobs:
               .filter((p) => p.owner.login === process.env.GITHUB_REPOSITORY_OWNER)
               .map((p) => p.name);
 
-            const result = JSON.stringify(repoNames);
-
-            console.log(result);
-
-            return result;
+            return JSON.stringify(repoNames);
 
   update-github-dependencies:
     name: 'update-github-dependencies-${{ matrix.repo }}'
