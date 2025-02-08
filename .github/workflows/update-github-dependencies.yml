@@ -51,7 +51,7 @@ jobs:
 
             const repos = await github.graphql(query, {});
 
-            const repoNames repos.viewer.repositories.nodes
+            const repoNames = repos.viewer.repositories.nodes
               .filter((p) => !p.isArchived)
               .filter((p) => !p.isFork)
               .filter((p) => !p.owner.login === process.env.GITHUB_REPOSITORY_OWNER)
