@@ -58,7 +58,6 @@ jobs:
       shell: pwsh
       run: |
         $ErrorActionPreference = "Stop"
-      run: |
         $settings = @{
           IncludeDefaultRules = $true
           Severity = @("Error", "Warning")
