@@ -129,6 +129,10 @@ jobs:
           @{
             name="PowerShell/PSScriptAnalyzer";
             target="PSSCRIPTANALYZER_VERSION";
+          },
+          @{
+            name="santisq/PSCompression";
+            target="PSCOMPRESSION_VERSION";
           }
         )
 
