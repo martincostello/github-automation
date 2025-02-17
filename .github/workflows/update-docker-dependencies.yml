@@ -130,13 +130,23 @@ jobs:
 
         foreach ($dependency in $dependencies) {
           $dependencyName = $dependency.name
-          $tags = regctl tag ls $dependencyName --exclude latest
-          $latestRelease = $tags | Select-Object -Last 1
-          $dependencyVersion = $latestRelease.Trim().TrimStart('v')
+
+          $tags = regctl tag ls $dependencyName
+
+          $versions = $tags | ForEach-Object {
+            $parsed = $null
+            if ([Version]::TryParse($_.Trim().TrimStart('v'), [ref]$parsed)) {
+              $parsed
+            }
+          } | Sort-Object -Descending | ForEach-Object ToString
+
+          $dependencyVersion = $versions | Select-Object -First 1
+
           if ($LASTEXITCODE -ne 0) {
             Write-Error "Failed to get the latest image version for ${dependencyName}."
             exit $LASTEXITCODE
           }
+
           $dependency.version = $dependencyVersion
           $dependency.digest = regctl image digest "${dependencyName}:${dependencyVersion}"
           $dependency.repo = "https://github.com/${dependencyName}"
