@@ -143,7 +143,7 @@ jobs:
           $dependency.version = $dependencyVersion
           $dependency.digest = regctl image digest "${dependencyName}:${dependencyVersion}"
           $dependency.repo = "https://github.com/${dependencyName}"
-          $dependency.url = $latestRelease.html_url
+          $dependency.url = "https://github.com/${dependencyName}/releases/tag/v$latestRelease"
         }
 
         $updates = @()
@@ -168,11 +168,10 @@ jobs:
             $dependencyDigest = $dependency.digest
             $dependencyVersion = $dependency.version
 
-            # regex escape the dependency name
-            $escapedName = [regex]::Escape($dependencyName)
+            $escapedName = $dependencyName.Replace("/", "\/")
 
             $previous = $workflowContent
-            $workflowContent = $previous -Replace "uses: docker:\/\/${escapedName}@sha256:[A-Fa-f0-9]{64} # v.+$", "uses: docker://${dependencyName}@sha256:${dependencyDigest} # v${dependencyVersion}"
+            $workflowContent = $previous -Replace "uses: docker:\/\/${escapedName}@sha256:[A-Fa-f0-9]{64} # v.+$", "uses: docker://${dependencyName}@${dependencyDigest} # v${dependencyVersion}"
 
             if ($previous -ne $workflowContent) {
               $updates += $dependency
