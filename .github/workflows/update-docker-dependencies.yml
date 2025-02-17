@@ -167,7 +167,6 @@ jobs:
             $dependencyName = $dependency.name
             $dependencyDigest = $dependency.digest
             $dependencyVersion = $dependency.version
-            $target = $dependency.target
 
             # regex escape the dependency name
             $escapedName = [regex]::Escape($dependencyName)
