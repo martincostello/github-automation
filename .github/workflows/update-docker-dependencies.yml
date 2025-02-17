@@ -1,4 +1,4 @@
-name: update-github-dependencies
+name: update-docker-dependencies
 
 on:
   schedule:
@@ -51,22 +51,28 @@ jobs:
 
             const repos = await github.graphql(query, {});
 
-            const repoNames = repos.viewer.repositories.nodes
+            let repoNames = repos.viewer.repositories.nodes
               .filter((p) => !p.isArchived)
               .filter((p) => !p.isFork)
               .filter((p) => p.owner.login === process.env.GITHUB_REPOSITORY_OWNER)
               .map((p) => p.name);
 
+            // TODO Remove once tested
+            repoNames = ['github-automation'];
+
             return JSON.stringify(repoNames);
 
-  update-github-dependencies:
-    name: 'update-github-dependencies-${{ matrix.repo }}'
+  update-docker-dependencies:
+    name: 'update-docker-dependencies-${{ matrix.repo }}'
     needs: [ get-repos ]
     runs-on: [ ubuntu-latest ]
 
     concurrency:
-      group: 'update-github-dependencies-${{ matrix.repo }}'
+      group: 'update-docker-dependencies-${{ matrix.repo }}'
       cancel-in-progress: false
+
+    env:
+      REGCLIENT_VERSION: 0.8.2
 
     strategy:
       fail-fast: false
@@ -75,6 +81,12 @@ jobs:
         repo: ${{ fromJSON(needs.get-repos.outputs.repos) }}
 
     steps:
+
+    - name: Install regctl
+      run: |
+        sudo curl -sL "https://github.com/regclient/regclient/releases/download/v${REGCLIENT_VERSION}/regctl-linux-amd64" --output /usr/local/bin/regctl
+        sudo chmod +x /usr/local/bin/regctl
+        regctl version
 
     - name: Get default branch
       id: get-default-branch
@@ -115,40 +127,21 @@ jobs:
 
         $dependencies = @(
           @{
-            name="cloudbase/powershell-yaml";
-            target="POWERSHELL_YAML_VERSION";
-          },
-          @{
-            name="lindell/multi-gitter";
-            target="MULTI_GITTER_VERSION";
-          },
-          @{
-            name="pester/Pester";
-            target="PESTER_VERSION";
-          },
-          @{
-            name="PowerShell/PSScriptAnalyzer";
-            target="PSSCRIPTANALYZER_VERSION";
-          },
-          @{
-            name="regclient/regclient";
-            target="REGCLIENT_VERSION";
-          },
-          @{
-            name="santisq/PSCompression";
-            target="PSCOMPRESSION_VERSION";
+            name="rhysd/actionlint";
           }
         )
 
         foreach ($dependency in $dependencies) {
           $dependencyName = $dependency.name
-          $latestRelease = (gh api "/repos/$dependencyName/releases/latest" | ConvertFrom-Json)
-          $dependencyVersion = $latestRelease.tag_name.Trim().TrimStart('v')
+          $tags = regctl tag ls $dependencyName --exclude latest
+          $latestRelease = $tags | Select-Object -Last 1
+          $dependencyVersion = $latestRelease.Trim().TrimStart('v')
           if ($LASTEXITCODE -ne 0) {
-            Write-Error "Failed to get the latest version for ${dependencyName}."
+            Write-Error "Failed to get the latest image version for ${dependencyName}."
             exit $LASTEXITCODE
           }
           $dependency.version = $dependencyVersion
+          $dependency.digest = regctl image digest "${dependencyName}:${dependencyVersion}"
           $dependency.repo = "https://github.com/${dependencyName}"
           $dependency.url = $latestRelease.html_url
         }
@@ -172,11 +165,15 @@ jobs:
 
           foreach ($dependency in $dependencies) {
             $dependencyName = $dependency.name
+            $dependencyDigest = $dependency.digest
             $dependencyVersion = $dependency.version
             $target = $dependency.target
 
+            # regex escape the dependency name
+            $escapedName = [regex]::Escape($dependencyName)
+
             $previous = $workflowContent
-            $workflowContent = $previous -Replace "${target}\:\s\`'([0-9\.]+)\`'", "${target}: `'${dependencyVersion}`'"
+            $workflowContent = $previous -Replace "uses: docker:\/\/${escapedName}@sha256:[A-Fa-f0-9]{64} # v.+$", "uses: docker://${dependencyName}@sha256:${dependencyDigest} # v${dependencyVersion}"
 
             if ($previous -ne $workflowContent) {
               $updates += $dependency
@@ -196,7 +193,7 @@ jobs:
           exit 0
         }
 
-        $BranchName = "update-github-dependencies"
+        $BranchName = "update-docker-dependencies"
 
         git config user.email ${env:GIT_COMMIT_USER_EMAIL} | Out-Null
         git config user.name ${env:GIT_COMMIT_USER_NAME} | Out-Null
@@ -209,13 +206,13 @@ jobs:
           exit 0
         }
 
-        $PullRequestTitle = "Update workflow GitHub dependencies"
+        $PullRequestTitle = "Update workflow Docker dependencies"
 
         $CommitMessage = @()
         $CommitMessage += $PullRequestTitle
         $CommitMessage += ""
         $CommitMessage += ""
-        $CommitMessage += "Updates GitHub dependencies for the GitHub Actions workflows."
+        $CommitMessage += "Updates Docker dependencies for the GitHub Actions workflows."
         $CommitMessage += ""
         foreach ($update in $updates) {
           $CommitMessage += "- Bumps $($update.name) to version $($update.version)."
@@ -224,7 +221,7 @@ jobs:
         $workflowUrl = "${env:GITHUB_SERVER_URL}/${env:GITHUB_REPOSITORY}/actions/runs/${env:GITHUB_RUN_ID}"
 
         $PullRequestBody = @()
-        $PullRequestBody += "This pull request updates the GitHub dependencies for the GitHub Actions workflows."
+        $PullRequestBody += "This pull request updates the Docker dependencies for the GitHub Actions workflows."
         $PullRequestBody += ""
         $PullRequestBody += "The following dependencies have been updated:"
         $PullRequestBody += ""
