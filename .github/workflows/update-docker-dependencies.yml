@@ -150,7 +150,7 @@ jobs:
           $dependency.version = $dependencyVersion
           $dependency.digest = regctl image digest "${dependencyName}:${dependencyVersion}"
           $dependency.repo = "https://github.com/${dependencyName}"
-          $dependency.url = "https://github.com/${dependencyName}/releases/tag/v$latestRelease"
+          $dependency.url = "https://github.com/${dependencyName}/releases/tag/v${dependencyVersion}"
         }
 
         $updates = @()
