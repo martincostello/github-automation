@@ -273,7 +273,7 @@ jobs:
       with:
         github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
         script: |
-          await github.rest.pulls.create({
+          const { data: pr } = await github.rest.pulls.create({
             owner: process.env.REPO_OWNER,
             repo: process.env.REPO_NAME,
             title: process.env.PR_TITLE,
@@ -281,3 +281,5 @@ jobs:
             base: process.env.BASE_BRANCH,
             body: process.env.PR_BODY
           });
+
+          core.notice(`Created pull request ${process.env.REPO_OWNER}/${process.env.REPO_NAME}#${pr.number}: ${pr.html_url}`);
