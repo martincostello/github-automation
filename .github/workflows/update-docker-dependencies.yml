@@ -176,14 +176,16 @@ jobs:
             $dependencyVersion = $dependency.version
 
             $escapedName = $dependencyName.Replace("/", "\/")
-            $replacement = "uses: docker://${dependencyName}@${dependencyDigest} # v${dependencyVersion}"
+            $replacementDigest = "uses: docker://${dependencyName}@${dependencyDigest} # v${dependencyVersion}"
+            $replacementVersion = "uses: docker://${dependencyName}@${dependencyVersion}"
 
-            if ($workflowContent.Contains($replacement)) {
+            if ($workflowContent.Contains($replacementDigest) -Or $workflowContent.Contains($replacementVersion)) {
               continue
             }
 
             $previous = $workflowContent
-            $workflowContent = $previous -Replace "(?m)uses: docker:\/\/${escapedName}@sha256:[A-Fa-f0-9]{64} # v.+$", $replacement
+            $workflowContent = $previous -Replace "(?m)uses: docker:\/\/${escapedName}@sha256:[A-Fa-f0-9]{64} # v.+$", $replacementDigest
+            $workflowContent = $workflowContent -Replace "(?m)uses: docker:\/\/${escapedName}@[0-9]+.+$", $replacementVersion
 
             if ($previous -ne $workflowContent) {
               $updates += $dependency
