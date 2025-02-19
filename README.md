@@ -10,17 +10,25 @@ GitHub automation for my repositories.
 
 The following workflows are available.
 
-| **Workflow**                                                     | **Description**                                                                                   |
-| :--------------------------------------------------------------- | :------------------------------------------------------------------------------------------------ |
-| [dotnet-dependencies-updated][dotnet-dependencies-updated]       | Runs the `rebase` workflow for a repository when its dependencies are determined to have changed. |
-| [dotnet-release][dotnet-release]                                 | Runs every 15 minutes to check for new official releases of the .NET SDK.                         |
-| [dotnet-upgrade-report][dotnet-upgrade-report]                   | Runs daily to produce a report for a specified branch used for testing .NET vNext.                |
-| [dotnet-version-report][dotnet-version-report]                   | Generates a report of the .NET SDK versions used by the default branch of my repositories.        |
-| [is-dotnet-change-available][is-dotnet-change-available]         | Determines whether the changes from a pull request are available in a .NET installer build        |
-| [issue-metrics][issue-metrics]                                   | Runs monthly to generate a report of metrics for issues and pull requests for my repositories.    |
-| [rebase][rebase]                                                 | Rebases a branch of one or more repositories onto a specified base branch.                        |
-| [update-dotnet-sdks][update-dotnet-sdks]                         | Runs the `update-dotnet-sdk` workflow for one or more repositories for a specified branch.        |
-| [update-dotnet-sdks-for-nightly][update-dotnet-sdks-for-nightly] | Runs the `update-dotnet-sdks` workflow daily for the `dotnet-nightly` branch.                     |
+| **Workflow**                                                                 | **Description**                                                                                                            |
+| :--------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------- |
+| [acr-housekeeping][acr-housekeeping]                                         | Deletes old container images in [Azure Container Registry][acr].                                                           |
+| [dotnet-dependencies-updated][dotnet-dependencies-updated]                   | Runs the `rebase` workflow for a repository when its dependencies are determined to have changed.                          |
+| [dotnet-bumper][dotnet-bumper]                                               | Runs [_.NET Bumper_][dotnet-bumper-tool] and generates a pull request to update the .NET version used in a repository.     |
+| [dotnet-release][dotnet-release]                                             | Runs every 15 minutes to check for new official releases of the .NET SDK.                                                  |
+| [dotnet-upgrade-report][dotnet-upgrade-report]                               | Runs daily to produce a report for a specified branch used for testing .NET vNext.                                         |
+| [dotnet-upgrade-report-for-nightly][dotnet-upgrade-report-for-nightly]       | Runs daily to produce a report for a specified branch used for testing .NET vNext using [.NET daily builds][dotnet-daily]. |
+| [dotnet-version-report][dotnet-version-report]                               | Generates a report of the .NET SDK versions used by the default branch of my repositories.                                 |
+| [is-dotnet-change-available][is-dotnet-change-available]                     | Determines whether the changes from a pull request are available in a .NET installer build                                 |
+| [issue-metrics][issue-metrics]                                               | Runs monthly to generate a report of metrics for issues and pull requests for my repositories.                             |
+| [nuget-packages-published][nuget-packages-published]                         | Waits for one or more NuGet packages to be published and then comments on issues/PRs associated with their milestone.      |
+| [rebase][rebase]                                                             | Rebases a branch of one or more repositories onto a specified base branch.                                                 |
+| [rebase-pull-request][rebase-pull-request]                                   | Rebases a pull request onto the default branch of a repository in response to a comment on the pull request.               |
+| [update-docker-dependencies][update-docker-dependencies]                     | Checks for new versions of `uses: docker://`-format Actions and generates pull requests to update them.                    |
+| [update-dotnet-sdks][update-dotnet-sdks]                                     | Runs the `update-dotnet-sdk` workflow for one or more repositories for a specified branch.                                 |
+| [update-dotnet-sdks-for-nightly][update-dotnet-sdks-for-nightly]             | Runs the `update-dotnet-sdks` workflow daily for the `dotnet-nightly` branch.                                              |
+| [update-github-dependencies][update-github-dependencies]                     | Checks for new versions of GitHub projects and updates environment variables containing their version.                     |
+| [update-static-assets][update-static-assets]                                 | Checks for new releases of static HTML assets served from [cdnjs][cdnjs] and generates pull requests to update them.       |
 
 ### .NET Dependencies Updated
 
@@ -86,7 +94,7 @@ is the latest official release.
 
 The [is-dotnet-change-available][is-dotnet-change-available] workflow is run manually
 to determine whether the changes from a pull request to a .NET repository have flowed
-into a daily build of the .NET SDK from the [dotnet/installer][dotnet-installer] repository.
+into a daily build of the .NET SDK from the [dotnet/sdk][dotnet-installer] repository.
 
 ### Issue Metrics
 
@@ -177,24 +185,36 @@ The repository is hosted in [GitHub][repository]: <https://github.com/martincost
 
 This project is licensed under the [Apache 2.0][license] license.
 
+[acr]: https://azure.microsoft.com/products/container-registry "Azure Container Registry"
+[acr-housekeeping]: ./.github/workflows/acr-housekeeping.yml
+[cdnjs]: https://cdnjs.com/
 [costellobot]: https://github.com/martincostello/costellobot
 [dotnet-core]: https://github.com/dotnet/core
+[dotnet-bumper]: ./.github/workflows/dotnet-bumper.yml
+[dotnet-bumper-tool]: https://github.com/martincostello/dotnet-bumper
+[dotnet-daily]: https://github.com/dotnet/sdk/blob/main/documentation/package-table.md
 [dotnet-dependencies-updated]: ./.github/workflows/dotnet-dependencies-updated.yml
-[dotnet-installer]: https://github.com/dotnet/installer
+[dotnet-installer]: https://github.com/dotnet/sdk
 [dotnet-release]: ./.github/workflows/dotnet-release.yml
 [dotnet-upgrade-report]: ./.github/workflows/dotnet-upgrade-report.yml
+[dotnet-upgrade-report-for-nightly]: ./.github/workflows/dotnet-upgrade-report-for-nightly.yml
 [dotnet-version-report]: ./.github/workflows/dotnet-version-report.yml
 [is-dotnet-change-available]: ./.github/workflows/is-dotnet-change-available.yml
 [issue-metrics]: ./.github/workflows/issue-metrics.yml
 [issue-metrics-action]: https://github.com/github/issue-metrics#readme
 [issues]: https://github.com/martincostello/github-automation/issues "Issues for this project on GitHub.com"
 [license]: http://www.apache.org/licenses/LICENSE-2.0.txt "The Apache 2.0 license"
+[nuget-packages-published]: ./.github/workflows/nuget-packages-published.yml
 [onboarding]: ./docs/onboarding.md
 [rebase]: ./.github/workflows/rebase.yml
+[rebase-pull-request]: ./.github/workflows/rebase-pull-request.yml
 [rebaser]: https://github.com/martincostello/rebaser
 [repository]: https://github.com/martincostello/github-automation "This project on GitHub.com"
+[update-docker-dependencies]: ./.github/workflows/update-docker-dependencies.yml
 [update-dotnet-sdk]: https://github.com/martincostello/update-dotnet-sdk/blob/main/.github/workflows/update-dotnet-sdk.yml
 [update-dotnet-sdk-schema]: ./.github/update-dotnet-sdk-schema.json
 [update-dotnet-sdks]: ./.github/workflows/update-dotnet-sdks.yml
 [update-dotnet-sdks-for-nightly]: ./.github/workflows/update-dotnet-sdks-for-nightly.yml
+[update-github-dependencies]: ./.github/workflows/update-github-dependencies.yml
+[update-static-assets]: ./.github/workflows/update-static-assets.yml
 [upgrade-report-gist]: https://gist.github.com/martincostello/2083bcc83f30a5038175e4f31e0fc59f
