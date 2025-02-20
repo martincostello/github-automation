@@ -297,6 +297,19 @@ jobs:
             core.setOutput('release-id', release_id);
             return assetsPath;
 
+      - name: Generate checksums
+        if: steps.find-assets.outputs.assets-to-sign == 'true'
+        env:
+          ASSETS_PATH: ${{ steps.find-assets.outputs.result }}
+        shell: bash
+        run: |
+          find "${ASSETS_PATH}" -type f -name '*' | while read -r fname; do
+            echo "Generating checksum for ${fname}"
+            sha256sum "${fname}" >> "${ASSETS_PATH}/checksums.txt"
+          done
+          echo "Verifying checksums"
+          sha256sum "${ASSETS_PATH}/checksums.txt" --check || exit 1
+
       - name: GPG sign assets
         if: steps.find-assets.outputs.assets-to-sign == 'true'
         env:
@@ -342,11 +355,13 @@ jobs:
 
             core.debug(`Found ${fileNames.length} asset signatures.`);
 
+            fileNames.push('checksums.txt');
+
             for (const name of fileNames) {
               const data = fs.readFileSync(path.join(assetsPath, name));
 
-              console.log(`Uploading signature for ${name}.`);
-              core.debug(`Uploading signature for ${name} (${data.length} bytes).`);
+              console.log(`Uploading ${name}.`);
+              core.debug(`Uploading ${name} (${data.length} bytes).`);
 
               await github.rest.repos.uploadReleaseAsset({
                 owner,
