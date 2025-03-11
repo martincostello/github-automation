@@ -305,7 +305,7 @@ jobs:
         run: |
           find "${ASSETS_PATH}" -type f -name '*' | while read -r fname; do
             echo "Generating checksum for ${fname}"
-            sha256sum "${fname}" >> "${ASSETS_PATH}/checksums.txt"
+            sha256sum "${fname}" | awk '{print $1 "  " basename($2)}' >> "${ASSETS_PATH}/checksums.txt"
           done
           echo "Verifying checksums"
           sha256sum "${ASSETS_PATH}/checksums.txt" --check || exit 1
