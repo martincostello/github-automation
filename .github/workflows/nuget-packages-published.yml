@@ -299,16 +299,16 @@ jobs:
 
       - name: Generate checksums
         if: steps.find-assets.outputs.assets-to-sign == 'true'
-        env:
-          ASSETS_PATH: ${{ steps.find-assets.outputs.result }}
         shell: bash
+        working-directory: ${{ steps.find-assets.outputs.result }}
         run: |
-          find "${ASSETS_PATH}" -type f -name '*' | while read -r fname; do
+          find "." -type f -name '*' | while read -r fname; do
             echo "Generating checksum for ${fname}"
-            sha256sum "${fname}" >> "${ASSETS_PATH}/checksums.txt"
+            base_name="$(basename ${fname})"
+            sha256sum "${base_name}" >> "./checksums.txt"
           done
           echo "Verifying checksums"
-          sha256sum "${ASSETS_PATH}/checksums.txt" --check || exit 1
+          sha256sum "./checksums.txt" --check || exit 1
 
       - name: GPG sign assets
         if: steps.find-assets.outputs.assets-to-sign == 'true'
