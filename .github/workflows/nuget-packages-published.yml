@@ -304,7 +304,7 @@ jobs:
         run: |
           find "." -type f -name '*' | while read -r fname; do
             echo "Generating checksum for ${fname}"
-            base_name="$(basename ${fname})"
+            base_name="$(basename "${fname}")"
             sha256sum "${base_name}" >> "./checksums.txt"
           done
           echo "Verifying checksums"
