@@ -40,5 +40,6 @@ jobs:
       - name: Generate report
         uses: ./actions/is-dotnet-change-available
         with:
+          channel: ${{ vars.DOTNET_NIGHTLY_CHANNEL }}
           pull-request: ${{ inputs.pull }}
           repository-name: ${{ inputs.repository }}
