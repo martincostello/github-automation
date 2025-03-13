@@ -8,7 +8,6 @@ import { XMLParser } from 'fast-xml-parser';
 import { Octokit, getFileContents } from '../shared/github';
 import { fetch } from 'undici';
 
-const defaultVersion = '9.0';
 const owner = 'dotnet';
 const repositoryNames = ['aspnetcore', 'efcore', 'installer', 'runtime', 'sdk'];
 
@@ -86,6 +85,10 @@ async function getLatestSdkVersion(channel: string): Promise<LatestInstallerVers
 
   response = await fetch(commitsUrl, init);
 
+  if (response.status && response.status >= 400) {
+    return null;
+  }
+
   const commitsJson = await response.json();
   const commits = commitsJson as SdkProductCommits;
 
@@ -137,6 +140,7 @@ async function findDependencySha(
 export async function run(): Promise<void> {
   try {
     const repo = core.getInput('repository-name', { required: true });
+    const defaultChannel = core.getInput('channel', { required: true });
     const pull_number = Number.parseInt(core.getInput('pull-request', { required: true }), 10);
     const token = core.getInput('github-token', { required: false });
 
@@ -160,9 +164,10 @@ export async function run(): Promise<void> {
       const merge_commit_sha = pull.merge_commit_sha;
 
       const releasePrefix = 'release/';
-      const channel = branch.startsWith(releasePrefix) ? branch.slice(releasePrefix.length) : defaultVersion;
+      const channel = branch.startsWith(releasePrefix) ? branch.slice(releasePrefix.length) : defaultChannel;
 
-      const sdkVersion = await getLatestSdkVersion(channel.slice(0, 3));
+      const majorMinor = channel.split('.').slice(0, 2).join('.');
+      const sdkVersion = await getLatestSdkVersion(majorMinor);
 
       if (!sdkVersion) {
         throw new Error(`The SDK version could not be determined for the ${branch} branch of the ${repo} repository.`);

@@ -24,6 +24,7 @@ describe('is-dotnet-change-available', () => {
       await setup(`is-dotnet-change-available/${repository}-${pull}`);
       fixture = new ActionFixture(run);
       await fixture.run({
+        'channel': '9.0',
         'github-token': 'github-token',
         'pull-request': pull,
         'repository-name': repository,

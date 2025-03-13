@@ -9,6 +9,10 @@ inputs:
     description: 'The GitHub token to use.'
     required: false
     default: ${{ github.token }}
+  channel:
+    description: 'The channel to use as the default for searching for a .NET SDK release.'
+    required: false
+    default: ''
   pull-request:
     description: 'The number of the pull request to search for.'
     required: true
