@@ -131,6 +131,10 @@ jobs:
             target="PSSCRIPTANALYZER_VERSION";
           },
           @{
+            name="grafana/pyroscope-dotnet";
+            target="PYROSCOPE_VERSION";
+          },
+          @{
             name="regclient/regclient";
             target="REGCLIENT_VERSION";
           },
