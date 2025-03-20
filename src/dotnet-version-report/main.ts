@@ -58,7 +58,7 @@ export async function run(): Promise<void> {
     }
 
     await core.summary.addRaw(report.join('\n')).write();
-  } catch (error: any) {
+  } catch (error) {
     handle(error);
   }
 }

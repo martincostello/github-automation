@@ -48,7 +48,7 @@ function getDependencySha(name: string, xml: string): string | null {
   const dependencies = versionDetails?.Dependencies?.ProductDependencies?.Dependency;
 
   if (dependencies && 'find' in dependencies) {
-    const dependency = dependencies.find((element: any) => element['@Name'] === name);
+    const dependency = dependencies.find((element) => element['@Name'] === name);
     if (dependency && 'Sha' in dependency) {
       return dependency.Sha;
     }
@@ -224,7 +224,7 @@ export async function run(): Promise<void> {
 
     core.setOutput('is-available', isAvailable);
     core.setOutput('installer-version', installerVersion);
-  } catch (error: any) {
+  } catch (error) {
     handle(error);
   }
 }

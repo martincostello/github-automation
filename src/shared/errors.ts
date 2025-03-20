@@ -3,6 +3,7 @@
 
 import { error, setFailed } from '@actions/core';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function handle(err: any): void {
   error(err);
   if (err instanceof Error) {

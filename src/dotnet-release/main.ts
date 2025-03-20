@@ -120,7 +120,7 @@ export async function run(): Promise<void> {
     }
 
     core.setOutput('sdk-versions', JSON.stringify(releaseNotes.map((r) => r['latest-sdk'])));
-  } catch (error: any) {
+  } catch (error) {
     handle(error);
   }
 }
