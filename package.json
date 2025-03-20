@@ -8,7 +8,7 @@
     "check-dist": "npm run build && npm run package",
     "format": "prettier --write eslint.config.mjs src/**/*.ts tests/**/*.ts",
     "format-check": "prettier --check eslint.config.mjs src/**/*.ts tests/**/*.ts",
-    "lint": "eslint src/**/*.ts",
+    "lint": "eslint src/**/*.ts --fix",
     "package": "npm run package:dotnet-release && npm run package:dotnet-upgrade-report && npm run package:dotnet-version-report && npm run package:get-dotnet-repos && npm run package:get-rebase-repos && npm run package:get-sdk-repos && npm run package:is-dotnet-change-available",
     "package:dotnet-release": "esbuild lib/dotnet-release/main.js --bundle --minify --outdir=actions/dotnet-release/dist --packages=bundle --platform=node --sourcemap --target=node20.0.0",
     "package:dotnet-upgrade-report": "esbuild lib/dotnet-upgrade-report/main.js --bundle --minify --outdir=actions/dotnet-upgrade-report/dist --packages=bundle --platform=node --sourcemap --target=node20.0.0",
