@@ -59,7 +59,7 @@ export async function run(): Promise<void> {
           branch,
         });
         commit_sha = response.data.commit.sha;
-      } catch (err) {
+      } catch {
         core.debug(`The ${branch} branch of ${slug} does not exist or does not have an open pull request.`);
         continue;
       }
@@ -185,7 +185,7 @@ export async function run(): Promise<void> {
         core.notice(gist.html_url);
       }
     }
-  } catch (error: any) {
+  } catch (error) {
     handle(error);
   }
 }

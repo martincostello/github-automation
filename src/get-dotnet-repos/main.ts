@@ -62,7 +62,7 @@ export async function run(): Promise<void> {
     }
 
     core.setOutput('repositories', JSON.stringify(result));
-  } catch (error: any) {
+  } catch (error) {
     handle(error);
   }
 }

@@ -120,7 +120,7 @@ export async function run(): Promise<void> {
     }
 
     core.setOutput('updates', JSON.stringify(result));
-  } catch (error: any) {
+  } catch (error) {
     handle(error);
   }
 }

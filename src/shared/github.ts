@@ -122,7 +122,7 @@ export async function getUpdateConfiguration(
 
   try {
     config = await getFileContents(octokit, owner, repo, '.github/update-dotnet-sdk.json', ref);
-  } catch (err) {
+  } catch {
     return null;
   }
 
@@ -149,7 +149,7 @@ export async function getDotNetSdk(octokit: Octokit, owner: string, repo: string
 
   try {
     globalJsonString = await getFileContents(octokit, owner, repo, 'global.json', ref);
-  } catch (err) {
+  } catch {
     return null;
   }
 
