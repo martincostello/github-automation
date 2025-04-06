@@ -17997,7 +17997,8 @@
       "body": {
         "event_type":"dotnet_release",
         "client_payload": {
-          "branch": "main"
+          "branch": "main",
+          "packages": "System.Text.Json@6.0.21,Microsoft.AspNetCore.Mvc.Testing@6.0.21,System.Text.Json@7.0.10,Microsoft.AspNetCore.Mvc.Testing@7.0.10,System.Text.Json@8.0.0-preview.7.23375.6,Microsoft.AspNetCore.Mvc.Testing@8.0.0-preview.7.23375.9"
         }
       },
       "response": {}

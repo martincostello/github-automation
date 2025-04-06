@@ -63,6 +63,30 @@ jobs:
           prerelease-label: ${{ vars.DOTNET_PRERELEASE_LABEL }}
           repository: ${{ inputs.repository || '' }}
 
+      - name: Setup .NET SDK
+        if: github.event_name == 'repository_dispatch' && github.event.action == 'dotnet_release'
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+
+      - name: Restore .NET tools
+        if: github.event_name == 'repository_dispatch' && github.event.action == 'dotnet_release'
+        shell: pwsh
+        run: dotnet tool restore
+
+      - name: Wait for NuGet packages to be published
+        if: github.event_name == 'repository_dispatch' && github.event.action == 'dotnet_release'
+        shell: pwsh
+        env:
+          PACKAGES: ${{ github.event.client_payload.packages }}
+          PUBLISH_TIMEOUT: '00:45:00'
+        run: |
+          $packages = ${env:PACKAGES} -Split ','
+
+          dotnet wait-for-package $packages --timeout ${env:PUBLISH_TIMEOUT}
+
+          if ($LASTEXITCODE -ne 0) {
+            Write-Output "::warning::NuGet packages were not published within the timeout period."
+          }
+
   update-sdk:
     name: 'update-${{ matrix.repo }}'
     needs: [ get-repos ]

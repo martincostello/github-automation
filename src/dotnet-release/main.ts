@@ -55,6 +55,7 @@ export async function run(): Promise<void> {
       }
     }
 
+    const packages: string[] = [];
     const releaseNotesUpdated = releaseNotesFiles.length > 0;
     const releaseNotes: ReleaseChannel[] = [];
 
@@ -62,9 +63,19 @@ export async function run(): Promise<void> {
       for (const path of releaseNotesFiles) {
         const release = await getFileContents(github, owner, repo, path, currentSha);
 
+        const notes: ReleaseChannel = JSON.parse(release);
+        const latest = notes.releases?.find((r) => r['release-version'] === notes['latest-release']);
+
+        if (latest) {
+          const runtimeVersion = latest['runtime'].version;
+          const aspnetcoreVersion = latest['aspnetcore-runtime'].version;
+
+          packages.push(`System.Text.Json@${runtimeVersion}`);
+          packages.push(`Microsoft.AspNetCore.Mvc.Testing@${aspnetcoreVersion}`);
+        }
+
         // Remove the releases array from the release notes
         // otherwise the JSON is too large to use as an output.
-        const notes: ReleaseChannel = JSON.parse(release);
         delete notes.releases;
 
         console.log(`Release notes for ${path}:\n${JSON.stringify(notes, null, 2)}`);
@@ -90,9 +101,11 @@ export async function run(): Promise<void> {
       for (const name of branchesToDispatch) {
         type dotnet_release = {
           branch: string;
+          packages: string;
         };
         const client_payload: dotnet_release = {
           branch: name,
+          packages: packages.join(','),
         };
 
         await github.rest.repos.createDispatchEvent({
