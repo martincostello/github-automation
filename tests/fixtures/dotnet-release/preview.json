@@ -180,7 +180,7 @@
         "event_type":"dotnet_release",
         "client_payload": {
           "branch": "dotnet-vnext",
-          "packages": "System.Text.Json@8.0.0-preview.7.23375.6,Microsoft.AspNetCore.Mvc.Testing@8.0.0-preview.7.23375.9"
+          "packages": "System.Text.Json@8.0.0-preview.7.23375.6,Microsoft.NET.ILLink.Tasks@8.0.0-preview.7.23375.6,Microsoft.AspNetCore.Mvc.Testing@8.0.0-preview.7.23375.9"
         }
       },
       "response": {}
