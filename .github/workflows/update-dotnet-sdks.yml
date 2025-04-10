@@ -91,7 +91,7 @@ jobs:
     name: 'update-${{ matrix.repo }}'
     needs: [ get-repos ]
     if: needs.get-repos.outputs.updates != '[]'
-    uses: martincostello/update-dotnet-sdk/.github/workflows/update-dotnet-sdk.yml@ef7653ed976c929ef8c6c6bd31c45b4675c2de71 # v3.6.0
+    uses: martincostello/update-dotnet-sdk/.github/workflows/update-dotnet-sdk.yml@0ca031b558fb894e5687d62a7e938c41261a41be # v3.7.0
 
     concurrency:
       group: 'update-sdk-${{ matrix.repo }}'
@@ -105,6 +105,7 @@ jobs:
 
     with:
       channel: ${{ matrix.channel }}
+      dotnet-roll-forward: 'Major'
       exclude-nuget-packages: ${{ matrix.exclude-nuget-packages }}
       include-nuget-packages: ${{ matrix.include-nuget-packages }}
       labels: ${{ matrix.labels }}
