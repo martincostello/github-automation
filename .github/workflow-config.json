@@ -21,6 +21,7 @@
     "martincostello/api",
     "martincostello/benchmarks",
     "martincostello/benchmarks-dashboard",
+    "martincostello/blog",
     "martincostello/cdn",
     "martincostello/costellobot",
     "martincostello/dependabot-helper",
