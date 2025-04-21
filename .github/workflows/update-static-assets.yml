@@ -67,6 +67,7 @@ jobs:
     - name: Update static assets
       uses: martincostello/update-static-assets@0ba0707d1cffae1b20b5887e26f4dff9c68f9279 # v2.3.0
       with:
+        file-extensions: 'cshtml,erb,html,razor'
         labels: dependencies
         repo: ${{ matrix.repo }}
         repo-token: ${{ secrets.COSTELLOBOT_TOKEN }}
