@@ -27,6 +27,7 @@
     "martincostello/cdn",
     "martincostello/costellobot",
     "martincostello/dependabot-helper",
+    "martincostello/dotnet-minimal-api-integration-testing",
     "martincostello/openapi-extensions",
     "martincostello/SignInWithAppleSample",
     "martincostello/website"
