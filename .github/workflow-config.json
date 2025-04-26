@@ -30,6 +30,7 @@
     "martincostello/dotnet-minimal-api-integration-testing",
     "martincostello/openapi-extensions",
     "martincostello/SignInWithAppleSample",
+    "martincostello/sqllocaldb",
     "martincostello/website"
   ]
 }
