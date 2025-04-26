@@ -1,6 +1,11 @@
 {
   "checksOfInterest": [
+    "analysis (actions)",
+    "analysis (csharp)",
+    "analysis (javascript)",
+    "codeql",
     "code-ql",
+    "code-ql (actions)",
     "code-ql (csharp)",
     "code-ql (javascript)",
     "dependency-review",
