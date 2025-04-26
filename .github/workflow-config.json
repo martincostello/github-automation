@@ -30,6 +30,7 @@
     "martincostello/costellobot",
     "martincostello/dependabot-helper",
     "martincostello/dotnet-minimal-api-integration-testing",
+    "martincostello/dotnet-patch-automation-sample",
     "martincostello/openapi-extensions",
     "martincostello/SignInWithAppleSample",
     "martincostello/sqllocaldb",
