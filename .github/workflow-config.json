@@ -18,8 +18,10 @@
   "update-static-assets": [
     "martincostello/adventofcode",
     "martincostello/alexa-london-travel-site",
+    "martincostello/antiforgery-testing-application-part",
     "martincostello/api",
     "martincostello/apple-fitness-workout-mapper",
+    "martincostello/aspnet-core-pseudo-localization",
     "martincostello/aspnetcore-openapi",
     "martincostello/benchmarks",
     "martincostello/benchmarks-dashboard",
