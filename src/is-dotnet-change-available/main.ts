@@ -106,17 +106,6 @@ async function findDependencySha(
     return null;
   }
 
-  if (root.repo === 'dotnet') {
-    const manifestJson = await getFileContents(octokit, owner, root.repo, 'src/source-manifest.json', root.sha);
-    const manifest = JSON.parse(manifestJson) as SourceManifest;
-    if (manifest) {
-      const repository = manifest.repositories.find((repo) => repo.path === root.id);
-      if (repository) {
-        return repository.commitSha;
-      }
-    }
-  }
-
   const xml = await getFileContents(octokit, owner, root.repo, 'eng/Version.Details.xml', root.sha);
   let sha = getDependencySha(target.packageName, xml);
 
