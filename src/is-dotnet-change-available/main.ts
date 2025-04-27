@@ -12,10 +12,11 @@ const owner = 'dotnet';
 const repositoryNames = ['aspnetcore', 'efcore', 'installer', 'runtime', 'sdk'];
 
 function getDependencyGraph(version: LatestInstallerVersion): DependencyGraph {
-  const createRepository = (repo: string, dependencies: string[], packageName: string | null = null): ProductRepository => {
+  const createRepository = (id: string, useVmr: boolean, dependencies: string[], packageName: string | null = null): ProductRepository => {
+    const repo = useVmr ? 'dotnet' : id;
     return {
+      id,
       dependencies,
-      full_name: `dotnet/${repo}`,
       owner,
       packageName,
       repo,
@@ -23,20 +24,25 @@ function getDependencyGraph(version: LatestInstallerVersion): DependencyGraph {
     };
   };
 
-  const runtime = createRepository('runtime', [], 'Microsoft.NETCore.App.Ref');
-  const efcore = createRepository('efcore', [runtime.full_name], 'Microsoft.EntityFrameworkCore');
-  const aspnetcore = createRepository('aspnetcore', [runtime.full_name, efcore.full_name], 'Microsoft.AspNetCore.App.Ref');
-  const sdk = createRepository('sdk', [runtime.full_name, aspnetcore.full_name], 'Microsoft.NET.Sdk');
-  const installer = version.commits.installer ? createRepository('installer', [sdk.full_name]) : sdk;
+  const useVmr =
+    version.commits.runtime.commit === version.commits.aspnetcore.commit &&
+    version.commits.runtime.commit === version.commits.windowsdesktop.commit &&
+    version.commits.runtime.commit === version.commits.sdk.commit;
+
+  const runtime = createRepository('runtime', useVmr, [], 'Microsoft.NETCore.App.Ref');
+  const efcore = createRepository('efcore', useVmr, [runtime.id], 'Microsoft.EntityFrameworkCore');
+  const aspnetcore = createRepository('aspnetcore', useVmr, [runtime.id, efcore.id], 'Microsoft.AspNetCore.App.Ref');
+  const sdk = createRepository('sdk', useVmr, [runtime.id, aspnetcore.id], 'Microsoft.NET.Sdk');
+  const installer = version.commits.installer ? createRepository('installer', false, [sdk.id]) : sdk;
 
   return {
-    root: installer.full_name,
+    root: installer.id,
     nodes: {
-      [runtime.full_name]: runtime,
-      [efcore.full_name]: efcore,
-      [aspnetcore.full_name]: aspnetcore,
-      [sdk.full_name]: sdk,
-      [installer.full_name]: installer,
+      [runtime.id]: runtime,
+      [efcore.id]: efcore,
+      [aspnetcore.id]: aspnetcore,
+      [sdk.id]: sdk,
+      [installer.id]: installer,
     },
   };
 }
@@ -92,7 +98,7 @@ async function findDependencySha(
   target: ProductRepository,
   graph: DependencyGraph
 ): Promise<string | null> {
-  if (root.full_name === target.full_name) {
+  if (root.id === target.id) {
     return root.sha;
   }
 
@@ -100,7 +106,10 @@ async function findDependencySha(
     return null;
   }
 
-  const xml = await getFileContents(octokit, owner, root.repo, 'eng/Version.Details.xml', root.sha);
+  const pathSuffix = 'eng/Version.Details.xml';
+  const path = root.repo === 'dotnet' ? `src/${root.id}/${pathSuffix}` : pathSuffix;
+
+  const xml = await getFileContents(octokit, owner, root.repo, path, root.sha);
   let sha = getDependencySha(target.packageName, xml);
 
   if (!sha) {
@@ -162,8 +171,8 @@ export async function run(): Promise<void> {
       let repository: ProductRepository | null = null;
       if (sdkVersion) {
         for (const [, dependency] of Object.entries(graph.nodes)) {
-          dependency.sha = sdkVersion?.commits[dependency.repo]?.commit;
-          if (dependency.repo === repo) {
+          dependency.sha = sdkVersion?.commits[dependency.id]?.commit;
+          if (dependency.id === repo) {
             repository = dependency;
           }
         }
@@ -218,7 +227,7 @@ if (require.main === module) {
 }
 
 type ProductRepository = {
-  full_name: string;
+  id: string;
   owner: string;
   repo: string;
   dependencies: string[];
