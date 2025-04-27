@@ -25,7 +25,7 @@ export async function run(): Promise<void> {
     const repositories = (await getReposForCurrentUser(github, 'all')).map((repo) => repo.full_name);
     const { checksOfInterest } = await getWorkflowConfig(github, context);
 
-    let latestVersion: string;
+    let latestVersion = '';
 
     if (branch === dotnetNextBranch || !channel) {
       const releasesIndex = await getFileContents(github, 'dotnet', 'core', 'release-notes/releases-index.json', 'main');
@@ -36,9 +36,11 @@ export async function run(): Promise<void> {
       latestVersion = releases['releases-index'][0]['latest-sdk'];
     } else {
       const quality = core.getInput('quality', { required: false }) || 'daily';
-      const versionsFile = await fetch(`https://aka.ms/dotnet/${channel}/${quality}/sdk-productVersion.txt`);
-      const versions = await versionsFile.text();
-      latestVersion = versions.trim();
+      const versionsFile = await fetch(`https://aka.ms/dotnet/${channel}/${quality}/productCommit-win-x64.json`);
+      const versions = (await versionsFile.json()) as SdkProductCommits;
+      if (versions?.sdk?.version) {
+        latestVersion = versions.sdk.version.trim();
+      }
     }
 
     const report = ['# .NET vNext Upgrade Report', ''];
@@ -192,4 +194,16 @@ export async function run(): Promise<void> {
 
 if (require.main === module) {
   run();
+}
+
+interface ProductCommit {
+  commit: string;
+  version: string;
+}
+
+interface SdkProductCommits {
+  runtime: ProductCommit;
+  aspnetcore: ProductCommit;
+  windowsdesktop: ProductCommit;
+  sdk: ProductCommit;
 }
