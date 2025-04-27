@@ -106,10 +106,18 @@ async function findDependencySha(
     return null;
   }
 
-  const pathSuffix = 'eng/Version.Details.xml';
-  const path = root.repo === 'dotnet' ? `src/${root.id}/${pathSuffix}` : pathSuffix;
+  if (root.repo === 'dotnet') {
+    const manifestJson = await getFileContents(octokit, owner, root.repo, 'src/source-manifest.json', root.sha);
+    const manifest = JSON.parse(manifestJson) as SourceManifest;
+    if (manifest) {
+      const repository = manifest.repositories.find((repo) => repo.path === root.id);
+      if (repository) {
+        return repository.commitSha;
+      }
+    }
+  }
 
-  const xml = await getFileContents(octokit, owner, root.repo, path, root.sha);
+  const xml = await getFileContents(octokit, owner, root.repo, 'eng/Version.Details.xml', root.sha);
   let sha = getDependencySha(target.packageName, xml);
 
   if (!sha) {
@@ -128,6 +136,18 @@ async function findDependencySha(
   }
 
   return sha;
+}
+
+async function findDependencyShaForVmr(octokit: Octokit, id: string, sha: string): Promise<string | null> {
+  const manifestJson = await getFileContents(octokit, 'dotnet', 'dotnet', 'src/source-manifest.json', sha);
+  const manifest = JSON.parse(manifestJson) as SourceManifest;
+  if (manifest) {
+    const repository = manifest.repositories.find((repo) => repo.path === id);
+    if (repository) {
+      return repository.commitSha;
+    }
+  }
+  return null;
 }
 
 export async function run(): Promise<void> {
@@ -182,8 +202,11 @@ export async function run(): Promise<void> {
         throw new Error(`The ${repo} repository is not supported.`);
       }
 
-      const installer = graph.nodes[graph.root];
-      const sha = await findDependencySha(github, installer, repository, graph);
+      const root = graph.nodes[graph.root];
+      const sha =
+        root.repo === 'dotnet'
+          ? await findDependencyShaForVmr(github, repo, root.sha)
+          : await findDependencySha(github, root, repository, graph);
 
       if (sha) {
         const mergedAt = new Date(pull.merged_at);
@@ -256,4 +279,16 @@ type DependencyGraph = {
 type LatestInstallerVersion = {
   version: string;
   commits: SdkProductCommits;
+};
+
+type SourceManifest = {
+  repositories: SourceRepository[];
+};
+
+type SourceRepository = {
+  packageVersion: string;
+  barId: number | null;
+  path: string;
+  remoteUri: string;
+  commitSha: string;
 };
