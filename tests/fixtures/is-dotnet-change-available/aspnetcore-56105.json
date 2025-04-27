@@ -18,15 +18,7 @@
     },
     {
       "basePath": "https://aka.ms",
-      "path": "/dotnet/9.0/daily/sdk-productVersion.txt",
-      "response": "9.0.100-preview.6.24318.4",
-      "responseHeaders": {
-        "content-type": "text/plain"
-      }
-    },
-    {
-      "basePath": "https://ci.dot.net",
-      "path": "/public/Sdk/9.0.100-preview.6.24318.4/productCommit-win-x64.json",
+      "path": "/dotnet/9.0/daily/productCommit-win-x64.json",
       "response": {
         "runtime": {
           "commit": "8fac5af2b11dc98fa0504f6fd06df790164ec958",

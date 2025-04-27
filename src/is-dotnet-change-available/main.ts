@@ -59,31 +59,15 @@ function getDependencySha(name: string, xml: string): string | null {
 
 async function getLatestSdkVersion(channel: string): Promise<LatestInstallerVersion | null> {
   const quality = 'daily';
-  const versionUrl = `https://aka.ms/dotnet/${channel}/${quality}/sdk-productVersion.txt`;
 
   const init = {
     headers: new Headers([['User-Agent', 'martincostello/github-automation']]),
   };
 
-  let response = await fetch(versionUrl, init);
-
-  if (response.status && response.status >= 400) {
-    return null;
-  }
-
-  const contentType = response.headers.get('content-type');
-
-  if (!(contentType === 'text/plain' || contentType === 'application/octet-stream')) {
-    return null;
-  }
-
-  const versionRaw = await response.text();
-  const version = versionRaw.trim();
-
   const platform = 'win-x64';
-  const commitsUrl = `https://ci.dot.net/public/Sdk/${version}/productCommit-${platform}.json`;
+  const commitsUrl = `https://aka.ms/dotnet/${channel}/${quality}/productCommit-${platform}.json`;
 
-  response = await fetch(commitsUrl, init);
+  const response = await fetch(commitsUrl, init);
 
   if (response.status && response.status >= 400) {
     return null;
@@ -97,7 +81,7 @@ async function getLatestSdkVersion(channel: string): Promise<LatestInstallerVers
   }
 
   return {
-    version,
+    version: commits.sdk.version,
     commits,
   };
 }
