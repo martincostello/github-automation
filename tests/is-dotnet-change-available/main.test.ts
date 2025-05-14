@@ -9,22 +9,23 @@ import { setup } from '../fixtures';
 
 describe('is-dotnet-change-available', () => {
   describe.each([
-    ['aspnetcore', '50019'],
-    ['aspnetcore', '56105'],
-    ['efcore', '31453'],
-    ['installer', '17295'],
-    ['runtime', '90349'],
-    ['runtime', '91218'],
-    ['runtime', '91359'],
-    ['sdk', '35087'],
-  ])('for dotnet/%s#%s', (repository: string, pull: string) => {
+    ['aspnetcore', '50019', '9.0'],
+    ['aspnetcore', '56105', '9.0'],
+    ['aspnetcore', '61541', '10.0'],
+    ['efcore', '31453', '9.0'],
+    ['installer', '17295', '9.0'],
+    ['runtime', '90349', '9.0'],
+    ['runtime', '91218', '9.0'],
+    ['runtime', '91359', '9.0'],
+    ['sdk', '35087', '9.0'],
+  ])('for dotnet/%s#%s', (repository: string, pull: string, channel: string) => {
     let fixture: ActionFixture;
 
     beforeAll(async () => {
       await setup(`is-dotnet-change-available/${repository}-${pull}`);
       fixture = new ActionFixture(run);
       await fixture.run({
-        'channel': '9.0',
+        'channel': channel,
         'github-token': 'github-token',
         'pull-request': pull,
         'repository-name': repository,

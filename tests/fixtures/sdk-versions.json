@@ -10,13 +10,21 @@
     },
     {
       "basePath": "https://aka.ms",
-      "path": "/dotnet/8.0/daily/sdk-productVersion.txt",
-      "response": "8.0.100-rc.2.23418.10"
+      "path": "/dotnet/8.0/daily/productCommit-win-x64.json",
+      "response": {
+        "sdk":{
+          "version": "8.0.100-rc.2.23418.10"
+        }
+      }
     },
     {
       "basePath": "https://aka.ms",
-      "path": "/dotnet/8.0.1xx-rc1/daily/sdk-productVersion.txt",
-      "response": "8.0.100-rc.1.23417.18"
+      "path": "/dotnet/8.0.1xx-rc1/daily/productCommit-win-x64.json",
+      "response": {
+        "sdk":{
+          "version": "8.0.100-rc.1.23417.18"
+        }
+      }
     }
   ]
 }

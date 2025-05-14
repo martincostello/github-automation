@@ -1,6 +1,11 @@
 {
   "checksOfInterest": [
+    "analysis (actions)",
+    "analysis (csharp)",
+    "analysis (javascript)",
+    "codeql",
     "code-ql",
+    "code-ql (actions)",
     "code-ql (csharp)",
     "code-ql (javascript)",
     "dependency-review",
@@ -18,14 +23,22 @@
   "update-static-assets": [
     "martincostello/adventofcode",
     "martincostello/alexa-london-travel-site",
+    "martincostello/antiforgery-testing-application-part",
     "martincostello/api",
+    "martincostello/apple-fitness-workout-mapper",
+    "martincostello/aspnet-core-pseudo-localization",
+    "martincostello/aspnetcore-openapi",
     "martincostello/benchmarks",
     "martincostello/benchmarks-dashboard",
+    "martincostello/blog",
     "martincostello/cdn",
     "martincostello/costellobot",
     "martincostello/dependabot-helper",
+    "martincostello/dotnet-minimal-api-integration-testing",
+    "martincostello/dotnet-patch-automation-sample",
     "martincostello/openapi-extensions",
     "martincostello/SignInWithAppleSample",
+    "martincostello/sqllocaldb",
     "martincostello/website"
   ]
 }

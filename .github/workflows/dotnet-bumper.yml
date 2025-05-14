@@ -115,7 +115,7 @@ jobs:
           token: ${{ secrets.COSTELLOBOT_TOKEN }}
 
       - name: Setup Node
-        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4.3.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '22'
 
@@ -215,14 +215,7 @@ jobs:
             const bumperUrl = 'https://github.com/martincostello/dotnet-bumper';
             const workflowUrl = `${process.env.GITHUB_SERVER_URL}/${thisOwner}/${thisRepo}/actions/runs/${process.env.GITHUB_RUN_ID}`;
 
-            let draft = isPreview;
-
-            if (draft) {
-              // Private personal repositories do not support drafts
-              const { data: repository } = await github.rest.repos.get({ owner: theirOwner, repo: theirRepo });
-              draft = repository.owner.type !== 'User' || repository.private === false;
-            }
-
+            const draft = isPreview;
             const json = fs.readFileSync(process.env.DOTNET_BUMPER_LOG, 'utf8');
             const bumperLog = JSON.parse(json);
 

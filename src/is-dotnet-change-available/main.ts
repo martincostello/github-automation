@@ -12,10 +12,11 @@ const owner = 'dotnet';
 const repositoryNames = ['aspnetcore', 'efcore', 'installer', 'runtime', 'sdk'];
 
 function getDependencyGraph(version: LatestInstallerVersion): DependencyGraph {
-  const createRepository = (repo: string, dependencies: string[], packageName: string | null = null): ProductRepository => {
+  const createRepository = (id: string, useVmr: boolean, dependencies: string[], packageName: string | null = null): ProductRepository => {
+    const repo = useVmr ? 'dotnet' : id;
     return {
+      id,
       dependencies,
-      full_name: `dotnet/${repo}`,
       owner,
       packageName,
       repo,
@@ -23,20 +24,25 @@ function getDependencyGraph(version: LatestInstallerVersion): DependencyGraph {
     };
   };
 
-  const runtime = createRepository('runtime', [], 'Microsoft.NETCore.App.Ref');
-  const efcore = createRepository('efcore', [runtime.full_name], 'Microsoft.EntityFrameworkCore');
-  const aspnetcore = createRepository('aspnetcore', [runtime.full_name, efcore.full_name], 'Microsoft.AspNetCore.App.Ref');
-  const sdk = createRepository('sdk', [runtime.full_name, aspnetcore.full_name], 'Microsoft.NET.Sdk');
-  const installer = version.commits.installer ? createRepository('installer', [sdk.full_name]) : sdk;
+  const useVmr =
+    version.commits.runtime.commit === version.commits.aspnetcore.commit &&
+    version.commits.runtime.commit === version.commits.windowsdesktop.commit &&
+    version.commits.runtime.commit === version.commits.sdk.commit;
+
+  const runtime = createRepository('runtime', useVmr, [], 'Microsoft.NETCore.App.Ref');
+  const efcore = createRepository('efcore', useVmr, [runtime.id], 'Microsoft.EntityFrameworkCore');
+  const aspnetcore = createRepository('aspnetcore', useVmr, [runtime.id, efcore.id], 'Microsoft.AspNetCore.App.Ref');
+  const sdk = createRepository('sdk', useVmr, [runtime.id, aspnetcore.id], 'Microsoft.NET.Sdk');
+  const installer = version.commits.installer ? createRepository('installer', false, [sdk.id]) : sdk;
 
   return {
-    root: installer.full_name,
+    root: installer.id,
     nodes: {
-      [runtime.full_name]: runtime,
-      [efcore.full_name]: efcore,
-      [aspnetcore.full_name]: aspnetcore,
-      [sdk.full_name]: sdk,
-      [installer.full_name]: installer,
+      [runtime.id]: runtime,
+      [efcore.id]: efcore,
+      [aspnetcore.id]: aspnetcore,
+      [sdk.id]: sdk,
+      [installer.id]: installer,
     },
   };
 }
@@ -59,31 +65,15 @@ function getDependencySha(name: string, xml: string): string | null {
 
 async function getLatestSdkVersion(channel: string): Promise<LatestInstallerVersion | null> {
   const quality = 'daily';
-  const versionUrl = `https://aka.ms/dotnet/${channel}/${quality}/sdk-productVersion.txt`;
 
   const init = {
     headers: new Headers([['User-Agent', 'martincostello/github-automation']]),
   };
 
-  let response = await fetch(versionUrl, init);
-
-  if (response.status && response.status >= 400) {
-    return null;
-  }
-
-  const contentType = response.headers.get('content-type');
-
-  if (!(contentType === 'text/plain' || contentType === 'application/octet-stream')) {
-    return null;
-  }
-
-  const versionRaw = await response.text();
-  const version = versionRaw.trim();
-
   const platform = 'win-x64';
-  const commitsUrl = `https://ci.dot.net/public/Sdk/${version}/productCommit-${platform}.json`;
+  const commitsUrl = `https://aka.ms/dotnet/${channel}/${quality}/productCommit-${platform}.json`;
 
-  response = await fetch(commitsUrl, init);
+  const response = await fetch(commitsUrl, init);
 
   if (response.status && response.status >= 400) {
     return null;
@@ -97,7 +87,7 @@ async function getLatestSdkVersion(channel: string): Promise<LatestInstallerVers
   }
 
   return {
-    version,
+    version: commits.sdk.version,
     commits,
   };
 }
@@ -108,7 +98,7 @@ async function findDependencySha(
   target: ProductRepository,
   graph: DependencyGraph
 ): Promise<string | null> {
-  if (root.full_name === target.full_name) {
+  if (root.id === target.id) {
     return root.sha;
   }
 
@@ -135,6 +125,18 @@ async function findDependencySha(
   }
 
   return sha;
+}
+
+async function findDependencyShaForVmr(octokit: Octokit, id: string, sha: string): Promise<string | null> {
+  const manifestJson = await getFileContents(octokit, 'dotnet', 'dotnet', 'src/source-manifest.json', sha);
+  const manifest = JSON.parse(manifestJson) as SourceManifest;
+  if (manifest) {
+    const repository = manifest.repositories.find((repo) => repo.path === id);
+    if (repository) {
+      return repository.commitSha;
+    }
+  }
+  return null;
 }
 
 export async function run(): Promise<void> {
@@ -178,8 +180,8 @@ export async function run(): Promise<void> {
       let repository: ProductRepository | null = null;
       if (sdkVersion) {
         for (const [, dependency] of Object.entries(graph.nodes)) {
-          dependency.sha = sdkVersion?.commits[dependency.repo]?.commit;
-          if (dependency.repo === repo) {
+          dependency.sha = sdkVersion?.commits[dependency.id]?.commit;
+          if (dependency.id === repo) {
             repository = dependency;
           }
         }
@@ -189,8 +191,11 @@ export async function run(): Promise<void> {
         throw new Error(`The ${repo} repository is not supported.`);
       }
 
-      const installer = graph.nodes[graph.root];
-      const sha = await findDependencySha(github, installer, repository, graph);
+      const root = graph.nodes[graph.root];
+      const sha =
+        root.repo === 'dotnet'
+          ? await findDependencyShaForVmr(github, repo, root.sha)
+          : await findDependencySha(github, root, repository, graph);
 
       if (sha) {
         const mergedAt = new Date(pull.merged_at);
@@ -234,7 +239,7 @@ if (require.main === module) {
 }
 
 type ProductRepository = {
-  full_name: string;
+  id: string;
   owner: string;
   repo: string;
   dependencies: string[];
@@ -263,4 +268,16 @@ type DependencyGraph = {
 type LatestInstallerVersion = {
   version: string;
   commits: SdkProductCommits;
+};
+
+type SourceManifest = {
+  repositories: SourceRepository[];
+};
+
+type SourceRepository = {
+  packageVersion: string;
+  barId: number | null;
+  path: string;
+  remoteUri: string;
+  commitSha: string;
 };
