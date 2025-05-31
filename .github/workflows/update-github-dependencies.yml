@@ -150,12 +150,33 @@ jobs:
 
         foreach ($dependency in $dependencies) {
           $dependencyName = $dependency.name
-          $latestRelease = (gh api "/repos/$dependencyName/releases/latest" | ConvertFrom-Json)
-          $dependencyVersion = $latestRelease.tag_name.Trim().TrimStart('v')
+          $releases = (gh api "/repos/$dependencyName/releases" | ConvertFrom-Json)
           if ($LASTEXITCODE -ne 0) {
-            Write-Error "Failed to get the latest version for ${dependencyName}."
+            Write-Error "Failed to get releases for ${dependencyName}."
             exit $LASTEXITCODE
           }
+          
+          $stableReleases = $releases | Where-Object { 
+            $_.prerelease -eq $false -and
+            $_.draft -eq $false -and
+            $_.tag_name -notmatch '-(?:alpha|beta|rc|pre|preview|dev|nightly|snapshot|opentracing)'
+          }
+          
+          if ($stableReleases.Count -eq 0) {
+            Write-Warning "No stable releases found for ${dependencyName}, skipping."
+            continue
+          }
+          
+          $latestRelease = $stableReleases | Sort-Object {
+            $version = $_.tag_name.Trim().TrimStart('v')
+            try {
+              [System.Version]::new($version)
+            } catch {
+              $_.created_at
+            }
+          } -Descending | Select-Object -First 1
+          
+          $dependencyVersion = $latestRelease.tag_name.Trim().TrimStart('v')
           $dependency.version = $dependencyVersion
           $dependency.repo = "https://github.com/${dependencyName}"
           $dependency.url = $latestRelease.html_url
