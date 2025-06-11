@@ -70,8 +70,10 @@ export async function run(): Promise<void> {
           const runtimeVersion = latest['runtime'].version;
           const aspnetcoreVersion = latest['aspnetcore-runtime'].version;
 
+          packages.push(`runtime.linux-x64.Microsoft.DotNet.ILCompiler@${runtimeVersion}`);
           packages.push(`System.Text.Json@${runtimeVersion}`);
           packages.push(`Microsoft.NET.ILLink.Tasks@${runtimeVersion}`);
+          packages.push(`Microsoft.AspNetCore.App.Runtime.linux-x64@${aspnetcoreVersion}`);
           packages.push(`Microsoft.AspNetCore.Mvc.Testing@${aspnetcoreVersion}`);
         }
 

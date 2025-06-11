@@ -17762,7 +17762,7 @@
         "event_type":"dotnet_release",
         "client_payload": {
           "branch": "main",
-          "packages": "System.Text.Json@6.0.21,Microsoft.NET.ILLink.Tasks@6.0.21,Microsoft.AspNetCore.Mvc.Testing@6.0.21"
+          "packages": "runtime.linux-x64.Microsoft.DotNet.ILCompiler@6.0.21,System.Text.Json@6.0.21,Microsoft.NET.ILLink.Tasks@6.0.21,Microsoft.AspNetCore.App.Runtime.linux-x64@6.0.21,Microsoft.AspNetCore.Mvc.Testing@6.0.21"
         }
       },
       "response": {}
