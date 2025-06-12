@@ -24,7 +24,7 @@ describe('handle', () => {
 
     expect(core.error).toHaveBeenCalledTimes(2);
     expect(core.error).toHaveBeenCalledWith(err);
-    expect(core.error).toHaveBeenCalledWith(err.stack);
+    expect(core.error).toHaveBeenCalledWith(err.stack ?? '');
     expect(core.setFailed).toHaveBeenCalledTimes(1);
     expect(core.setFailed).toHaveBeenCalledWith(err.message);
   });
@@ -36,7 +36,7 @@ describe('handle', () => {
 
     expect(core.error).toHaveBeenCalledTimes(2);
     expect(core.error).toHaveBeenCalledWith(err);
-    expect(core.error).toHaveBeenCalledWith(err.stack);
+    expect(core.error).toHaveBeenCalledWith(err.stack ?? '');
     expect(core.setFailed).toHaveBeenCalledTimes(1);
     expect(core.setFailed).toHaveBeenCalledWith(err.message);
   });
