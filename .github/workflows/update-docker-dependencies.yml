@@ -69,6 +69,7 @@ jobs:
       cancel-in-progress: false
 
     env:
+      # renovate: datasource=github-releases depName=regclient packageName=regclient/regclient
       REGCLIENT_VERSION: 0.8.2
 
     strategy:
