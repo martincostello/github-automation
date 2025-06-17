@@ -24,7 +24,6 @@
     "martincostello/adventofcode",
     "martincostello/alexa-london-travel-site",
     "martincostello/antiforgery-testing-application-part",
-    "martincostello/api",
     "martincostello/apple-fitness-workout-mapper",
     "martincostello/aspnet-core-pseudo-localization",
     "martincostello/aspnetcore-openapi",
@@ -32,13 +31,11 @@
     "martincostello/benchmarks-dashboard",
     "martincostello/blog",
     "martincostello/cdn",
-    "martincostello/costellobot",
     "martincostello/dependabot-helper",
     "martincostello/dotnet-minimal-api-integration-testing",
     "martincostello/dotnet-patch-automation-sample",
     "martincostello/openapi-extensions",
     "martincostello/SignInWithAppleSample",
-    "martincostello/sqllocaldb",
-    "martincostello/website"
+    "martincostello/sqllocaldb"
   ]
 }
