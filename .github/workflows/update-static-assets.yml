@@ -33,11 +33,12 @@ jobs:
           GH_TOKEN: ${{ secrets.COSTELLOBOT_TOKEN }}
           REPOSITORY: ${{ github.event.inputs.repository || '' }}
         run: |
-          if (-Not [string]::IsNullOrEmpty(${env:REPOSITORY})) {
-            if (-Not ${env:REPOSITORY}.Contains('/')) {
-              ${env:REPOSITORY} = "${env:GITHUB_REPOSITORY_OWNER}/${env:REPOSITORY}"
+          $repo = ${env:REPOSITORY}
+          if (-Not [string]::IsNullOrEmpty($repo)) {
+            if (-Not $repo.Contains('/')) {
+              $repo = "${env:GITHUB_REPOSITORY_OWNER}/${repo}"
             }
-            $repos = @(${env:REPOSITORY})
+            $repos = @($repo)
           } else {
             $contents = gh api "repos/${env:GITHUB_REPOSITORY}/contents/.github/workflow-config.json?ref=${env:GITHUB_SHA}" | ConvertFrom-Json
             $repos = ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($contents.content)) | ConvertFrom-Json).'update-static-assets'
