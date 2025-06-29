@@ -22,12 +22,9 @@
   ],
   "update-static-assets": [
     "martincostello/antiforgery-testing-application-part",
-    "martincostello/apple-fitness-workout-mapper",
     "martincostello/aspnet-core-pseudo-localization",
     "martincostello/aspnetcore-openapi",
     "martincostello/benchmarks",
-    "martincostello/blog",
-    "martincostello/cdn",
     "martincostello/dotnet-minimal-api-integration-testing",
     "martincostello/dotnet-patch-automation-sample"
   ]
