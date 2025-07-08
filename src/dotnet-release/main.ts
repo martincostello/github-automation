@@ -71,10 +71,16 @@ export async function run(): Promise<void> {
           const aspnetcoreVersion = latest['aspnetcore-runtime'].version;
 
           packages.push(`runtime.linux-x64.Microsoft.DotNet.ILCompiler@${runtimeVersion}`);
-          packages.push(`System.Text.Json@${runtimeVersion}`);
           packages.push(`Microsoft.NET.ILLink.Tasks@${runtimeVersion}`);
+          packages.push(`Microsoft.NETCore.App.Runtime.linux-x64@${runtimeVersion}`);
           packages.push(`Microsoft.AspNetCore.App.Runtime.linux-x64@${aspnetcoreVersion}`);
           packages.push(`Microsoft.AspNetCore.Mvc.Testing@${aspnetcoreVersion}`);
+
+          const supportPhase = notes['support-phase'];
+
+          if (supportPhase === 'preview' || supportPhase === 'go-live' || parseFloat(notes['channel-version']) >= 9.0) {
+            packages.push(`System.Text.Json@${runtimeVersion}`);
+          }
         }
 
         // Remove the releases array from the release notes
