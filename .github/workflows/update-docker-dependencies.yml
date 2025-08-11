@@ -249,7 +249,7 @@ jobs:
 
         git checkout -b $BranchName
         git add .
-        git commit -m $CommitMessage
+        git commit -m $CommitMessage -s
         git push -u origin $BranchName
 
         "branch-name=${BranchName}" >> ${env:GITHUB_OUTPUT}

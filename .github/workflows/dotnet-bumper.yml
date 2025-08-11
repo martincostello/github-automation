@@ -181,7 +181,7 @@ jobs:
 
           git checkout -b $BranchName
           git add .
-          git commit -m "Update to .NET ${DotNetVersion}`n`nUpdate to .NET ${DotNetVersion} with .NET SDK version ${DotNetSdkVersion}."
+          git commit -m "Update to .NET ${DotNetVersion}`n`nUpdate to .NET ${DotNetVersion} with .NET SDK version ${DotNetSdkVersion}." -s
 
           if (${env:DRY_RUN} -ne "true") {
             git push -u origin $BranchName
