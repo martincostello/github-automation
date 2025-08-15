@@ -13,7 +13,7 @@ jobs:
     uses: ./.github/workflows/rebase.yml
     permissions:
       contents: read
-    secrets: inherit
+    secrets: inherit # zizmor: ignore[secrets-inherit] Usage is safe
     with:
       base: ${{ github.event.client_payload.ref_name }}
       branch: ${{ github.event.client_payload.ref_name == 'dotnet-vnext' && 'dotnet-nightly' || 'dotnet-vnext' }}

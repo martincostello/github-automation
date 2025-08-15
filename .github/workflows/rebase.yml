@@ -108,6 +108,7 @@ jobs:
         with:
           fetch-depth: 0
           filter: 'tree:0'
+          persist-credentials: true # zizmor: ignore[artipacked] Needed to push commits
           ref: ${{ inputs.branch }}
           repository: ${{ matrix.repo }}
           show-progress: false
