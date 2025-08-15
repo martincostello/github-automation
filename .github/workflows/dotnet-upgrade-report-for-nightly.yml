@@ -12,7 +12,7 @@ permissions: {}
 jobs:
   update-from-nightly:
     uses: ./.github/workflows/dotnet-upgrade-report.yml
-    secrets: inherit
+    secrets: inherit # zizmor: ignore[secrets-inherit] Usage is safe
     with:
       branch: 'dotnet-nightly'
       gist-id: ${{ vars.NIGHTLY_UPGRADE_REPORT_GIST_ID }}

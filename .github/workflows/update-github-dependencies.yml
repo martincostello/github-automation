@@ -96,6 +96,7 @@ jobs:
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         filter: 'tree:0'
+        persist-credentials: true # zizmor: ignore[artipacked] Needed to push commits
         show-progress: false
         ref: ${{ steps.get-default-branch.outputs.result }}
         repository: ${{ format('{0}/{1}', github.repository_owner, matrix.repo) }}
@@ -155,18 +156,18 @@ jobs:
             Write-Error "Failed to get releases for ${dependencyName}."
             exit $LASTEXITCODE
           }
-          
-          $stableReleases = $releases | Where-Object { 
+
+          $stableReleases = $releases | Where-Object {
             $_.prerelease -eq $false -and
             $_.draft -eq $false -and
             $_.tag_name -notmatch '-(?:alpha|beta|rc|pre|preview|dev|nightly|snapshot|opentracing)'
           }
-          
+
           if ($stableReleases.Count -eq 0) {
             Write-Warning "No stable releases found for ${dependencyName}, skipping."
             continue
           }
-          
+
           $latestRelease = $stableReleases | Sort-Object {
             $version = $_.tag_name.Trim().TrimStart('v')
             try {
@@ -175,7 +176,7 @@ jobs:
               $_.created_at
             }
           } -Descending | Select-Object -First 1
-          
+
           $dependencyVersion = $latestRelease.tag_name.Trim().TrimStart('v')
           $dependency.version = $dependencyVersion
           $dependency.repo = "https://github.com/${dependencyName}"
