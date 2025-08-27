@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`get-rebase-repos force=false for repository "" with base= outputs the correct repositories 1`] = `"["martincostello/adventofcode"]"`;
 

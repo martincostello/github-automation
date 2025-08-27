@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`dotnet-version-report generating a report outputs the Markdown report 1`] = `
 "# .NET SDK Version Report
