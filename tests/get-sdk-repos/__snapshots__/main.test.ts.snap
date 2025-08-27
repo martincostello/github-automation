@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`get-sdk-repos custom-config on dotnet-vnext for repository "martincostello/website" outputs the correct repositories 1`] = `"[{"channel":"","dotnet-prerelease-label":"","exclude-nuget-packages":"SomeExcludedPackage","include-nuget-packages":"SomeIncludedPackage","labels":"dependencies,.NET","quality":"","ref":"dotnet-vnext","repo":"martincostello/website","update-nuget-packages":false}]"`;
 

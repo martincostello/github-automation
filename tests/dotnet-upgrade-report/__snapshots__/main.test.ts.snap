@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`dotnet-upgrade-report failing-build for dotnet-vnext outputs the Markdown report 1`] = `
 "# .NET vNext Upgrade Report

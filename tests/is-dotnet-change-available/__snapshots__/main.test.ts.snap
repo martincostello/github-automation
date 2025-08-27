@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`is-dotnet-change-available for dotnet/aspnetcore#50019 outputs the Markdown report 1`] = `"The changes from [dotnet/aspnetcore#50019](https://github.com/dotnet/aspnetcore/pull/50019) are available in version \`9.0.100-alpha.1.23451.3\` of the .NET SDK."`;
 

@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`get-dotnet-repos multiple on main for repository "" outputs the correct repositories 1`] = `"[{"ref":"main","repo":"martincostello/adventofcode"},{"ref":"main","repo":"martincostello/alexa-london-travel"},{"ref":"main","repo":"martincostello/website"}]"`;
 
