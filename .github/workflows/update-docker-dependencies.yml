@@ -70,7 +70,7 @@ jobs:
 
     env:
       # renovate: datasource=github-releases depName=regclient packageName=regclient/regclient
-      REGCLIENT_VERSION: 0.9.1
+      REGCLIENT_VERSION: 0.9.2
 
     strategy:
       fail-fast: false
