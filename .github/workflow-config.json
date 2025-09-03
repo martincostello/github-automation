@@ -21,11 +21,6 @@
     "windows-latest"
   ],
   "update-static-assets": [
-    "martincostello/antiforgery-testing-application-part",
-    "martincostello/aspnet-core-pseudo-localization",
-    "martincostello/aspnetcore-openapi",
-    "martincostello/benchmarks",
-    "martincostello/dotnet-minimal-api-integration-testing",
     "martincostello/dotnet-patch-automation-sample"
   ]
 }
