@@ -1,0 +1,23 @@
+# Workaround for https://github.com/rhysd/actionlint/issues/559
+paths:
+  .github/workflows/dotnet-bumper.yml:
+    ignore:
+      - 'invalid runner name \"node24\"'
+  .github/workflows/dotnet-release.yml:
+    ignore:
+      - 'invalid runner name \"node24\"'
+  .github/workflows/dotnet-upgrade-report.yml:
+    ignore:
+      - 'invalid runner name \"node24\"'
+  .github/workflows/dotnet-version-report.yml:
+    ignore:
+      - 'invalid runner name \"node24\"'
+  .github/workflows/is-dotnet-change-available.yml:
+    ignore:
+      - 'invalid runner name \"node24\"'
+  .github/workflows/rebase.yml:
+    ignore:
+      - 'invalid runner name \"node24\"'
+  .github/workflows/update-dotnet-sdks.yml:
+    ignore:
+      - 'invalid runner name \"node24\"'
