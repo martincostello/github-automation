@@ -82,7 +82,7 @@ jobs:
         token: ${{ secrets.COSTELLOBOT_TOKEN }}
 
     - name: Update static assets
-      uses: martincostello/update-static-assets@b7457b21cbcf7db0a758f4b4ce8c76c0857f8c7e # v2.3.1
+      uses: martincostello/update-static-assets@0cf1bdb3e08a14b765fa2c8ba87f01b95c7fab07 # v3.0.0
       with:
         file-extensions: 'cshtml,erb,html,razor'
         labels: dependencies
