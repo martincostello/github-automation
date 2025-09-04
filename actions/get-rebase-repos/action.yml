@@ -15,7 +15,7 @@ inputs:
   force:
     description: 'Whether to rebase even if the branch has no conflicts.'
     required: false
-    default: false
+    default: 'false'
   github-token:
     description: 'The GitHub token to use.'
     required: false
@@ -28,5 +28,5 @@ outputs:
   repositories:
     description: 'A JSON array of the full names of repositories which need rebasing.'
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/main.js'
