@@ -26,7 +26,7 @@ export async function run(): Promise<void> {
     const { checksOfInterest } = await getWorkflowConfig(github, context);
 
     let latestVersion = '';
-    let latestVersionExact = true;
+    let latestVersionExact: boolean;
 
     if (branch === dotnetNextBranch || !channel) {
       const releasesIndex = await getFileContents(github, 'dotnet', 'core', 'release-notes/releases-index.json', 'main');
