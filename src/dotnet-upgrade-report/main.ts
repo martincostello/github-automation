@@ -26,6 +26,7 @@ export async function run(): Promise<void> {
     const { checksOfInterest } = await getWorkflowConfig(github, context);
 
     let latestVersion = '';
+    let latestVersionExact = true;
 
     if (branch === dotnetNextBranch || !channel) {
       const releasesIndex = await getFileContents(github, 'dotnet', 'core', 'release-notes/releases-index.json', 'main');
@@ -34,6 +35,7 @@ export async function run(): Promise<void> {
         throw new Error('No releases found in releases-index.json.');
       }
       latestVersion = releases['releases-index'][0]['latest-sdk'];
+      latestVersionExact = false;
     } else {
       const quality = core.getInput('quality', { required: false }) || 'daily';
       const versionsFile = await fetch(`https://aka.ms/dotnet/${channel}/${quality}/productCommit-win-x64.json`);
@@ -41,6 +43,7 @@ export async function run(): Promise<void> {
       if (versions?.sdk?.version) {
         latestVersion = versions.sdk.version.trim();
       }
+      latestVersionExact = true;
     }
 
     const report = ['# .NET vNext Upgrade Report', ''];
@@ -140,7 +143,7 @@ export async function run(): Promise<void> {
       const buildUrl = pull.html_url;
 
       const purple = '512BD4';
-      const sdkColor = sdkVersion === latestVersion ? purple : 'yellow';
+      const sdkColor = sdkVersion === latestVersion || (!latestVersionExact && latestVersion.startsWith(sdkVersion)) ? purple : 'yellow';
       const sdkBadge = getBadge('SDK', sdkVersion, sdkColor, 'dotnet');
       const sdkUrl = `${context.serverUrl}/${slug}/blob/${branch}/global.json#L${dotnetSdk.line}`;
 

@@ -50,7 +50,7 @@ export async function run(): Promise<void> {
       }
 
       const purple = '512BD4';
-      const sdkColor = sdkVersion === latestVersion ? purple : 'yellow';
+      const sdkColor = sdkVersion === latestVersion || latestVersion.startsWith(sdkVersion) ? purple : 'yellow';
       const sdkBadge = getBadge('SDK', sdkVersion, sdkColor, 'dotnet');
       const sdkUrl = `${context.serverUrl}/${slug}/blob/${branch}/global.json#L${dotnetSdk.line}`;
 
