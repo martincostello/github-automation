@@ -24,7 +24,6 @@ The following workflows are available.
 | [nuget-packages-published][nuget-packages-published]                         | Waits for one or more NuGet packages to be published and then comments on issues/PRs associated with their milestone.      |
 | [rebase][rebase]                                                             | Rebases a branch of one or more repositories onto a specified base branch.                                                 |
 | [rebase-pull-request][rebase-pull-request]                                   | Rebases a pull request onto the default branch of a repository in response to a comment on the pull request.               |
-| [update-docker-dependencies][update-docker-dependencies]                     | Checks for new versions of `uses: docker://`-format Actions and generates pull requests to update them.                    |
 | [update-dotnet-sdks][update-dotnet-sdks]                                     | Runs the `update-dotnet-sdk` workflow for one or more repositories for a specified branch.                                 |
 | [update-dotnet-sdks-for-nightly][update-dotnet-sdks-for-nightly]             | Runs the `update-dotnet-sdks` workflow daily for the `dotnet-nightly` branch.                                              |
 | [update-github-dependencies][update-github-dependencies]                     | Checks for new versions of GitHub projects and updates environment variables containing their version.                     |
@@ -210,7 +209,6 @@ This project is licensed under the [Apache 2.0][license] license.
 [rebase-pull-request]: ./.github/workflows/rebase-pull-request.yml
 [rebaser]: https://github.com/martincostello/rebaser
 [repository]: https://github.com/martincostello/github-automation "This project on GitHub.com"
-[update-docker-dependencies]: ./.github/workflows/update-docker-dependencies.yml
 [update-dotnet-sdk]: https://github.com/martincostello/update-dotnet-sdk/blob/main/.github/workflows/update-dotnet-sdk.yml
 [update-dotnet-sdk-schema]: ./.github/update-dotnet-sdk-schema.json
 [update-dotnet-sdks]: ./.github/workflows/update-dotnet-sdks.yml
