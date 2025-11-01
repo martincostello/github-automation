@@ -16,7 +16,7 @@ permissions: {}
 jobs:
 
   get-repos:
-    runs-on: [ ubuntu-latest ]
+    runs-on: [ ubuntu-slim ]
 
     concurrency:
       group: ${{ github.workflow }}
@@ -56,7 +56,7 @@ jobs:
   update-static-assets:
     name: 'update-${{ matrix.repo }}'
     needs: get-repos
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     if: needs.get-repos.outputs.repos != '[]'
 
     concurrency:
