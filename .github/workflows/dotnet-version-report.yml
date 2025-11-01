@@ -9,7 +9,7 @@ permissions: {}
 
 jobs:
   generate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     concurrency:
       group: ${{ github.workflow }}
       cancel-in-progress: false
