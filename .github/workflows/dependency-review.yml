@@ -8,7 +8,7 @@ permissions: {}
 
 jobs:
   dependency-review:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     if: github.event.repository.fork == false
 
     permissions:
