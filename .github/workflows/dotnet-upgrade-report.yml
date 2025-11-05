@@ -35,7 +35,7 @@ permissions: {}
 
 jobs:
   generate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     concurrency:
       group: '${{ github.workflow }}-${{ inputs.branch }}'
       cancel-in-progress: false
