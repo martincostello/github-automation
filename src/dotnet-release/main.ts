@@ -70,10 +70,22 @@ export async function run(): Promise<void> {
           const runtimeVersion = latest['runtime'].version;
           const aspnetcoreVersion = latest['aspnetcore-runtime'].version;
 
-          packages.push(`runtime.linux-x64.Microsoft.DotNet.ILCompiler@${runtimeVersion}`);
+          const rids = ['linux-x64', 'osx-arm64', 'win-x64'];
+
+          for (const rid of rids) {
+            packages.push(`runtime.${rid}.Microsoft.DotNet.ILCompiler@${runtimeVersion}`);
+          }
+
           packages.push(`Microsoft.NET.ILLink.Tasks@${runtimeVersion}`);
-          packages.push(`Microsoft.NETCore.App.Runtime.linux-x64@${runtimeVersion}`);
-          packages.push(`Microsoft.AspNetCore.App.Runtime.linux-x64@${aspnetcoreVersion}`);
+
+          for (const rid of rids) {
+            packages.push(`Microsoft.NETCore.App.Runtime.${rid}@${runtimeVersion}`);
+          }
+
+          for (const rid of rids) {
+            packages.push(`Microsoft.AspNetCore.App.Runtime.${rid}@${aspnetcoreVersion}`);
+          }
+
           packages.push(`Microsoft.AspNetCore.Mvc.Testing@${aspnetcoreVersion}`);
 
           const supportPhase = notes['support-phase'];
