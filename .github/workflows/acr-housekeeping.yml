@@ -32,7 +32,6 @@ jobs:
           - api
           - applepayjssample
           - costellobot
-          - dependabot-helper
           - home
           - signinwithapplesample
           - website
