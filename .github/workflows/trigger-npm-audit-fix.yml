@@ -60,5 +60,6 @@ jobs:
 
                 core.info(`Dispatched workflow in ${repo}.`);
               } catch (err) {
+                core.warning(`Failed to dispatch workflow in ${repo}: ${err}`);
               }
             }
