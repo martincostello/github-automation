@@ -1,17 +1,17 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`get-rebase-repos force=false for repository "" with base= outputs the correct repositories 1`] = `"["martincostello/adventofcode"]"`;
+exports[`get-rebase-repos > force=false for repository "" with base= > outputs the correct repositories 1`] = `"["martincostello/adventofcode"]"`;
 
-exports[`get-rebase-repos force=false for repository "" with base=main outputs the correct repositories 1`] = `"["martincostello/adventofcode"]"`;
+exports[`get-rebase-repos > force=false for repository "" with base=main > outputs the correct repositories 1`] = `"["martincostello/adventofcode"]"`;
 
-exports[`get-rebase-repos force=false for repository "" with base=some-other-branch outputs the correct repositories 1`] = `"[]"`;
+exports[`get-rebase-repos > force=false for repository "" with base=some-other-branch > outputs the correct repositories 1`] = `"[]"`;
 
-exports[`get-rebase-repos force=false for repository "martincostello/website" with base=main outputs the correct repositories 1`] = `"[]"`;
+exports[`get-rebase-repos > force=false for repository "martincostello/website" with base=main > outputs the correct repositories 1`] = `"[]"`;
 
-exports[`get-rebase-repos force=true for repository "" with base= outputs the correct repositories 1`] = `"["martincostello/adventofcode","martincostello/api","martincostello/website"]"`;
+exports[`get-rebase-repos > force=true for repository "" with base= > outputs the correct repositories 1`] = `"["martincostello/adventofcode","martincostello/api","martincostello/website"]"`;
 
-exports[`get-rebase-repos force=true for repository "" with base=main outputs the correct repositories 1`] = `"["martincostello/adventofcode","martincostello/api","martincostello/website"]"`;
+exports[`get-rebase-repos > force=true for repository "" with base=main > outputs the correct repositories 1`] = `"["martincostello/adventofcode","martincostello/api","martincostello/website"]"`;
 
-exports[`get-rebase-repos force=true for repository "" with base=some-other-branch outputs the correct repositories 1`] = `"["martincostello/adventofcode","martincostello/api","martincostello/website"]"`;
+exports[`get-rebase-repos > force=true for repository "" with base=some-other-branch > outputs the correct repositories 1`] = `"["martincostello/adventofcode","martincostello/api","martincostello/website"]"`;
 
-exports[`get-rebase-repos force=true for repository "martincostello/website" with base=main outputs the correct repositories 1`] = `"["martincostello/website"]"`;
+exports[`get-rebase-repos > force=true for repository "martincostello/website" with base=main > outputs the correct repositories 1`] = `"["martincostello/website"]"`;

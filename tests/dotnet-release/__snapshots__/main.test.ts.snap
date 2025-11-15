@@ -1,13 +1,13 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`dotnet-release multiple for ref 02369e7047c776f8cbf06aab76a7e8a79064bef9 outputs the correct SDK versions 1`] = `"["6.0.413","7.0.400","8.0.100-preview.7.23376.3"]"`;
+exports[`dotnet-release > multiple for ref 02369e7047c776f8cbf06aab76a7e8a79064bef9 > outputs the correct SDK versions 1`] = `"["6.0.413","7.0.400","8.0.100-preview.7.23376.3"]"`;
 
-exports[`dotnet-release no-new-commits for ref  outputs the correct SDK versions 1`] = `"[]"`;
+exports[`dotnet-release > no-new-commits for ref  > outputs the correct SDK versions 1`] = `"[]"`;
 
-exports[`dotnet-release no-new-commits for ref 6dc7506c307ddf3165cdd724ce1a5db4b31040a1 outputs the correct SDK versions 1`] = `"[]"`;
+exports[`dotnet-release > no-new-commits for ref 6dc7506c307ddf3165cdd724ce1a5db4b31040a1 > outputs the correct SDK versions 1`] = `"[]"`;
 
-exports[`dotnet-release no-releases for ref 53c167c2b0996ece03d56e20ff5977fdd16f3f9a outputs the correct SDK versions 1`] = `"[]"`;
+exports[`dotnet-release > no-releases for ref 53c167c2b0996ece03d56e20ff5977fdd16f3f9a > outputs the correct SDK versions 1`] = `"[]"`;
 
-exports[`dotnet-release preview for ref 02369e7047c776f8cbf06aab76a7e8a79064bef9 outputs the correct SDK versions 1`] = `"["8.0.100-preview.7.23376.3"]"`;
+exports[`dotnet-release > preview for ref 02369e7047c776f8cbf06aab76a7e8a79064bef9 > outputs the correct SDK versions 1`] = `"["8.0.100-preview.7.23376.3"]"`;
 
-exports[`dotnet-release stable for ref 02369e7047c776f8cbf06aab76a7e8a79064bef9 outputs the correct SDK versions 1`] = `"["6.0.413"]"`;
+exports[`dotnet-release > stable for ref 02369e7047c776f8cbf06aab76a7e8a79064bef9 > outputs the correct SDK versions 1`] = `"["6.0.413"]"`;

@@ -2,7 +2,7 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
 import { getOctokit as getClient } from '@actions/github';
-import { beforeAll, beforeEach, describe, expect, jest, test } from '@jest/globals';
+import { beforeAll, beforeEach, describe, expect, vi, test } from 'vitest';
 import {
   getDotNetSdk,
   getFileContents,
@@ -209,7 +209,7 @@ describe('getReposForCurrentUser', () => {
 
 describe('getPull', () => {
   const getOctokitForPulls = (responses: any | any[]): any => {
-    let mock = jest.fn();
+    let mock = vi.fn();
 
     if (!Array.isArray(responses)) {
       responses = [responses];
