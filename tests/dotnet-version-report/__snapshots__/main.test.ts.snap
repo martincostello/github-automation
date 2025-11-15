@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`dotnet-version-report generating a report outputs the Markdown report 1`] = `
+exports[`dotnet-version-report > generating a report > outputs the Markdown report 1`] = `
 "# .NET SDK Version Report
 
 | Repository | SDK Version |

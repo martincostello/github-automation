@@ -2,13 +2,14 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
 import * as core from '@actions/core';
-import { beforeEach, describe, expect, jest, test } from '@jest/globals';
+import { beforeEach, describe, expect, vi, test } from 'vitest';
 import { handle } from '../../src/shared/errors';
 
 describe('handle', () => {
   beforeEach(() => {
-    jest.spyOn(core, 'error').mockImplementation(() => {});
-    jest.spyOn(core, 'setFailed').mockImplementation(() => {});
+    vi.clearAllMocks();
+    vi.spyOn(core, 'error').mockImplementation(() => {});
+    vi.spyOn(core, 'setFailed').mockImplementation(() => {});
   });
 
   test('for Error', () => {
