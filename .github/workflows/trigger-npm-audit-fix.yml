@@ -35,11 +35,15 @@ jobs:
               const workflow_id = 'npm-audit-fix.yml';
 
               try {
-                await github.rest.repos.getContent({
-                  owner,
-                  repo,
-                  path: `.github/workflows/${workflow_id}`,
-                });
+                try {
+                  await github.rest.repos.getContent({
+                    owner,
+                    repo,
+                    path: `.github/workflows/${workflow_id}`,
+                  });
+                } catch {
+                  continue;
+                }
 
                 try {
                   await github.rest.repos.checkCollaborator({
