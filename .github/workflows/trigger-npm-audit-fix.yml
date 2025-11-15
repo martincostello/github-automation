@@ -1,0 +1,65 @@
+name: trigger-npm-audit-fix
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  trigger-npm-audit-fix:
+    runs-on: [ ubuntu-latest ]
+    timeout-minutes: 20
+
+    steps:
+      - name: Dispatch npm-audit-fix workflow
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        with:
+          github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const allRepos = await github.paginate(
+              github.rest.repos.listForUser, {
+                username: owner,
+                per_page: 100
+              },
+            );
+
+            const repositories = allRepos
+              .filter(r => !r.archived)
+              .filter(r => !r.fork);
+
+            const actor = (await github.rest.users.getAuthenticated()).data.login;
+
+            for (const repository of repositories) {
+              const repo = repository.name;
+              const workflow_id = 'npm-audit-fix.yml';
+
+              try {
+                await github.rest.repos.getContent({
+                  owner,
+                  repo,
+                  path: `.github/workflows/${workflow_id}`,
+                });
+
+                try {
+                  await github.rest.repos.checkCollaborator({
+                    owner,
+                    repo,
+                    username: actor,
+                  });
+                } catch {
+                  continue;
+                }
+
+                await github.rest.actions.createWorkflowDispatch({
+                  owner,
+                  repo,
+                  workflow_id,
+                  ref: repository.default_branch,
+                });
+
+                core.info(`Dispatched workflow in ${repo}.`);
+              } catch (err) {
+                core.warning(`Failed to dispatch workflow in ${repo}: ${err}`);
+              }
+            }
