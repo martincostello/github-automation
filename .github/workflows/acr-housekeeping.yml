@@ -14,7 +14,7 @@ env:
 jobs:
   purge:
     name: 'purge-${{ matrix.repository }}'
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
 
     environment:
       name: azure

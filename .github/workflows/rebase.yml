@@ -90,7 +90,7 @@ jobs:
     name: "rebase-${{ matrix.repo }}"
     needs: get-repos
     if: needs.get-repos.outputs.repos != '[]'
-    runs-on: [ ubuntu-slim ]
+    runs-on: [ ubuntu-latest ]
 
     concurrency:
       group: "rebase-${{ matrix.repo }}"
