@@ -13,7 +13,7 @@ permissions: read-all # zizmor: ignore[excessive-permissions] Recommended permis
 jobs:
   analysis:
     name: analysis
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
 
     permissions:
       id-token: write
