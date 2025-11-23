@@ -16,7 +16,7 @@ permissions: {}
 jobs:
 
   get-repos:
-    runs-on: [ ubuntu-slim ]
+    runs-on: [ ubuntu-latest ]
 
     concurrency:
       group: ${{ github.workflow }}

@@ -122,7 +122,7 @@ jobs:
       repo-token: ${{ secrets.COSTELLOBOT_TOKEN }}
 
   update-sdk-external:
-    runs-on: [ ubuntu-slim ]
+    runs-on: [ ubuntu-latest ]
     if: inputs.repository == ''
 
     concurrency:
