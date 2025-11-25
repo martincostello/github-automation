@@ -243,6 +243,11 @@ jobs:
               return;
             }
 
+            if (release.immutable) {
+              console.log(`Skipping release for version ${version} as it is immutable.`);
+              return;
+            }
+
             const release_id = release.id;
             core.debug(`Found release ${release.tag_name} (${release_id}).`);
 
