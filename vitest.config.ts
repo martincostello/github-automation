@@ -10,5 +10,6 @@ export default defineConfig({
       reporter: ['json', 'json-summary', 'text'],
       include: ['src/**/*.ts'],
     },
+    reporters: ['default', 'github-actions'],
   },
 });
