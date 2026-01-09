@@ -50,7 +50,7 @@
     "@octokit/plugin-paginate-rest": "14.0.0",
     "@octokit/plugin-rest-endpoint-methods": "11.0.1",
     "fast-xml-parser": "5.3.3",
-    "undici": "7.18.0"
+    "undici": "7.18.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "3.3.3",
