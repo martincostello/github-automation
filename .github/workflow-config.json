@@ -9,7 +9,6 @@
     "code-ql (csharp)",
     "code-ql (javascript)",
     "dependency-review",
-    "lighthouse",
     "lint",
     "linux",
     "macos",
