@@ -175,6 +175,6 @@ export async function getDotNetSdk(octokit: Octokit, owner: string, repo: string
   };
 }
 
-export type Octokit = import('@octokit/plugin-rest-endpoint-methods/dist-types/types').Api & {
+export type Octokit = import('@octokit/plugin-rest-endpoint-methods').Api & {
   paginate: import('@octokit/plugin-paginate-rest').PaginateInterface;
 };
