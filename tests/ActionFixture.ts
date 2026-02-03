@@ -75,7 +75,6 @@ export class ActionFixture {
   }
 
   private setupLogging(): void {
-    const self = this;
     const logger = (level: string, arg: string | Error) => {
       console.debug(`[${level}] ${arg}`);
     };
@@ -110,7 +109,7 @@ export class ActionFixture {
     });
 
     coreMock.summary.addRaw.mockImplementation((text: string) => {
-      self.stepSummary += text;
+      this.stepSummary += text;
       return core.summary;
     });
   }

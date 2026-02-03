@@ -31,4 +31,3 @@ vi.mock('@actions/core', async (importOriginal) => {
     },
   };
 });
-
