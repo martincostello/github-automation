@@ -2,11 +2,10 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
 import * as core from '@actions/core';
-import { getOctokit } from '@actions/github';
-import { Context } from '@actions/github/lib/context';
-import { UpdateDotNetSdkConfig } from '../shared/config';
-import { handle } from '../shared/errors';
-import { getDotNetSdk, getReposForCurrentUser, getUpdateConfiguration } from '../shared/github';
+import { context, getOctokit } from '@actions/github';
+import { UpdateDotNetSdkConfig } from '../shared/config.js';
+import { handle } from '../shared/errors.js';
+import { getDotNetSdk, getReposForCurrentUser, getUpdateConfiguration } from '../shared/github.js';
 
 type UpdateConfiguration = {
   'channel': string;
@@ -63,7 +62,6 @@ export async function run(): Promise<void> {
     let singleRepository = core.getInput('repository', { required: false });
 
     if (singleRepository && !singleRepository.includes('/')) {
-      const context = new Context();
       singleRepository = `${context.repo.owner}/${singleRepository}`;
     }
 

@@ -2,13 +2,12 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
 import * as core from '@actions/core';
-import { getOctokit } from '@actions/github';
-import { Context } from '@actions/github/lib/context';
+import { context, getOctokit } from '@actions/github';
 import { fetch } from 'undici';
-import { getBadge } from '../shared/badges';
-import { ReleasesIndex } from '../shared/dotnet';
-import { handle } from '../shared/errors';
-import { getDotNetSdk, getFileContents, getPull, getReposForCurrentUser, getWorkflowConfig } from '../shared/github';
+import { getBadge } from '../shared/badges.js';
+import { ReleasesIndex } from '../shared/dotnet.js';
+import { handle } from '../shared/errors.js';
+import { getDotNetSdk, getFileContents, getPull, getReposForCurrentUser, getWorkflowConfig } from '../shared/github.js';
 
 export async function run(): Promise<void> {
   try {
@@ -19,7 +18,6 @@ export async function run(): Promise<void> {
     const token = core.getInput('github-token', { required: false });
     const channel = core.getInput('channel', { required: false });
 
-    const context = new Context();
     const github = getOctokit(token);
 
     const repositories = (await getReposForCurrentUser(github, 'all')).map((repo) => repo.full_name);

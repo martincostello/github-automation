@@ -2,10 +2,9 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
 import * as core from '@actions/core';
-import { getOctokit } from '@actions/github';
-import { Context } from '@actions/github/lib/context';
-import { handle } from '../shared/errors';
-import { getDotNetSdk, getReposForCurrentUser } from '../shared/github';
+import { context, getOctokit } from '@actions/github';
+import { handle } from '../shared/errors.js';
+import { getDotNetSdk, getReposForCurrentUser } from '../shared/github.js';
 
 type DotNetRepository = {
   ref: string;
@@ -24,7 +23,6 @@ export async function run(): Promise<void> {
     let singleRepository = core.getInput('repository', { required: false });
 
     if (singleRepository && !singleRepository.includes('/')) {
-      const context = new Context();
       singleRepository = `${context.repo.owner}/${singleRepository}`;
     }
 

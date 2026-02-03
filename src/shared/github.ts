@@ -2,9 +2,11 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
 import { debug } from '@actions/core';
-import { Context } from '@actions/github/lib/context';
+import { context as githubContext } from '@actions/github';
 import { fetch } from 'undici';
-import { UpdateDotNetSdkConfig, WorkflowConfig } from './config';
+import { UpdateDotNetSdkConfig, WorkflowConfig } from './config.js';
+
+type Context = typeof githubContext;
 
 export async function getFileContents(octokit: Octokit, owner: string, repo: string, path: string, ref: string): Promise<string> {
   const { data: contents } = await octokit.rest.repos.getContent({

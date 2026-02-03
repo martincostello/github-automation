@@ -42,6 +42,12 @@ export default [
       'eslint-comments/no-use': 'off',
       'filenames/match-regex': 'off',
       'import/no-namespace': 'off',
+      'import/no-unresolved': [
+        'error',
+        {
+          ignore: ['\\.js$'],
+        },
+      ],
       'no-unused-vars': 'off',
       'semi': 'off',
       '@stylistic/semi': ['error', 'always'],

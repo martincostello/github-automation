@@ -3,9 +3,9 @@
 
 import * as core from '@actions/core';
 import { getOctokit } from '@actions/github';
-import { handle } from '../shared/errors';
+import { handle } from '../shared/errors.js';
 import { XMLParser } from 'fast-xml-parser';
-import { Octokit, getFileContents } from '../shared/github';
+import { Octokit, getFileContents } from '../shared/github.js';
 import { fetch } from 'undici';
 
 const owner = 'dotnet';

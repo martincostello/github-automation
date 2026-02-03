@@ -3,8 +3,8 @@
 
 import * as core from '@actions/core';
 import { getOctokit } from '@actions/github';
-import { handle } from '../shared/errors';
-import { getPull, getReposForCurrentUser } from '../shared/github';
+import { handle } from '../shared/errors.js';
+import { getPull, getReposForCurrentUser } from '../shared/github.js';
 
 export async function run(): Promise<void> {
   try {
