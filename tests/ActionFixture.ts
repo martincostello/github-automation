@@ -83,7 +83,6 @@ export class ActionFixture {
       };
     };
 
-    // Clear call counts
     coreMock.setFailed.mockClear();
     coreMock.debug.mockClear();
     coreMock.info.mockClear();
