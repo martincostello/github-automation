@@ -67,4 +67,3 @@ vi.mock('@actions/github', async (importOriginal) => {
     context: contextProxy,
   };
 });
-
