@@ -71,10 +71,35 @@ export class ActionFixture {
 
   private setupMocks(): void {
     // Mocks are already set up in tests/setup.ts for ESM compatibility
+    // Clear mock call counts before setting up implementations
+    const coreMock = core as unknown as {
+      setFailed: ReturnType<typeof vi.fn>;
+      debug: ReturnType<typeof vi.fn>;
+      info: ReturnType<typeof vi.fn>;
+      notice: ReturnType<typeof vi.fn>;
+      warning: ReturnType<typeof vi.fn>;
+      error: ReturnType<typeof vi.fn>;
+      summary: {
+        addRaw: ReturnType<typeof vi.fn>;
+        write: ReturnType<typeof vi.fn>;
+      };
+    };
+    
+    // Clear call counts
+    coreMock.setFailed.mockClear();
+    coreMock.debug.mockClear();
+    coreMock.info.mockClear();
+    coreMock.notice.mockClear();
+    coreMock.warning.mockClear();
+    coreMock.error.mockClear();
+    coreMock.summary.addRaw.mockClear();
+    coreMock.summary.write.mockClear();
+    
     this.setupLogging();
   }
 
   private setupLogging(): void {
+    const self = this;
     const logger = (level: string, arg: string | Error) => {
       console.debug(`[${level}] ${arg}`);
     };
@@ -109,7 +134,7 @@ export class ActionFixture {
     });
 
     coreMock.summary.addRaw.mockImplementation((text: string) => {
-      this.stepSummary += text;
+      self.stepSummary += text;
       return core.summary;
     });
   }
