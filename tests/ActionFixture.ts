@@ -70,35 +70,68 @@ export class ActionFixture {
   }
 
   private setupMocks(): void {
-    vi.spyOn(core, 'setFailed').mockImplementation(() => {});
+    const coreMock = core as unknown as {
+      setFailed: ReturnType<typeof vi.fn>;
+      debug: ReturnType<typeof vi.fn>;
+      info: ReturnType<typeof vi.fn>;
+      notice: ReturnType<typeof vi.fn>;
+      warning: ReturnType<typeof vi.fn>;
+      error: ReturnType<typeof vi.fn>;
+      summary: {
+        addRaw: ReturnType<typeof vi.fn>;
+        write: ReturnType<typeof vi.fn>;
+      };
+    };
+
+    coreMock.setFailed.mockClear();
+    coreMock.debug.mockClear();
+    coreMock.info.mockClear();
+    coreMock.notice.mockClear();
+    coreMock.warning.mockClear();
+    coreMock.error.mockClear();
+    coreMock.summary.addRaw.mockClear();
+    coreMock.summary.write.mockClear();
+
     this.setupLogging();
   }
 
   private setupLogging(): void {
+    const self = this;
     const logger = (level: string, arg: string | Error) => {
       console.debug(`[${level}] ${arg}`);
     };
 
-    vi.spyOn(core, 'debug').mockImplementation((arg) => {
+    const coreMock = core as unknown as {
+      debug: ReturnType<typeof vi.fn>;
+      info: ReturnType<typeof vi.fn>;
+      notice: ReturnType<typeof vi.fn>;
+      warning: ReturnType<typeof vi.fn>;
+      error: ReturnType<typeof vi.fn>;
+      summary: {
+        addRaw: ReturnType<typeof vi.fn>;
+        write: ReturnType<typeof vi.fn>;
+      };
+    };
+
+    coreMock.debug.mockImplementation((arg) => {
       logger('debug', arg);
     });
-    vi.spyOn(core, 'info').mockImplementation((arg) => {
+    coreMock.info.mockImplementation((arg) => {
       logger('info', arg);
     });
-    vi.spyOn(core, 'notice').mockImplementation((arg) => {
+    coreMock.notice.mockImplementation((arg) => {
       logger('notice', arg);
     });
-    vi.spyOn(core, 'warning').mockImplementation((arg) => {
+    coreMock.warning.mockImplementation((arg) => {
       logger('warning', arg);
     });
-    vi.spyOn(core, 'error').mockImplementation((arg) => {
+    coreMock.error.mockImplementation((arg) => {
       logger('error', arg);
     });
 
-    vi.spyOn(core.summary, 'addRaw').mockImplementation((text: string) => {
-      this.stepSummary += text;
+    coreMock.summary.addRaw.mockImplementation((text: string) => {
+      self.stepSummary += text;
       return core.summary;
     });
-    vi.spyOn(core.summary, 'write').mockReturnThis();
   }
 }
