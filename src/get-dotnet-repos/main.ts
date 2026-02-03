@@ -3,8 +3,8 @@
 
 import * as core from '@actions/core';
 import { context, getOctokit } from '@actions/github';
-import { handle } from '../shared/errors.js';
-import { getDotNetSdk, getReposForCurrentUser } from '../shared/github.js';
+import { handle } from '../shared/errors';
+import { getDotNetSdk, getReposForCurrentUser } from '../shared/github';
 
 type DotNetRepository = {
   ref: string;
@@ -65,6 +65,6 @@ export async function run(): Promise<void> {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (require.main === module) {
   run();
 }

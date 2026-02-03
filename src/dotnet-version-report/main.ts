@@ -3,10 +3,10 @@
 
 import * as core from '@actions/core';
 import { context, getOctokit } from '@actions/github';
-import { getBadge } from '../shared/badges.js';
-import { handle } from '../shared/errors.js';
-import { getFileContents, getDotNetSdk, getReposForCurrentUser } from '../shared/github.js';
-import { ReleaseChannel } from '../shared/dotnet.js';
+import { getBadge } from '../shared/badges';
+import { handle } from '../shared/errors';
+import { getFileContents, getDotNetSdk, getReposForCurrentUser } from '../shared/github';
+import { ReleaseChannel } from '../shared/dotnet';
 
 /* eslint-disable no-console */
 
@@ -61,6 +61,6 @@ export async function run(): Promise<void> {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (require.main === module) {
   run();
 }

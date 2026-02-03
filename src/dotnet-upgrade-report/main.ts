@@ -4,10 +4,10 @@
 import * as core from '@actions/core';
 import { context, getOctokit } from '@actions/github';
 import { fetch } from 'undici';
-import { getBadge } from '../shared/badges.js';
-import { ReleasesIndex } from '../shared/dotnet.js';
-import { handle } from '../shared/errors.js';
-import { getDotNetSdk, getFileContents, getPull, getReposForCurrentUser, getWorkflowConfig } from '../shared/github.js';
+import { getBadge } from '../shared/badges';
+import { ReleasesIndex } from '../shared/dotnet';
+import { handle } from '../shared/errors';
+import { getDotNetSdk, getFileContents, getPull, getReposForCurrentUser, getWorkflowConfig } from '../shared/github';
 
 export async function run(): Promise<void> {
   try {
@@ -193,7 +193,7 @@ export async function run(): Promise<void> {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (require.main === module) {
   run();
 }
 

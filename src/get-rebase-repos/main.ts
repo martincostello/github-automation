@@ -3,8 +3,8 @@
 
 import * as core from '@actions/core';
 import { getOctokit } from '@actions/github';
-import { handle } from '../shared/errors.js';
-import { getPull, getReposForCurrentUser } from '../shared/github.js';
+import { handle } from '../shared/errors';
+import { getPull, getReposForCurrentUser } from '../shared/github';
 
 export async function run(): Promise<void> {
   try {
@@ -88,6 +88,6 @@ export async function run(): Promise<void> {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (require.main === module) {
   run();
 }

@@ -70,8 +70,6 @@ export class ActionFixture {
   }
 
   private setupMocks(): void {
-    // Mocks are already set up in tests/setup.ts for ESM compatibility
-    // Clear mock call counts before setting up implementations
     const coreMock = core as unknown as {
       setFailed: ReturnType<typeof vi.fn>;
       debug: ReturnType<typeof vi.fn>;
@@ -84,7 +82,7 @@ export class ActionFixture {
         write: ReturnType<typeof vi.fn>;
       };
     };
-    
+
     // Clear call counts
     coreMock.setFailed.mockClear();
     coreMock.debug.mockClear();
@@ -94,7 +92,7 @@ export class ActionFixture {
     coreMock.error.mockClear();
     coreMock.summary.addRaw.mockClear();
     coreMock.summary.write.mockClear();
-    
+
     this.setupLogging();
   }
 
@@ -104,7 +102,6 @@ export class ActionFixture {
       console.debug(`[${level}] ${arg}`);
     };
 
-    // Get the mocked functions and set up their implementation
     const coreMock = core as unknown as {
       debug: ReturnType<typeof vi.fn>;
       info: ReturnType<typeof vi.fn>;

@@ -3,9 +3,9 @@
 
 import * as core from '@actions/core';
 import { context, getOctokit } from '@actions/github';
-import { UpdateDotNetSdkConfig } from '../shared/config.js';
-import { handle } from '../shared/errors.js';
-import { getDotNetSdk, getReposForCurrentUser, getUpdateConfiguration } from '../shared/github.js';
+import { UpdateDotNetSdkConfig } from '../shared/config';
+import { handle } from '../shared/errors';
+import { getDotNetSdk, getReposForCurrentUser, getUpdateConfiguration } from '../shared/github';
 
 type UpdateConfiguration = {
   'channel': string;
@@ -123,6 +123,6 @@ export async function run(): Promise<void> {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (require.main === module) {
   run();
 }

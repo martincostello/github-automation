@@ -4,7 +4,7 @@
 import { debug } from '@actions/core';
 import { context as githubContext } from '@actions/github';
 import { fetch } from 'undici';
-import { UpdateDotNetSdkConfig, WorkflowConfig } from './config.js';
+import { UpdateDotNetSdkConfig, WorkflowConfig } from './config';
 
 type Context = typeof githubContext;
 
