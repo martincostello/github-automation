@@ -43,9 +43,9 @@
   },
   "homepage": "https://github.com/martincostello/github-automation#readme",
   "dependencies": {
-    "@actions/core": "2.0.3",
+    "@actions/core": "3.0.0",
     "@actions/exec": "3.0.0",
-    "@actions/github": "8.0.1",
+    "@actions/github": "9.0.0",
     "@actions/io": "3.0.2",
     "@octokit/plugin-paginate-rest": "14.0.0",
     "@octokit/plugin-rest-endpoint-methods": "17.0.0",

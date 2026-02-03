@@ -2,8 +2,7 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
 import * as core from '@actions/core';
-import { getOctokit } from '@actions/github';
-import { Context } from '@actions/github/lib/context';
+import { context, getOctokit } from '@actions/github';
 import { isPreview, ReleaseChannel } from '../shared/dotnet';
 import { handle } from '../shared/errors';
 import { getFileContents } from '../shared/github';
@@ -15,7 +14,6 @@ export async function run(): Promise<void> {
     const githubToken = core.getInput('github-token', { required: false });
     const previousSha = core.getInput('ref', { required: false });
 
-    const context = new Context();
     let github = getOctokit(githubToken);
 
     const owner = 'dotnet';
