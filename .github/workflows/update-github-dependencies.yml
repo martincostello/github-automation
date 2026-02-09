@@ -153,14 +153,6 @@ jobs:
             target="POWERSHELL_YAML_VERSION";
           },
           @{
-            name="grafana/k6";
-            target="K6_VERSION";
-          },
-          @{
-            name="grafana/pyroscope-dotnet";
-            target="PYROSCOPE_VERSION";
-          },
-          @{
             name="lindell/multi-gitter";
             target="MULTI_GITTER_VERSION";
           },
