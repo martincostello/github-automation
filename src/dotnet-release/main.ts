@@ -75,10 +75,14 @@ export async function run(): Promise<void> {
           }
 
           packages.push(`Microsoft.NET.ILLink.Tasks@${runtimeVersion}`);
+          packages.push(`Microsoft.NETCore.App.Ref@${runtimeVersion}`);
 
           for (const rid of rids) {
+            packages.push(`Microsoft.NETCore.App.Host.${rid}@${runtimeVersion}`);
             packages.push(`Microsoft.NETCore.App.Runtime.${rid}@${runtimeVersion}`);
           }
+
+          packages.push(`Microsoft.AspNetCore.App.Ref@${aspnetcoreVersion}`);
 
           for (const rid of rids) {
             packages.push(`Microsoft.AspNetCore.App.Runtime.${rid}@${aspnetcoreVersion}`);
