@@ -18,6 +18,7 @@ jobs:
 
     environment:
       name: azure
+      deployment: false
 
     permissions:
       id-token: write
