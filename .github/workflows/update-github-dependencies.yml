@@ -161,10 +161,6 @@ jobs:
             target="PESTER_VERSION";
           },
           @{
-            name="PowerShell/PSScriptAnalyzer";
-            target="PSSCRIPTANALYZER_VERSION";
-          },
-          @{
             name="regclient/regclient";
             target="REGCLIENT_VERSION";
           },
