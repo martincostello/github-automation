@@ -6,7 +6,7 @@ import { getOctokit } from '@actions/github';
 import { handle } from '../shared/errors';
 import { XMLParser } from 'fast-xml-parser';
 import { Octokit, getFileContents } from '../shared/github';
-import { fetch } from 'undici';
+import { fetch, Headers } from 'undici';
 
 const owner = 'dotnet';
 const repositoryNames = ['aspnetcore', 'efcore', 'installer', 'runtime', 'sdk'];
