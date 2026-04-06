@@ -32,6 +32,7 @@ vi.mock('@actions/core', async (importOriginal) => {
 
 vi.mock('@actions/github', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@actions/github')>();
+  const { fetch: undiciFetch } = await import('undici');
 
   const contextProxy = new Proxy(
     {},
@@ -62,5 +63,8 @@ vi.mock('@actions/github', async (importOriginal) => {
   return {
     ...actual,
     context: contextProxy,
+    getOctokit: (token: string, options?: Parameters<typeof actual.getOctokit>[1]) => {
+      return actual.getOctokit(token, { ...options, request: { ...options?.request, fetch: undiciFetch as typeof fetch } });
+    },
   };
 });
