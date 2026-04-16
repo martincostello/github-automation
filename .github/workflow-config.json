@@ -9,6 +9,7 @@
     "code-ql (csharp)",
     "code-ql (javascript)",
     "dependency-review",
+    "integration-tests",
     "lint",
     "linux",
     "macos",
