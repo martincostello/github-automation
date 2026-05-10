@@ -62,7 +62,7 @@ jobs:
   update-github-dependencies:
     name: 'update-github-dependencies-${{ matrix.repo }}'
     needs: [ get-repos ]
-    runs-on: [ ubuntu-latest ]
+    runs-on: [ ubuntu-24.04 ]
 
     concurrency:
       group: 'update-github-dependencies-${{ matrix.repo }}'
