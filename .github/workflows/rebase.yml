@@ -90,7 +90,7 @@ jobs:
     name: "rebase-${{ matrix.repo }}"
     needs: get-repos
     if: needs.get-repos.outputs.repos != '[]'
-    runs-on: [ ubuntu-latest ]
+    runs-on: [ ubuntu-24.04 ]
 
     concurrency:
       group: "rebase-${{ matrix.repo }}"
