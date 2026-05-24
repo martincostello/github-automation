@@ -1,0 +1,24 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://costellobot.martincostello.com",
+      "method": "POST",
+      "path": "/github-token",
+      "headers": {
+        "authorization": "Bearer fake-oidc-token",
+        "content-type": "application/json",
+        "user-agent": "martincostello/github-automation"
+      },
+      "body": {
+        "profile": "costellobot"
+      },
+      "status": 401,
+      "response": {
+        "type": "https://tools.ietf.org/html/rfc9110#section-15.5.2",
+        "title": "Unauthorized",
+        "status": 401,
+        "detail": "The supplied OIDC token is invalid."
+      }
+    }
+  ]
+}
