@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://costellobot.martincostello.com",
+      "method": "POST",
+      "path": "/github-token",
+      "headers": {
+        "authorization": "Bearer fake-oidc-token",
+        "content-type": "application/json",
+        "user-agent": "martincostello/github-automation"
+      },
+      "body": {
+        "profile": "costellobot"
+      },
+      "response": null
+    }
+  ]
+}
