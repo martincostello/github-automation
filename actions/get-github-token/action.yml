@@ -11,6 +11,8 @@ inputs:
 outputs:
   token:
     description: 'A GitHub token for the specified profile.'
+  token-type:
+    description: 'The type of the GitHub token.'
 runs:
   using: 'node24'
   main: 'dist/main.js'

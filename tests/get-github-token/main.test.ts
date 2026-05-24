@@ -38,7 +38,7 @@ describe('get-github-token', () => {
       expect(core.setSecret).toHaveBeenCalledWith('fake-github-token');
     });
 
-    test.each(['token'])('the %s output is correct', (name: string) => {
+    test.each(['token', 'token-type'])('the %s output is correct', (name: string) => {
       expect(fixture.getOutput(name)).toMatchSnapshot();
     });
   });

@@ -44,7 +44,9 @@ export async function run(): Promise<void> {
     }
 
     core.setSecret(githubToken.token);
+
     core.setOutput('token', githubToken.token);
+    core.setOutput('token-type', githubToken.type);
   } catch (error) {
     handle(error);
   }
@@ -60,4 +62,5 @@ type TokenRequest = {
 
 type TokenResponse = {
   token: string;
+  type: 'app' | 'user';
 };

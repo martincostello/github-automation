@@ -13,7 +13,8 @@
         "profile": "costellobot"
       },
       "response": {
-        "token": "fake-github-token"
+        "token": "fake-github-token",
+        "type": "app"
       }
     }
   ]
