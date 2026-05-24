@@ -37,7 +37,7 @@ permissions: {}
 
 jobs:
   get-repos:
-    runs-on: [ ubuntu-slim ]
+    runs-on: ubuntu-slim
 
     concurrency:
       group: ${{ github.workflow }}
@@ -66,7 +66,7 @@ jobs:
   upgrade-dotnet:
     name: 'upgrade-${{ matrix.repo }}'
     needs: [ get-repos ]
-    runs-on: [ ubuntu-24.04 ]
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     if: needs.get-repos.outputs.repositories != '[]'
 
