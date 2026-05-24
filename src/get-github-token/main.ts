@@ -37,10 +37,10 @@ export async function run(): Promise<void> {
       throw new Error(`Failed to get GitHub token from broker. Status: ${response.status}, Body: ${await response.text()}`);
     }
 
-    const githubToken = (await response.json()) as TokenResponse;
+    const githubToken = (await response.json()) as Partial<TokenResponse> | null;
 
-    if (!githubToken) {
-      throw new Error('Failed to get GitHub token from broker.');
+    if (typeof githubToken?.token !== 'string' || !githubToken.token) {
+      throw new Error('Failed to get GitHub token from broker. No token was returned.');
     }
 
     core.setSecret(githubToken.token);

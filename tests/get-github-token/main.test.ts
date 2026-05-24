@@ -107,4 +107,43 @@ describe('get-github-token', () => {
       expect(fixture.getOutput('token')).toBeUndefined();
     });
   });
+
+  describe.each([
+    ['missing-token', 'an object without a token'],
+    ['empty-token', 'an object with an empty token'],
+    ['null-token', 'a null response body'],
+  ])('when the broker returns %s', (name: string) => {
+    let fixture: ActionFixture;
+
+    beforeAll(async () => {
+      await setup(`get-github-token/${name}`);
+
+      vi.spyOn(core, 'getIDToken').mockResolvedValue('fake-oidc-token');
+      vi.spyOn(core, 'setSecret').mockImplementation(() => {});
+
+      fixture = new ActionFixture(run);
+      await fixture.run({
+        'profile-name': 'costellobot',
+      });
+    });
+
+    afterAll(async () => {
+      vi.restoreAllMocks();
+      await fixture?.destroy();
+    });
+
+    test('fails the action', () => {
+      expect(core.error).toHaveBeenCalledTimes(2);
+      expect(core.setFailed).toHaveBeenCalledTimes(1);
+      expect(core.setFailed).toHaveBeenCalledWith('Failed to get GitHub token from broker. No token was returned.');
+    });
+
+    test('does not mask the token', () => {
+      expect(core.setSecret).toHaveBeenCalledTimes(0);
+    });
+
+    test('does not output a token', () => {
+      expect(fixture.getOutput('token')).toBeUndefined();
+    });
+  });
 });
