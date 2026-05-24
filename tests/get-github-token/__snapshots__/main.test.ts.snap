@@ -1,3 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`get-github-token > when the broker returns a token > the token output is correct 1`] = `"fake-github-token"`;
+
+exports[`get-github-token > when the broker returns a token > the token-type output is correct 1`] = `"app"`;
