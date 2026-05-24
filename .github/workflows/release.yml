@@ -1,0 +1,73 @@
+name: release
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'The name of the action to release.'
+        required: true
+        type: choice
+        options:
+          - 'get-github-token'
+      publish:
+        description: 'If true, does not create the release as a draft.'
+        required: false
+        type: boolean
+        default: false
+
+permissions: {}
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+
+    concurrency:
+      group: ${{ github.workflow }}
+      cancel-in-progress: false
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          filter: 'tree:0'
+          persist-credentials: false
+          show-progress: false
+
+      - name: Get version
+        id: get-version
+        shell: pwsh
+        run: |
+          $fileName = Join-Path "." "package.json"
+          $json = (Get-Content $fileName | Out-String | ConvertFrom-Json)
+          $version = $json.version
+          "version=${version}" >> $env:GITHUB_OUTPUT
+
+      - name: Create release
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          ACTION: ${{ inputs.action }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          DRAFT: ${{ inputs.publish != true }}
+          VERSION: ${{ steps.get-version.outputs.version }}
+        with:
+          github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
+          script: |
+            const { repo, owner } = context.repo;
+            const draft = process.env.DRAFT === 'true';
+            const version = process.env.VERSION;
+            const tag_name = `${process.env.ACTION}/v${version}`;
+            const target_commitish = process.env.DEFAULT_BRANCH;
+            const name = `${process.env.ACTION} v${version}`;
+
+            const { data: release } = await github.rest.repos.createRelease({
+              owner,
+              repo,
+              tag_name,
+              target_commitish,
+              name,
+              draft,
+              generate_release_notes: true,
+            });
+
+            core.notice(`Created release ${release.name}: ${release.html_url}`);

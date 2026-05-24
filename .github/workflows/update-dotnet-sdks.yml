@@ -36,7 +36,7 @@ permissions: {}
 
 jobs:
   get-repos:
-    runs-on: [ ubuntu-24.04 ]
+    runs-on: ubuntu-24.04
 
     concurrency:
       group: ${{ github.workflow }}
@@ -122,7 +122,7 @@ jobs:
       repo-token: ${{ secrets.COSTELLOBOT_TOKEN }}
 
   update-sdk-external:
-    runs-on: [ ubuntu-24.04 ]
+    runs-on: ubuntu-24.04
     if: inputs.repository == ''
 
     concurrency:
