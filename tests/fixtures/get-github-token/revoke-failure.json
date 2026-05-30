@@ -1,0 +1,13 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "method": "DELETE",
+      "path": "/installation/token",
+      "status": 401,
+      "response": {
+        "message": "Bad credentials"
+      }
+    }
+  ]
+}

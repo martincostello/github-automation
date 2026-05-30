@@ -15,6 +15,7 @@ describe('get-github-token', () => {
       await setup('get-github-token/success');
 
       vi.spyOn(core, 'getIDToken').mockResolvedValue('fake-oidc-token');
+      vi.spyOn(core, 'saveState').mockImplementation(() => {});
       vi.spyOn(core, 'setSecret').mockImplementation(() => {});
 
       fixture = new ActionFixture(run);
@@ -38,8 +39,54 @@ describe('get-github-token', () => {
       expect(core.setSecret).toHaveBeenCalledWith('fake-github-token');
     });
 
+    test('saves the app token for the post action', () => {
+      expect(core.saveState).toHaveBeenCalledTimes(1);
+      expect(core.saveState).toHaveBeenCalledWith('token', 'fake-github-token');
+    });
+
     test.each(['token', 'token-type'])('the %s output is correct', (name: string) => {
       expect(fixture.getOutput(name)).toMatchSnapshot();
+    });
+  });
+
+  describe('when the broker returns a user token', () => {
+    let fixture: ActionFixture;
+
+    beforeAll(async () => {
+      await setup('get-github-token/success-user');
+
+      vi.spyOn(core, 'getIDToken').mockResolvedValue('fake-oidc-token');
+      vi.spyOn(core, 'saveState').mockImplementation(() => {});
+      vi.spyOn(core, 'setSecret').mockImplementation(() => {});
+
+      fixture = new ActionFixture(run);
+      await fixture.run({
+        'profile-name': 'costellobot',
+      });
+    });
+
+    afterAll(async () => {
+      vi.restoreAllMocks();
+      await fixture?.destroy();
+    });
+
+    test('generates no errors', () => {
+      expect(core.error).toHaveBeenCalledTimes(0);
+      expect(core.setFailed).toHaveBeenCalledTimes(0);
+    });
+
+    test('masks the token', () => {
+      expect(core.setSecret).toHaveBeenCalledTimes(1);
+      expect(core.setSecret).toHaveBeenCalledWith('fake-github-token');
+    });
+
+    test('does not save the token for revocation', () => {
+      expect(core.saveState).toHaveBeenCalledTimes(0);
+    });
+
+    test('outputs the user token details', () => {
+      expect(fixture.getOutput('token')).toBe('fake-github-token');
+      expect(fixture.getOutput('token-type')).toBe('user');
     });
   });
 
