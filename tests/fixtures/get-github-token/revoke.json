@@ -1,0 +1,11 @@
+{
+  "scenarios": [
+    {
+      "basePath": "https://api.github.com",
+      "method": "DELETE",
+      "path": "/installation/token",
+      "status": 204,
+      "response": ""
+    }
+  ]
+}

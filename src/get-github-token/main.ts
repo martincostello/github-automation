@@ -47,6 +47,11 @@ export async function run(): Promise<void> {
 
     core.setOutput('token', githubToken.token);
     core.setOutput('token-type', githubToken.type);
+
+    if (githubToken.type === 'app') {
+      // Make token accessible to post function to invalidate if needed
+      core.saveState('token', githubToken.token);
+    }
   } catch (error) {
     handle(error);
   }

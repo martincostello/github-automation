@@ -16,3 +16,4 @@ outputs:
 runs:
   using: 'node24'
   main: 'dist/main.js'
+  post: 'dist/post.js'
