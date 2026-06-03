@@ -218,7 +218,8 @@ jobs:
               state: 'open',
             });
 
-            const milestone = milestones.find((p) => p.title === process.env.RELEASE_VERSION);
+            const title = process.env.RELEASE_VERSION.split('/').pop();
+            const milestone = milestones.find((p) => p.title === title);
 
             if (!milestone) {
               return;
