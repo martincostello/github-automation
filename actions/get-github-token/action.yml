@@ -13,6 +13,10 @@ outputs:
     description: 'A GitHub token for the specified profile.'
   token-type:
     description: 'The type of the GitHub token.'
+  app-id:
+    description: 'If the token type is "app", the ID of the GitHub App.'
+  app-slug:
+    description: 'If the token type is "app", the slug of the GitHub App.'
 runs:
   using: 'node24'
   main: 'dist/main.js'

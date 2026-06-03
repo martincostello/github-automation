@@ -14,7 +14,9 @@
       },
       "response": {
         "token": "fake-github-token",
-        "type": "app"
+        "type": "app",
+        "appId": 123456,
+        "appSlug": "costellobot"
       }
     }
   ]
