@@ -188,3 +188,50 @@ jobs:
             } catch (error) {
               // Ignore
             }
+
+  close-milestone:
+    runs-on: ubuntu-24.04
+    if: github.event_name == 'release'
+
+    concurrency:
+      group: ${{ github.workflow }}
+      cancel-in-progress: false
+
+    permissions:
+      issues: write
+
+    steps:
+
+      - name: Close milestone
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          RELEASE_DATE: ${{ github.event.release.published_at }}
+          RELEASE_VERSION: ${{ github.event.release.tag_name }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { repo, owner } = context.repo;
+
+            const { data: milestones } = await github.rest.issues.listMilestones({
+              owner,
+              repo,
+              state: 'open',
+            });
+
+            const milestone = milestones.find((p) => p.title === process.env.RELEASE_VERSION);
+
+            if (!milestone) {
+              return;
+            }
+
+            try {
+              await github.rest.issues.updateMilestone({
+                owner,
+                repo,
+                milestone_number: milestone.number,
+                state: 'closed',
+                due_on: process.env.RELEASE_DATE,
+              });
+            } catch (error) {
+              // Ignore
+            }
