@@ -65,7 +65,7 @@ jobs:
 
     permissions: {}
 
-    runs-on: [ ubuntu-slim ]
+    runs-on: ubuntu-slim
 
     steps:
 
