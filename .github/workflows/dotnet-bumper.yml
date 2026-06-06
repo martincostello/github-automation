@@ -38,10 +38,15 @@ permissions: {}
 jobs:
   get-repos:
     runs-on: ubuntu-slim
+    timeout-minutes: 10
 
     concurrency:
       group: ${{ github.workflow }}
       cancel-in-progress: false
+
+    environment:
+      name: dotnet-bumper
+      deployment: false
 
     outputs:
       repositories: ${{ steps.get-repos.outputs.repositories }}
@@ -55,12 +60,18 @@ jobs:
           persist-credentials: false
           show-progress: false
 
+      - name: Get GitHub token
+        id: get-github-token
+        uses: martincostello/github-automation/actions/get-github-token@567bf2ea7958064af7863e6004a545a799f57982 # get-github-token/v4.2.0
+        with:
+          profile-name: dotnet-bumper-read
+
       - name: Get repositories to upgrade
         uses: ./actions/get-dotnet-repos
         id: get-repos
         with:
           branch: ${{ inputs.branch || '' }}
-          github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
+          github-token: ${{ steps.get-github-token.outputs.token }}
           repository: ${{ inputs.repository || '' }}
 
   upgrade-dotnet:
@@ -73,6 +84,13 @@ jobs:
     concurrency:
       group: 'upgrade-dotnet-${{ matrix.repo }}'
       cancel-in-progress: false
+
+    environment:
+      name: dotnet-bumper
+      deployment: false
+
+    permissions:
+      contents: read
 
     strategy:
       fail-fast: false
@@ -108,14 +126,14 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        id: checkout-code
         with:
           filter: 'tree:0'
-          persist-credentials: true # zizmor: ignore[artipacked] Needed to push commits
+          persist-credentials: false
           ref: ${{ matrix.ref }}
           repository: ${{ matrix.repo }}
           show-progress: false
           submodules: recursive
-          token: ${{ secrets.COSTELLOBOT_TOKEN }}
 
       - name: Setup Node
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
@@ -147,81 +165,174 @@ jobs:
           dotnet bumper . --log-format Json --log-path $tempFile --test --upgrade-type ${env:DOTNET_BUMPER_UPGRADE_TYPE}
           "dotnet-bumper-log=${tempFile}" >> ${env:GITHUB_OUTPUT}
 
-      - name: Import GPG private key
-        shell: bash
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.COSTELLOBOT_GPG_PRIVATE_KEY }}
-        run: |
-          echo "${GPG_PRIVATE_KEY}" | gpg --batch --import
-
-      - name: Set up GPG script
-        id: create-gpg-script
-        shell: bash
-        run: |
-          GPG_SCRIPT="${RUNNER_TEMP}/${GITHUB_REPOSITORY_OWNER_ID}-${GITHUB_REPOSITORY_ID}-gpg.sh"
-          echo '#!/bin/bash' > "${GPG_SCRIPT}"
-          # shellcheck disable=SC2016
-          echo 'gpg --batch --pinentry-mode=loopback --passphrase "${GPG_PASSPHRASE}" "$@"' >> "${GPG_SCRIPT}"
-          chmod +x "${GPG_SCRIPT}"
-          echo "gpg-script=${GPG_SCRIPT}" >> "${GITHUB_OUTPUT}"
-
-      - name: Configure Git
-        shell: bash
-        env:
-          GIT_COMMIT_USER_EMAIL: ${{ vars.GIT_COMMIT_USER_EMAIL }}
-          GIT_COMMIT_USER_NAME: ${{ vars.GIT_COMMIT_USER_NAME }}
-          GPG_KEY_ID: ${{ secrets.COSTELLOBOT_GPG_KEY_ID }}
-          GPG_SCRIPT: ${{ steps.create-gpg-script.outputs.gpg-script }}
-        run: |
-          git config commit.gpgsign true
-          git config gpg.program "${GPG_SCRIPT}"
-          git config user.email "${GIT_COMMIT_USER_EMAIL}"
-          git config user.name "${GIT_COMMIT_USER_NAME}"
-          git config user.signingkey "${GPG_KEY_ID}"
-
-      - name: Push changes to GitHub
-        id: push-changes
+      - name: Check for changes
+        id: check-for-changes
         shell: pwsh
-        env:
-          DRY_RUN: ${{ inputs.dry-run }}
-          GIT_COMMIT_USER_EMAIL: ${{ vars.GIT_COMMIT_USER_EMAIL }}
-          GIT_COMMIT_USER_NAME: ${{ vars.GIT_COMMIT_USER_NAME }}
-          GPG_PASSPHRASE: ${{ secrets.COSTELLOBOT_GPG_PASSPHRASE }}
         run: |
           $GitStatus = (git status --porcelain)
 
           if ([string]::IsNullOrEmpty($GitStatus)) {
             Write-Output "No changes to commit."
-            exit 0
+            "has-changes=false" >> ${env:GITHUB_OUTPUT}
+          } else {
+            "has-changes=true" >> ${env:GITHUB_OUTPUT}
           }
 
+      - name: Show Git diff
+        shell: pwsh
+        run: |
           git config color.diff always
           git --no-pager diff
 
-          $GlobalJson = Join-Path . "global.json"
+      - name: Get GitHub token
+        id: get-github-token
+        if: steps.check-for-changes.outputs.has-changes == 'true' && inputs.dry-run != 'true'
+        uses: martincostello/github-automation/actions/get-github-token@567bf2ea7958064af7863e6004a545a799f57982 # get-github-token/v4.2.0
+        with:
+          profile-name: dotnet-bumper-write
+
+      - name: Push changes to GitHub
+        id: push-changes
+        if: steps.check-for-changes.outputs.has-changes == 'true' && inputs.dry-run != 'true'
+        shell: pwsh
+        env:
+          APP_SLUG: ${{ steps.get-github-token.outputs.app-slug }}
+          CHECKOUT_COMMIT: ${{ steps.checkout-code.outputs.commit }}
+          GH_TOKEN: ${{ steps.get-github-token.outputs.token }}
+          TOKEN_TYPE: ${{ steps.get-github-token.outputs.token-type }}
+        run: |
+          $GlobalJson = Join-Path ${env:GITHUB_WORKSPACE} "global.json"
           $DotNetSdkVersion = (Get-Content $GlobalJson | Out-String | ConvertFrom-Json).sdk.version
           $DotNetVersion = $DotNetSdkVersion.Split('.')[0]
 
           $BranchName = ${env:DOTNET_BUMPER_UPGRADE_TYPE} -eq "Preview" ? "dotnet-vnext" : "dotnet-${DotNetVersion}-upgrade"
 
-          git fetch origin --no-tags | Out-Null
-          git rev-parse --verify --quiet "remotes/origin/${BranchName}" | Out-Null
+          $branchProbe = gh api "repos/${env:GITHUB_REPOSITORY}/git/ref/heads/${branchName}" 2>&1
 
           if ($LASTEXITCODE -eq 0) {
-            Write-Output "Branch ${BranchName} already exists."
+            Write-Output "::notice::Branch ${branchName} already exists."
+            "regenerated=false" >> ${env:GITHUB_OUTPUT}
             exit 0
           }
 
-          git checkout -b $BranchName
-          git add .
-          git commit -m "Update to .NET ${DotNetVersion}`n`nUpdate to .NET ${DotNetVersion} with .NET SDK version ${DotNetSdkVersion}." -s
-
-          if (${env:DRY_RUN} -ne "true") {
-            git push -u origin $BranchName
+          if ((($branchProbe | Out-String) -notmatch 'HTTP 404')) {
+            throw "Failed to check whether branch '${branchName}' exists."
           }
 
-          "branch-name=${BranchName}" >> ${env:GITHUB_OUTPUT}
+          if (${env:TOKEN_TYPE} -eq "app") {
+            $gitUserName = "${env:APP_SLUG}[bot]"
+            $gitUserId = gh api "users/${gitUserName}" --jq '.id'
+            if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($gitUserId)) {
+              throw "Failed to resolve user ID for GitHub app ${gitUserName}."
+            }
+            $gitUserEmail = "${gitUserId}+${gitUserName}@users.noreply.github.com"
+          } else {
+            $identity = gh api "user" | ConvertFrom-Json
+            $gitUserName = $identity.login
+            $gitUserEmail = if ([string]::IsNullOrEmpty($identity.email)) {
+              "$($identity.id)+$($identity.login)@users.noreply.github.com"
+            } else {
+              $identity.email
+            }
+          }
+
+          $baseSha = ${env:CHECKOUT_COMMIT}
+
+          $editedFiles = @()
+          git diff --name-only $baseSha | ForEach-Object {
+            $editedFiles += $_
+          }
+
+          if (($LASTEXITCODE -ne 0) -or ($editedFiles.Count -lt 1)) {
+            Write-Output "No changes to commit."
+            "regenerated=false" >> ${env:GITHUB_OUTPUT}
+            exit 0
+          }
+
+          $edits = @()
+
+          foreach ($filePath in $editedFiles) {
+            $fileFullPath = Join-Path ${env:GITHUB_WORKSPACE} $filePath
+            $currentFile = gh api "repos/${env:GITHUB_REPOSITORY}/contents/${filePath}?ref=${baseSha}" | ConvertFrom-Json
+            $currentContent = $currentFile.content.Replace("`r", "").Replace("`n", "")
+            $localContent = [System.Convert]::ToBase64String(
+              [System.IO.File]::ReadAllBytes($fileFullPath))
+            
+            if ($currentContent -ne $localContent) {
+              $edits += @{
+                path = $filePath
+                contents = $localContent
+              }
+            }
+          }
+
+          if ($edits.Count -lt 1) {
+            Write-Output "No changes to commit."
+            "regenerated=false" >> ${env:GITHUB_OUTPUT}
+            exit 0
+          }
+
+          @{
+            ref = "refs/heads/${branchName}"
+            sha = $baseSha
+          } | ConvertTo-Json -Compress | gh api --method POST "repos/${env:GITHUB_REPOSITORY}/git/refs" --input -
+
+          $query = @'
+          mutation($input: CreateCommitOnBranchInput!) {
+            createCommitOnBranch(input: $input) {
+              commit {
+                oid
+              }
+            }
+          }
+          '@
+
+          $title = "Update to .NET ${DotNetVersion}"
+          $body = @(
+            "Update to .NET ${DotNetVersion} with .NET SDK version ${DotNetSdkVersion}.",
+            "",
+            "Signed-off-by: ${gitUserName} <${gitUserEmail}>"
+          ) -join "`n"
+
+          $payload = @{
+            query = $query
+            variables = @{
+              input = @{
+                branch = @{
+                  repositoryNameWithOwner = ${env:GITHUB_REPOSITORY}
+                  branchName = $branchName
+                }
+                expectedHeadOid = $baseSha
+                message = @{
+                  headline = $title
+                  body = $body
+                }
+                fileChanges = @{
+                  additions = $edits
+                }
+              }
+            }
+          } | ConvertTo-Json -Depth 20 -Compress
+
+          $headers = @{
+            Authorization = "Bearer ${env:GH_TOKEN}"
+            Accept = "application/vnd.github+json"
+          }
+
+          $result = Invoke-RestMethod `
+            -Method POST `
+            -Uri ${env:GITHUB_GRAPHQL_URL} `
+            -Headers $headers `
+            -ContentType "application/json" `
+            -Body $payload
+
+          if ($null -ne $result.errors) {
+            throw ($result.errors | ConvertTo-Json -Depth 20 -Compress)
+          }
+
+          "branch-name=${branchName}" >> ${env:GITHUB_OUTPUT}
           "dotnet-version=${DotNetVersion}" >> ${env:GITHUB_OUTPUT}
+          "title=${title}" >> ${env:GITHUB_OUTPUT}
           "updated-dotnet=true" >> ${env:GITHUB_OUTPUT}
 
       - name: Create pull request
@@ -231,12 +342,11 @@ jobs:
         env:
           DOTNET_BUMPER_LOG: ${{ steps.upgrade-dotnet.outputs.dotnet-bumper-log }}
           DOTNET_VERSION: ${{ steps.push-changes.outputs.dotnet-version }}
-          DRY_RUN: ${{ inputs.dry-run }}
           BASE_BRANCH: ${{ matrix.ref }}
           HEAD_BRANCH: ${{ steps.push-changes.outputs.branch-name }}
           UPGRADE_REPO: ${{ matrix.repo }}
         with:
-          github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
+          github-token: ${{ steps.get-github-token.outputs.token }}
           result-encoding: string
           script: |
             const fs = require('fs');
@@ -245,7 +355,6 @@ jobs:
 
             const isPreview = process.env.DOTNET_BUMPER_UPGRADE_TYPE === 'Preview';
             const dotnetVersion = process.env.DOTNET_VERSION;
-            const isDryRun = process.env.DRY_RUN === 'true';
             const bumperUrl = 'https://github.com/martincostello/dotnet-bumper';
             const workflowUrl = `${process.env.GITHUB_SERVER_URL}/${thisOwner}/${thisRepo}/actions/runs/${process.env.GITHUB_RUN_ID}`;
 
@@ -346,11 +455,9 @@ jobs:
                 for (const edit of edits) {
                   let location = `\`${relativePath}:${edit.line}\``;
 
-                  if (!isDryRun) {
-                    const query = relativePath.endsWith('.md') || relativePath.startsWith('.github/ISSUE_TEMPLATE/') ? '?plain=1' : '';
-                    const linkUrl = `${process.env.GITHUB_SERVER_URL}/${theirOwner}/${theirRepo}/blob/${process.env.HEAD_BRANCH}/${encodeURIComponent(relativePath)}${query}#L${edit.line}`;
-                    location = `[${location}](${linkUrl})`;
-                  }
+                  const query = relativePath.endsWith('.md') || relativePath.startsWith('.github/ISSUE_TEMPLATE/') ? '?plain=1' : '';
+                  const linkUrl = `${process.env.GITHUB_SERVER_URL}/${theirOwner}/${theirRepo}/blob/${process.env.HEAD_BRANCH}/${encodeURIComponent(relativePath)}${query}#L${edit.line}`;
+                  location = `[${location}](${linkUrl})`;
 
                   rows.push(`| ${location} | \`${edit.text}\` |`);
                 }
@@ -394,30 +501,27 @@ jobs:
             bodyLines.push('');
 
             const body = bodyLines.join('\n');
+            const { data: pr } = await github.rest.pulls.create({
+              title: `Update to .NET ${dotnetVersion}`,
+              owner: theirOwner,
+              repo: theirRepo,
+              head: process.env.HEAD_BRANCH,
+              base: process.env.BASE_BRANCH,
+              draft,
+              body,
+            });
 
-            if (!isDryRun) {
-              const { data: pr } = await github.rest.pulls.create({
-                title: `Update to .NET ${dotnetVersion}`,
+            core.notice(`Created pull request ${theirOwner}/${theirRepo}#${pr.number}: ${pr.html_url}`);
+
+            try {
+              await github.rest.issues.addLabels({
                 owner: theirOwner,
                 repo: theirRepo,
-                head: process.env.HEAD_BRANCH,
-                base: process.env.BASE_BRANCH,
-                draft,
-                body,
+                issue_number: pr.number,
+                labels: ['.NET', 'dependencies', 'enhancement'],
               });
-
-              core.notice(`Created pull request ${theirOwner}/${theirRepo}#${pr.number}: ${pr.html_url}`);
-
-              try {
-                await github.rest.issues.addLabels({
-                  owner: theirOwner,
-                  repo: theirRepo,
-                  issue_number: pr.number,
-                  labels: ['.NET', 'dependencies', 'enhancement'],
-                });
-              } catch (error) {
-                // Ignore
-              }
+            } catch (error) {
+              // Ignore
             }
 
             return body;
