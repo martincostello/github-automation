@@ -25,6 +25,14 @@ jobs:
       group: ${{ github.workflow }}
       cancel-in-progress: false
 
+    environment:
+      name: release
+      deployment: false
+
+    permissions:
+      contents: read
+      id-token: write
+
     steps:
 
       - name: Checkout code
@@ -43,6 +51,12 @@ jobs:
           $version = $json.version
           "version=${version}" >> $env:GITHUB_OUTPUT
 
+      - name: Get GitHub token
+        id: get-github-token
+        uses: martincostello/github-automation/actions/get-github-token@567bf2ea7958064af7863e6004a545a799f57982 # get-github-token/v4.2.0
+        with:
+          profile-name: release
+
       - name: Create release
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
@@ -51,7 +65,7 @@ jobs:
           DRAFT: ${{ inputs.publish != true }}
           VERSION: ${{ steps.get-version.outputs.version }}
         with:
-          github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
+          github-token: ${{ steps.get-github-token.outputs.token }}
           script: |
             const { repo, owner } = context.repo;
             const draft = process.env.DRAFT === 'true';
