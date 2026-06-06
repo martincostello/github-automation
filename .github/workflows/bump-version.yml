@@ -123,7 +123,7 @@ jobs:
 
           if ($LASTEXITCODE -ne 0 || $editedFiles.Count -lt 1) {
             Write-Output "No changes to commit."
-            "regenerated=false" >> ${env:GITHUB_OUTPUT}
+            "updated-version=false" >> ${env:GITHUB_OUTPUT}
             exit 0
           }
 
@@ -176,7 +176,7 @@ jobs:
 
           if ($edits.Count -lt 1) {
             Write-Output "No changes to commit."
-            "regenerated=false" >> ${env:GITHUB_OUTPUT}
+            "updated-version=false" >> ${env:GITHUB_OUTPUT}
             exit 0
           }
 
