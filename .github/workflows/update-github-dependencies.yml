@@ -13,7 +13,7 @@ permissions: {}
 
 jobs:
   get-repos:
-    runs-on: [ ubuntu-slim ]
+    runs-on: ubuntu-slim
     if: github.event.repository.fork == false
 
     outputs:
