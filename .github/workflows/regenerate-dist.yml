@@ -77,7 +77,7 @@ jobs:
             exit 0
           }
 
-          $branchName = "npm-audit-fix"
+          $branchName = "regenerate-dist"
           $branchProbe = gh api "repos/${env:GITHUB_REPOSITORY}/git/ref/heads/${branchName}" 2>&1
 
           if ($LASTEXITCODE -eq 0) {

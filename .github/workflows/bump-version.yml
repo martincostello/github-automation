@@ -81,22 +81,15 @@ jobs:
           APP_SLUG: ${{ steps.get-github-token.outputs.app-slug }}
           CHECKOUT_COMMIT: ${{ steps.checkout-code.outputs.commit }}
           GH_TOKEN: ${{ steps.get-github-token.outputs.token }}
+          NEXT_VERSION: ${{ steps.bump-version.outputs.version }}
           TOKEN_TYPE: ${{ steps.get-github-token.outputs.token-type }}
         run: |
-          $gitStatus = (git status --porcelain)
-
-          if ([string]::IsNullOrEmpty($gitStatus)) {
-            Write-Output "No changes to commit."
-            "regenerated=false" >> ${env:GITHUB_OUTPUT}
-            exit 0
-          }
-
-          $branchName = "npm-audit-fix"
+          $branchName = "bump-version-${env:NEXT_VERSION}"
           $branchProbe = gh api "repos/${env:GITHUB_REPOSITORY}/git/ref/heads/${branchName}" 2>&1
 
           if ($LASTEXITCODE -eq 0) {
             Write-Output "::notice::Branch ${branchName} already exists."
-            "regenerated=false" >> ${env:GITHUB_OUTPUT}
+            "updated-version=false" >> ${env:GITHUB_OUTPUT}
             exit 0
           }
 
@@ -172,9 +165,9 @@ jobs:
           }
           '@
 
-          $title = "Run npm audit fix"
+          $title = "Bump version"
           $body = @(
-            "Run ``npm audit fix`` to pick up latest fixes.",
+            "Bump version to ${env:NEXT_VERSION} for the next release.",
             "",
             "Signed-off-by: ${gitUserName} <${gitUserEmail}>"
           ) -join "`n"
@@ -216,8 +209,9 @@ jobs:
           }
 
           "branch-name=${branchName}" >> ${env:GITHUB_OUTPUT}
-          "regenerated=true" >> ${env:GITHUB_OUTPUT}
           "title=${title}" >> ${env:GITHUB_OUTPUT}
+          "updated-version=true" >> ${env:GITHUB_OUTPUT}
+          "version=${env:NEXT_VERSION}" >> ${env:GITHUB_OUTPUT}
 
       - name: Create pull request
         if: steps.push-changes.outputs.updated-version == 'true'
