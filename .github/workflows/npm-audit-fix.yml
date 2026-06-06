@@ -67,6 +67,12 @@ jobs:
             exit 0
           }
 
+          npm run generate
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "npm run generate failed with exit code $LASTEXITCODE."
+          }
+
           $branchName = "npm-audit-fix"
           $branchProbe = gh api "repos/${env:GITHUB_REPOSITORY}/git/ref/heads/${branchName}" 2>&1
 
