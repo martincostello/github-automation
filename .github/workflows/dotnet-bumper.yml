@@ -51,6 +51,10 @@ jobs:
     outputs:
       repositories: ${{ steps.get-repos.outputs.repositories }}
 
+    permissions:
+      contents: read
+      id-token: write
+
     steps:
 
       - name: Checkout code
@@ -91,6 +95,7 @@ jobs:
 
     permissions:
       contents: read
+      id-token: write
 
     strategy:
       fail-fast: false
