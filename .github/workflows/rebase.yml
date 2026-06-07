@@ -127,7 +127,7 @@ jobs:
 
       - name: Get GitHub token
         id: get-github-token
-        uses: ./actions/get-github-token
+        uses: martincostello/github-automation/actions/get-github-token@36f156b090e9259937ebf5151c165ddb1fcf6eac # get-github-token/v4.3.0
         with:
           profile-name: rebase
 
