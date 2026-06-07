@@ -16,7 +16,8 @@
         "token": "fake-github-token",
         "type": "app",
         "appId": 123456,
-        "appSlug": "costellobot"
+        "appSlug": "costellobot",
+        "installationId": 987654
       }
     }
   ]
