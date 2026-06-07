@@ -196,7 +196,7 @@ jobs:
           git config color.diff always
           git --no-pager diff
 
-      - name: Get GitHub token
+      - name: Get GitHub write token
         id: get-github-write-token
         if: steps.check-for-changes.outputs.has-changes == 'true' && inputs.dry-run != 'true'
         uses: martincostello/github-automation/actions/get-github-token@567bf2ea7958064af7863e6004a545a799f57982 # get-github-token/v4.2.0
@@ -212,6 +212,7 @@ jobs:
           CHECKOUT_COMMIT: ${{ steps.checkout-code.outputs.commit }}
           GH_TOKEN: ${{ steps.get-github-write-token.outputs.token }}
           TOKEN_TYPE: ${{ steps.get-github-write-token.outputs.token-type }}
+          UPGRADE_REPO: ${{ matrix.repo }}
         run: |
           $GlobalJson = Join-Path ${env:GITHUB_WORKSPACE} "global.json"
           $DotNetSdkVersion = (Get-Content $GlobalJson | Out-String | ConvertFrom-Json).sdk.version
@@ -219,7 +220,7 @@ jobs:
 
           $BranchName = ${env:DOTNET_BUMPER_UPGRADE_TYPE} -eq "Preview" ? "dotnet-vnext" : "dotnet-${DotNetVersion}-upgrade"
 
-          $branchProbe = gh api "repos/${env:GITHUB_REPOSITORY}/git/ref/heads/${branchName}" 2>&1
+          $branchProbe = gh api "repos/${env:UPGRADE_REPO}/git/ref/heads/${branchName}" 2>&1
 
           if ($LASTEXITCODE -eq 0) {
             Write-Output "::notice::Branch ${branchName} already exists."
@@ -265,7 +266,7 @@ jobs:
 
           foreach ($filePath in $editedFiles) {
             $fileFullPath = Join-Path ${env:GITHUB_WORKSPACE} $filePath
-            $currentFile = gh api "repos/${env:GITHUB_REPOSITORY}/contents/${filePath}?ref=${baseSha}" | ConvertFrom-Json
+            $currentFile = gh api "repos/${env:UPGRADE_REPO}/contents/${filePath}?ref=${baseSha}" | ConvertFrom-Json
             $currentContent = $currentFile.content.Replace("`r", "").Replace("`n", "")
             $localContent = [System.Convert]::ToBase64String(
               [System.IO.File]::ReadAllBytes($fileFullPath))
@@ -287,7 +288,7 @@ jobs:
           @{
             ref = "refs/heads/${branchName}"
             sha = $baseSha
-          } | ConvertTo-Json -Compress | gh api --method POST "repos/${env:GITHUB_REPOSITORY}/git/refs" --input -
+          } | ConvertTo-Json -Compress | gh api --method POST "repos/${env:UPGRADE_REPO}/git/refs" --input -
 
           $query = @'
           mutation($input: CreateCommitOnBranchInput!) {
@@ -311,7 +312,7 @@ jobs:
             variables = @{
               input = @{
                 branch = @{
-                  repositoryNameWithOwner = ${env:GITHUB_REPOSITORY}
+                  repositoryNameWithOwner = ${env:UPGRADE_REPO}
                   branchName = $branchName
                 }
                 expectedHeadOid = $baseSha
