@@ -17,6 +17,8 @@ outputs:
     description: 'If the token type is "app", the ID of the GitHub App.'
   app-slug:
     description: 'If the token type is "app", the slug of the GitHub App.'
+  installation-id:
+    description: 'If the token type is "app", the installation ID of the GitHub App.'
 runs:
   using: 'node24'
   main: 'dist/main.js'

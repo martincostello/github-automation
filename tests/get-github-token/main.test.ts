@@ -197,6 +197,7 @@ describe('get-github-token', () => {
       expect(fixture.getOutput('token-type')).toBe('app');
       expect(fixture.getOutput('app-id')).toBe('123456');
       expect(fixture.getOutput('app-slug')).toBe('costellobot');
+      expect(fixture.getOutput('installation-id')).toBe('987654');
     });
   });
 
