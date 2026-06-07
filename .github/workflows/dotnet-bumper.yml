@@ -129,6 +129,12 @@ jobs:
           dotnet tool install --global dotnet-outdated-tool --version $dotnetOutdatedVersion
           dotnet tool install --global MartinCostello.DotNetBumper --version $dotnetBumperVersion
 
+      - name: Get GitHub read token
+        id: get-github-read-token
+        uses: martincostello/github-automation/actions/get-github-token@567bf2ea7958064af7863e6004a545a799f57982 # get-github-token/v4.2.0
+        with:
+          profile-name: dotnet-bumper-read
+
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         id: checkout-code
@@ -139,6 +145,7 @@ jobs:
           repository: ${{ matrix.repo }}
           show-progress: false
           submodules: recursive
+          token: ${{ steps.get-github-read-token.outputs.token }}
 
       - name: Setup Node
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
@@ -190,7 +197,7 @@ jobs:
           git --no-pager diff
 
       - name: Get GitHub token
-        id: get-github-token
+        id: get-github-write-token
         if: steps.check-for-changes.outputs.has-changes == 'true' && inputs.dry-run != 'true'
         uses: martincostello/github-automation/actions/get-github-token@567bf2ea7958064af7863e6004a545a799f57982 # get-github-token/v4.2.0
         with:
@@ -201,10 +208,10 @@ jobs:
         if: steps.check-for-changes.outputs.has-changes == 'true' && inputs.dry-run != 'true'
         shell: pwsh
         env:
-          APP_SLUG: ${{ steps.get-github-token.outputs.app-slug }}
+          APP_SLUG: ${{ steps.get-github-write-token.outputs.app-slug }}
           CHECKOUT_COMMIT: ${{ steps.checkout-code.outputs.commit }}
-          GH_TOKEN: ${{ steps.get-github-token.outputs.token }}
-          TOKEN_TYPE: ${{ steps.get-github-token.outputs.token-type }}
+          GH_TOKEN: ${{ steps.get-github-write-token.outputs.token }}
+          TOKEN_TYPE: ${{ steps.get-github-write-token.outputs.token-type }}
         run: |
           $GlobalJson = Join-Path ${env:GITHUB_WORKSPACE} "global.json"
           $DotNetSdkVersion = (Get-Content $GlobalJson | Out-String | ConvertFrom-Json).sdk.version
@@ -351,7 +358,7 @@ jobs:
           HEAD_BRANCH: ${{ steps.push-changes.outputs.branch-name }}
           UPGRADE_REPO: ${{ matrix.repo }}
         with:
-          github-token: ${{ steps.get-github-token.outputs.token }}
+          github-token: ${{ steps.get-github-write-token.outputs.token }}
           result-encoding: string
           script: |
             const fs = require('fs');
