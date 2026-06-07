@@ -10,9 +10,20 @@ permissions: {}
 jobs:
   generate:
     runs-on: ubuntu-slim
+    timeout-minutes: 10
+
     concurrency:
       group: ${{ github.workflow }}
       cancel-in-progress: false
+
+    environment:
+      name: admin
+      deployment: false
+
+    permissions:
+      contents: read
+      id-token: write
+
     steps:
 
       - name: Checkout code
@@ -22,7 +33,13 @@ jobs:
           persist-credentials: false
           show-progress: false
 
+      - name: Get GitHub token
+        id: get-github-token
+        uses: ./actions/get-github-token
+        with:
+          profile-name: read
+
       - name: Generate report
         uses: ./actions/dotnet-version-report
         with:
-          github-token: ${{ secrets.ACCESS_TOKEN }}
+          github-token: ${{ steps.get-github-token.outputs.token }}

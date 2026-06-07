@@ -17,20 +17,35 @@ jobs:
 
   get-repos:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
 
     concurrency:
       group: ${{ github.workflow }}
       cancel-in-progress: false
 
+    environment:
+      name: maintenance
+      deployment: false
+
     outputs:
       repos: ${{ steps.get-repos.outputs.repos }}
 
+    permissions:
+      id-token: write
+
     steps:
+
+      - name: Get GitHub token
+        id: get-github-token
+        uses: ./actions/get-github-token
+        with:
+          profile-name: maintenance
+
       - name: Get repositories
         id: get-repos
         shell: pwsh
         env:
-          GH_TOKEN: ${{ secrets.COSTELLOBOT_TOKEN }}
+          GH_TOKEN: ${{ steps.get-github-token.outputs.token }}
           REPOSITORY: ${{ github.event.inputs.repository || '' }}
         run: |
           $repo = ${env:REPOSITORY}
@@ -57,11 +72,19 @@ jobs:
     name: 'update-${{ matrix.repo }}'
     needs: get-repos
     runs-on: ubuntu-slim
+    timeout-minutes: 10
     if: needs.get-repos.outputs.repos != '[]'
 
     concurrency:
       group: 'update-assets-${{ matrix.repo }}'
       cancel-in-progress: false
+
+    environment:
+      name: maintenance
+      deployment: false
+
+    permissions:
+      id-token: write
 
     strategy:
       fail-fast: false
@@ -71,6 +94,12 @@ jobs:
 
     steps:
 
+    - name: Get GitHub token
+      id: get-github-token
+      uses: ./actions/get-github-token
+      with:
+        profile-name: maintenance
+
     - name: Checkout code
       uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       with:
@@ -79,7 +108,7 @@ jobs:
         repository: ${{ matrix.repo }}
         show-progress: false
         submodules: recursive
-        token: ${{ secrets.COSTELLOBOT_TOKEN }}
+        token: ${{ steps.get-github-token.outputs.token }}
 
     - name: Update static assets
       uses: martincostello/update-static-assets@0cf1bdb3e08a14b765fa2c8ba87f01b95c7fab07 # v3.0.0
@@ -87,6 +116,6 @@ jobs:
         file-extensions: 'cshtml,erb,html,razor'
         labels: dependencies
         repo: ${{ matrix.repo }}
-        repo-token: ${{ secrets.COSTELLOBOT_TOKEN }}
+        repo-token: ${{ steps.get-github-token.outputs.token }}
         user-email: ${{ vars.GIT_COMMIT_USER_EMAIL }}
         user-name: ${{ vars.GIT_COMMIT_USER_NAME }}

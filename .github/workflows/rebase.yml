@@ -59,13 +59,19 @@ env:
 
 jobs:
   get-repos:
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+
+    environment:
+      name: admin
+      deployment: false
 
     outputs:
       repos: ${{ steps.get-repos.outputs.repositories }}
 
-    permissions: {}
-
-    runs-on: ubuntu-slim
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
 
@@ -76,6 +82,12 @@ jobs:
           persist-credentials: false
           show-progress: false
 
+      - name: Get GitHub token
+        id: get-github-token
+        uses: ./actions/get-github-token
+        with:
+          profile-name: admin
+
       - name: Get repositories to rebase
         uses: ./actions/get-rebase-repos
         id: get-repos
@@ -83,7 +95,7 @@ jobs:
           base: ${{ inputs.base }}
           branch: ${{ inputs.branch }}
           force: ${{ inputs.force }}
-          github-token: ${{ secrets.ACCESS_TOKEN }}
+          github-token: ${{ steps.get-github-token.outputs.token }}
           repository: ${{ inputs.repository }}
 
   rebase:
@@ -91,10 +103,19 @@ jobs:
     needs: get-repos
     if: needs.get-repos.outputs.repos != '[]'
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
 
     concurrency:
       group: "rebase-${{ matrix.repo }}"
       cancel-in-progress: false
+
+    environment:
+      name: rebase
+      deployment: false
+
+    permissions:
+      contents: read
+      id-token: write
 
     strategy:
       fail-fast: false
@@ -103,6 +124,13 @@ jobs:
         repo: ${{ fromJSON(needs.get-repos.outputs.repos) }}
 
     steps:
+
+      - name: Get GitHub token
+        id: get-github-token
+        uses: ./actions/get-github-token
+        with:
+          profile-name: rebase
+
       - name: Checkout code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
@@ -113,7 +141,7 @@ jobs:
           repository: ${{ matrix.repo }}
           show-progress: false
           submodules: recursive
-          token: ${{ secrets.ACCESS_TOKEN }}
+          token: ${{ steps.get-github-token.outputs.token }}
 
       - name: Rebase ${{ inputs.branch }}
         uses: martincostello/rebaser@5d88e6a62adeb1c9efb055b62c5fda3509299898 # v3.0.0

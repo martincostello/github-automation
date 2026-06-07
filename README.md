@@ -26,7 +26,6 @@ The following workflows are available.
 | [rebase-pull-request][rebase-pull-request]                                   | Rebases a pull request onto the default branch of a repository in response to a comment on the pull request.               |
 | [update-dotnet-sdks][update-dotnet-sdks]                                     | Runs the `update-dotnet-sdk` workflow for one or more repositories for a specified branch.                                 |
 | [update-dotnet-sdks-for-nightly][update-dotnet-sdks-for-nightly]             | Runs the `update-dotnet-sdks` workflow daily for the `dotnet-nightly` branch.                                              |
-| [update-github-dependencies][update-github-dependencies]                     | Checks for new versions of GitHub projects and updates environment variables containing their version.                     |
 | [update-static-assets][update-static-assets]                                 | Checks for new releases of static HTML assets served from [cdnjs][cdnjs] and generates pull requests to update them.       |
 
 ### .NET Dependencies Updated
@@ -213,6 +212,5 @@ This project is licensed under the [Apache 2.0][license] license.
 [update-dotnet-sdk-schema]: ./.github/update-dotnet-sdk-schema.json
 [update-dotnet-sdks]: ./.github/workflows/update-dotnet-sdks.yml
 [update-dotnet-sdks-for-nightly]: ./.github/workflows/update-dotnet-sdks-for-nightly.yml
-[update-github-dependencies]: ./.github/workflows/update-github-dependencies.yml
 [update-static-assets]: ./.github/workflows/update-static-assets.yml
 [upgrade-report-gist]: https://gist.github.com/martincostello/2083bcc83f30a5038175e4f31e0fc59f

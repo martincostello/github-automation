@@ -36,9 +36,19 @@ permissions: {}
 jobs:
   generate:
     runs-on: ubuntu-slim
+    timeout-minutes: 15
+
     concurrency:
       group: '${{ github.workflow }}-${{ inputs.branch }}'
       cancel-in-progress: false
+
+    environment:
+      name: admin
+      deployment: false
+
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
 
@@ -49,10 +59,16 @@ jobs:
           persist-credentials: false
           show-progress: false
 
+      - name: Get GitHub token
+        id: get-github-token
+        uses: ./actions/get-github-token
+        with:
+          profile-name: admin
+
       - name: Generate report
         uses: ./actions/dotnet-upgrade-report
         with:
           branch: ${{ inputs.branch }}
           channel: ${{ vars.DOTNET_NIGHTLY_CHANNEL }}
           gist-id: ${{ inputs.gist-id || ((inputs.branch == 'dotnet-vnext' || github.event_name == 'schedule') && vars.UPGRADE_REPORT_GIST_ID) || '' }}
-          github-token: ${{ secrets.ACCESS_TOKEN }}
+          github-token: ${{ steps.get-github-token.outputs.token }}

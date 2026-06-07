@@ -11,9 +11,18 @@ jobs:
 
   metrics:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
     concurrency:
       group: ${{ github.workflow }}
       cancel-in-progress: false
+
+    environment:
+      name: admin
+      deployment: false
+
+    permissions:
+      id-token: write
 
     steps:
 
@@ -24,15 +33,21 @@ jobs:
         first_day=$(date -d "last month" +%Y-%m-01)
         last_day=$(date -d "$first_day +1 month -1 day" +%Y-%m-%d)
         echo "$first_day..$last_day"
-        echo "last-month=$first_day..$last_day" >> "$GITHUB_OUTPUT"
+        echo "last-month=$first_day..$last_day" >> "${GITHUB_OUTPUT}"
+
+    - name: Get GitHub token
+      id: get-github-token
+      uses: ./actions/get-github-token
+      with:
+        profile-name: read
 
     - name: Run issue-metrics tool
       uses: github-community-projects/issue-metrics@1e38d5e62363e14db8019ed7d106b9855bdba6cc # v4.2.7
       env:
-        GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        GH_TOKEN: ${{ steps.get-github-token.outputs.token }}
         IGNORE_USERS: 'codecov[bot],Copilot,costellobot,costellobot[bot],dotnet-bumper[bot],dotnet-patch-automation-updater[bot],github-actions[bot],renovate[bot]'
         SEARCH_QUERY: 'owner:${{ github.repository_owner }} created:${{ steps.last-month.outputs.last-month }} -reason:"not planned" -author:app/dependabot'
 
     - name: Output the report
       shell: bash
-      run: cat ./issue_metrics.md >> "$GITHUB_STEP_SUMMARY"
+      run: cat ./issue_metrics.md >> "${GITHUB_STEP_SUMMARY}"
