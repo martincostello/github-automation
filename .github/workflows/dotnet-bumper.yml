@@ -76,6 +76,7 @@ jobs:
         with:
           branch: ${{ inputs.branch || '' }}
           github-token: ${{ steps.get-github-token.outputs.token }}
+          installation-id: ${{ steps.get-github-token.outputs.installation-id }}
           repository: ${{ inputs.repository || '' }}
 
   upgrade-dotnet:

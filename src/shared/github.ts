@@ -86,6 +86,34 @@ export type Repository = {
   html_url: string;
 };
 
+export async function getReposForCurrentApp(octokit: Octokit, installationId: number): Promise<Repository[]> {
+  const per_page = 100;
+  const repos = await octokit.paginate(octokit.rest.apps.listInstallationReposForAuthenticatedUser, {
+    installation_id: installationId,
+    per_page,
+  });
+
+  debug(`Found ${repos.length} repos for installation ${installationId} before filtering.`);
+  for (const repo of repos) {
+    debug(`- ${repo.full_name}`);
+  }
+
+  return repos
+    .filter((repo) => !repo.archived)
+    .filter((repo) => !repo.fork)
+    .filter((repo) => !repo.is_template)
+    .filter((repo) => repo.permissions?.push)
+    .map((repo) => {
+      return {
+        full_name: repo.full_name,
+        repo: repo.name,
+        owner: repo.owner.login,
+        default_branch: repo.default_branch,
+        html_url: repo.html_url,
+      };
+    });
+}
+
 export async function getReposForCurrentUser(octokit: Octokit, type: 'all' | 'owner' | 'member'): Promise<Repository[]> {
   const per_page = 100;
   const repos = await octokit.paginate(octokit.rest.repos.listForAuthenticatedUser, {

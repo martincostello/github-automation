@@ -4,7 +4,7 @@
 import * as core from '@actions/core';
 import { context, getOctokit } from '@actions/github';
 import { handle } from '../shared/errors';
-import { getDotNetSdk, getReposForCurrentUser } from '../shared/github';
+import { getDotNetSdk, getReposForCurrentApp, getReposForCurrentUser, Repository } from '../shared/github';
 
 type DotNetRepository = {
   ref: string;
@@ -15,10 +15,17 @@ export async function run(): Promise<void> {
   try {
     const branch = core.getInput('branch', { required: false });
     const token = core.getInput('github-token', { required: false });
+    const installationId = core.getInput('installation-id', { required: false });
     const github = getOctokit(token);
 
     const ref = branch;
-    const repositories = await getReposForCurrentUser(github, 'member');
+    let repositories: Repository[] = [];
+
+    if (installationId) {
+      repositories = await getReposForCurrentApp(github, parseInt(installationId, 10));
+    } else {
+      repositories = await getReposForCurrentUser(github, 'member');
+    }
 
     let singleRepository = core.getInput('repository', { required: false });
 

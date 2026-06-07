@@ -13,13 +13,17 @@ inputs:
     description: 'The GitHub token to use.'
     required: false
     default: ${{ github.token }}
+  installation-id:
+    description: 'The GitHub App installation ID if the specified token is for a GitHub App.'
+    required: false
+    default: ''
   repository:
     description: 'An optional single repository to check.'
     required: false
     default: ''
 outputs:
   repositories:
-    description: 'A JSON array of the repositories for which .NET is present that can be pushed to by github-token.'
+    description: 'A JSON array of the repositories for which .NET is present that can be pushed to by the specified GitHub token.'
 runs:
   using: 'node24'
   main: 'dist/main.js'
