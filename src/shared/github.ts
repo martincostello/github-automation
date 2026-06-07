@@ -102,7 +102,6 @@ export async function getReposForCurrentApp(octokit: Octokit, installationId: nu
     .filter((repo) => !repo.archived)
     .filter((repo) => !repo.fork)
     .filter((repo) => !repo.is_template)
-    .filter((repo) => repo.permissions?.push)
     .map((repo) => {
       return {
         full_name: repo.full_name,
