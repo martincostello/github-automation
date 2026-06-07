@@ -30,7 +30,7 @@ jobs:
       uses: github-community-projects/issue-metrics@1e38d5e62363e14db8019ed7d106b9855bdba6cc # v4.2.7
       env:
         GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        IGNORE_USERS: 'codecov[bot],Copilot,costellobot,costellobot[bot],dotnet-patch-automation-updater[bot],github-actions[bot],renovate[bot]'
+        IGNORE_USERS: 'codecov[bot],Copilot,costellobot,costellobot[bot],dotnet-bumper[bot],dotnet-patch-automation-updater[bot],github-actions[bot],renovate[bot]'
         SEARCH_QUERY: 'owner:${{ github.repository_owner }} created:${{ steps.last-month.outputs.last-month }} -reason:"not planned" -author:app/dependabot'
 
     - name: Output the report

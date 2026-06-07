@@ -1,8 +1,9 @@
 changelog:
   exclude:
     authors:
-      - dependabot[bot]
       - costellobot
       - costellobot[bot]
+      - dependabot[bot]
+      - dotnet-bumper[bot]
       - github-actions[bot]
       - renovate[bot]
