@@ -88,7 +88,7 @@ export type Repository = {
 
 export async function getReposForCurrentApp(octokit: Octokit, installationId: number): Promise<Repository[]> {
   const per_page = 100;
-  const repos = await octokit.paginate(octokit.rest.apps.listInstallationReposForAuthenticatedUser, {
+  const repos = await octokit.paginate(octokit.rest.apps.listReposAccessibleToInstallation, {
     installation_id: installationId,
     per_page,
   });
