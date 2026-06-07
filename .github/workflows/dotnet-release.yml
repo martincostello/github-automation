@@ -16,9 +16,15 @@ permissions: {}
 
 jobs:
   check-for-release:
+    timeout-minutes: 10
+
+    environment:
+      name: admin
+      deployment: false
 
     permissions:
       contents: write
+      id-token: write
 
     runs-on: ubuntu-slim
 
@@ -31,9 +37,15 @@ jobs:
           persist-credentials: false
           show-progress: false
 
+      - name: Get GitHub token
+        id: get-github-token
+        uses: ./actions/get-github-token
+        with:
+          profile-name: admin
+
       - name: Check for new .NET releases
         uses: ./actions/dotnet-release
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          state-token: ${{ secrets.ACCESS_TOKEN }}
+          state-token: ${{ steps.get-github-token.outputs.token }}
           ref: ${{ inputs.ref || vars.DOTNET_CORE_SHA }}

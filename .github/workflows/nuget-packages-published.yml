@@ -87,7 +87,20 @@ jobs:
       group: '${{ github.workflow }}-${{ github.event.client_payload.repository }}-notify'
       cancel-in-progress: false
 
+    environment:
+      name: comment
+      deployment: false
+
+    permissions:
+      id-token: write
+
     steps:
+
+      - name: Get GitHub token
+        id: get-github-token
+        uses: ./actions/get-github-token
+        with:
+          profile-name: comment
 
       - name: Comment on issues and pull requests
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
@@ -95,7 +108,7 @@ jobs:
           REPOSITORY_NAME: ${{ github.event.client_payload.repository }}
           VERSION: ${{ github.event.client_payload.version }}
         with:
-          github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
+          github-token: ${{ steps.get-github-token.outputs.token }}
           script: |
             const [ owner, repo ] = process.env.REPOSITORY_NAME.split('/');
             const version = process.env.VERSION;
@@ -203,178 +216,4 @@ jobs:
               } catch (err) {
                 core.warning(`Failed to add comment to issue #${issue_number}: ${err}`);
               }
-            }
-
-  gpg-sign-release-assets:
-    runs-on: ubuntu-24.04
-
-    concurrency:
-      group: '${{ github.workflow }}-${{ github.event.client_payload.repository }}-gpg-sign'
-      cancel-in-progress: false
-
-    steps:
-
-      - name: Get names of assets to sign
-        id: find-assets
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-        env:
-          REPOSITORY_NAME: ${{ github.event.client_payload.repository }}
-          VERSION: ${{ github.event.client_payload.version }}
-        with:
-          github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
-          result-encoding: string
-          script: |
-            const [ owner, repo ] = process.env.REPOSITORY_NAME.split('/');
-            const version = process.env.VERSION;
-
-            const releases = await github.paginate(github.rest.repos.listReleases, {
-              owner,
-              repo,
-            });
-
-            core.debug(`Found ${releases.length} releases.`);
-
-            const release =
-              releases.find((p) => p.tag_name === version) ||
-              releases.find((p) => p.tag_name === `v${version}`);
-
-            if (!release) {
-              console.log(`Release for version ${version} not found.`);
-              return;
-            }
-
-            if (release.immutable) {
-              console.log(`Skipping release for version ${version} as it is immutable.`);
-              return;
-            }
-
-            const release_id = release.id;
-            core.debug(`Found release ${release.tag_name} (${release_id}).`);
-
-            const allAssets = await github.paginate(github.rest.repos.listReleaseAssets, {
-              owner,
-              repo,
-              release_id,
-            });
-
-            core.debug(`Found ${allAssets.length} assets.`);
-
-            const assets = allAssets.filter((p) => !p.name.endsWith('.sig'));
-            const signatures = allAssets.filter((p) => p.name.endsWith('.sig'));
-            const assetsToSign = assets.filter((p) => !signatures.some((q) => q.name === `${p.name}.sig`));
-
-            if (assetsToSign.length === 0) {
-              console.log('No assets to sign.');
-              return;
-            }
-
-            core.debug(`Found ${assetsToSign.length} assets to sign.`);
-
-            const fs = require('fs');
-            const path = require('path');
-
-            const assetsPath = path.join(process.env.GITHUB_WORKSPACE, 'artifacts');
-            if (!fs.existsSync(assetsPath)) {
-              fs.mkdirSync(assetsPath);
-            }
-
-            for (const asset of assetsToSign) {
-              const response = await github.rest.repos.getReleaseAsset({
-                owner,
-                repo,
-                asset_id: asset.id,
-                headers: {
-                  Accept: 'application/octet-stream',
-                },
-              });
-
-              if (response.status !== 200 && response.status !== 302) {
-                core.warning(`Failed to download asset ${asset.name}: ${response.status} ${response.statusText}`);
-                continue;
-              }
-
-              const fileName = path.join(assetsPath, asset.name);
-              fs.writeFileSync(fileName, Buffer.from(response.data));
-
-              core.debug(`Downloaded asset ${asset.name} to ${fileName}.`);
-            }
-
-            core.setOutput('assets-to-sign', 'true');
-            core.setOutput('release-id', release_id);
-            return assetsPath;
-
-      - name: Generate checksums
-        if: steps.find-assets.outputs.assets-to-sign == 'true'
-        shell: bash
-        working-directory: ${{ steps.find-assets.outputs.result }}
-        run: |
-          find "." -type f -name '*' | while read -r fname; do
-            echo "Generating checksum for ${fname}"
-            base_name="$(basename "${fname}")"
-            sha256sum "${base_name}" >> "./checksums.txt"
-          done
-          echo "Verifying checksums"
-          sha256sum "./checksums.txt" --check || exit 1
-
-      - name: GPG sign assets
-        if: steps.find-assets.outputs.assets-to-sign == 'true'
-        env:
-          ASSETS_PATH: ${{ steps.find-assets.outputs.result }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-        shell: bash
-        run: |
-          gh api "/users/${GITHUB_REPOSITORY_OWNER}/gpg_keys" --jq ".[].raw_key" | gpg --import
-          gpg --list-keys --with-colons | awk -F: '/^fpr:/ { print $10 }' | while read -r key; do
-            echo "${key}:6:" | gpg --import-ownertrust
-          done
-          echo "${GPG_PRIVATE_KEY}" | gpg --import --batch --yes --passphrase "${GPG_PASSPHRASE}"
-          find "${ASSETS_PATH}" -type f -name '*' | while read -r fname; do
-            echo "Signing ${fname}"
-            gpg --batch --yes --pinentry-mode loopback --passphrase "${GPG_PASSPHRASE}" --detach-sig "${fname}"
-            gpg --verify "${fname}.sig" "${fname}"
-          done
-
-      - name: Upload asset signatures
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-        if: steps.find-assets.outputs.assets-to-sign == 'true'
-        env:
-          ASSETS_PATH: ${{ steps.find-assets.outputs.result }}
-          RELEASE_ID: ${{ steps.find-assets.outputs.release-id }}
-          REPOSITORY_NAME: ${{ github.event.client_payload.repository }}
-        with:
-          github-token: ${{ secrets.COSTELLOBOT_TOKEN }}
-          script: |
-            const [ owner, repo ] = process.env.REPOSITORY_NAME.split('/');
-            const release_id = process.env.RELEASE_ID;
-            const assetsPath = process.env.ASSETS_PATH;
-
-            const fs = require('fs');
-            const path = require('path');
-
-            const fileNames = fs.readdirSync(assetsPath).filter((p) => p.endsWith('.sig'));
-
-            if (fileNames.length === 0) {
-              console.log('No asset signatures to upload.');
-              return;
-            }
-
-            core.debug(`Found ${fileNames.length} asset signatures.`);
-
-            fileNames.push('checksums.txt');
-
-            for (const name of fileNames) {
-              const data = fs.readFileSync(path.join(assetsPath, name));
-
-              console.log(`Uploading ${name}.`);
-              core.debug(`Uploading ${name} (${data.length} bytes).`);
-
-              await github.rest.repos.uploadReleaseAsset({
-                owner,
-                repo,
-                release_id,
-                name,
-                data,
-              });
             }
