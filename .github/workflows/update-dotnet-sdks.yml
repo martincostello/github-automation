@@ -107,7 +107,7 @@ jobs:
     name: 'update-${{ matrix.repo }}'
     needs: [ get-repos ]
     if: needs.get-repos.outputs.updates != '[]'
-    uses: martincostello/update-dotnet-sdk/.github/workflows/update-dotnet-sdk.yml@b7c93e525dbe5e9a7ff3852916c04e5b02ccf44a # v6.0.0
+    uses: martincostello/update-dotnet-sdk/.github/workflows/update-dotnet-sdk.yml@1c341ee98df3a894a9e16dce947c643e7da1a076 # v6.1.0
 
     concurrency:
       group: 'update-sdk-${{ matrix.repo }}'
