@@ -39,6 +39,11 @@ export async function run(): Promise<void> {
 
       // Make token accessible to post function to invalidate if needed
       core.saveState('token', githubToken.token);
+
+      if (core.isDebug()) {
+        core.debug(`App permissions: ${JSON.stringify(githubToken.appPermissions ?? {}, null, 2)}`);
+        core.debug(`App repositories: ${JSON.stringify(githubToken.appRepositories ?? [], null, 2)}`);
+      }
     }
   } catch (error) {
     handle(error);
@@ -117,6 +122,8 @@ type TokenResponse = {
   token: string;
   type: 'app' | 'user';
   appId?: number;
+  appPermissions?: Record<string, string>;
+  appRepositories?: string[];
   appSlug?: string;
   installationId?: number;
 };
