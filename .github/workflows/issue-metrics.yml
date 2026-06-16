@@ -42,7 +42,7 @@ jobs:
         profile-name: read
 
     - name: Run issue-metrics tool
-      uses: github-community-projects/issue-metrics@1e38d5e62363e14db8019ed7d106b9855bdba6cc # v4.2.7
+      uses: github-community-projects/issue-metrics@44173f9e0a3b2144a777a10a340e4c09a25ac9f8 # v4.2.8
       env:
         GH_TOKEN: ${{ steps.get-github-token.outputs.token }}
         IGNORE_USERS: 'codecov[bot],Copilot,costellobot,costellobot[bot],dotnet-bumper[bot],dotnet-patch-automation-updater[bot],github-actions[bot],renovate[bot]'
