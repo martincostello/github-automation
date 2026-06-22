@@ -111,7 +111,7 @@ jobs:
         token: ${{ steps.get-github-token.outputs.token }}
 
     - name: Update static assets
-      uses: martincostello/update-static-assets@e19de6f8f89855fe1ac4b0baa43f0239a674f5cc # v4.0.1
+      uses: martincostello/update-static-assets@f3f8cbbb93561daeb7efc78f736538c6ede2c3e6 # v4.0.2
       with:
         file-extensions: 'cshtml,erb,html,razor'
         labels: dependencies
