@@ -143,7 +143,7 @@ jobs:
           token: ${{ steps.get-github-token.outputs.token }}
 
       - name: Rebase ${{ inputs.branch }}
-        uses: martincostello/rebaser@02547f7d84e35da2095293c2275a83552fcf240d # v3.0.1
+        uses: martincostello/rebaser@abc4bb4f3290930bbae1f9d6dd04ce3e416dd5f2 # v3.0.2
         id: rebase
         with:
           branch: origin/${{ inputs.base || 'main' }}
