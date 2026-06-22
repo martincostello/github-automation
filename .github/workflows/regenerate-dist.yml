@@ -202,40 +202,82 @@ jobs:
             "Signed-off-by: ${gitUserName} <${gitUserEmail}>"
           ) -join "`n"
 
-          $payload = @{
-            query = $query
-            variables = @{
-              input = @{
-                branch = @{
-                  repositoryNameWithOwner = ${env:GITHUB_REPOSITORY}
-                  branchName = $branchName
-                }
-                expectedHeadOid = $baseSha
-                message = @{
-                  headline = $title
-                  body = $body
-                }
-                fileChanges = @{
-                  additions = $edits
-                }
-              }
-            }
-          } | ConvertTo-Json -Depth 20 -Compress
-
           $headers = @{
             Authorization = "Bearer ${env:GH_TOKEN}"
             Accept = "application/vnd.github+json"
           }
 
-          $result = Invoke-RestMethod `
-            -Method POST `
-            -Uri ${env:GITHUB_GRAPHQL_URL} `
-            -Headers $headers `
-            -ContentType "application/json" `
-            -Body $payload
+          # The GitHub GraphQL API rejects requests whose payload is larger than 45MB,
+          # so use a slightly smaller threshold to leave headroom for the rest of the payload.
+          $maxPayloadBytes = 44MB
 
-          if ($null -ne $result.errors) {
-            throw ($result.errors | ConvertTo-Json -Depth 20 -Compress)
+          function New-CommitPayload([array] $additions, [string] $expectedHeadOid, [string] $headline, [string] $commitBody) {
+            return @{
+              query = $query
+              variables = @{
+                input = @{
+                  branch = @{
+                    repositoryNameWithOwner = ${env:GITHUB_REPOSITORY}
+                    branchName = $branchName
+                  }
+                  expectedHeadOid = $expectedHeadOid
+                  message = @{
+                    headline = $headline
+                    body = $commitBody
+                  }
+                  fileChanges = @{
+                    additions = @($additions)
+                  }
+                }
+              }
+            } | ConvertTo-Json -Depth 20 -Compress
+          }
+
+          function Invoke-Commit([string] $payload) {
+            $result = Invoke-RestMethod `
+              -Method POST `
+              -Uri ${env:GITHUB_GRAPHQL_URL} `
+              -Headers $headers `
+              -ContentType "application/json" `
+              -Body $payload
+
+            if ($null -ne $result.errors) {
+              throw ($result.errors | ConvertTo-Json -Depth 20 -Compress)
+            }
+
+            return $result.data.createCommitOnBranch.commit.oid
+          }
+
+          $fullPayload = New-CommitPayload $edits $baseSha $title $body
+          $payloadBytes = [System.Text.Encoding]::UTF8.GetByteCount($fullPayload)
+
+          if ($payloadBytes -le $maxPayloadBytes) {
+            $null = Invoke-Commit $fullPayload
+          } else {
+            Write-Output "::notice::Combined payload is ${payloadBytes} bytes, which exceeds the ${maxPayloadBytes} byte limit. Committing each action individually."
+
+            # Group the edits by the action they belong to so that each action is committed
+            # separately, keeping every request comfortably under the GitHub API payload limit.
+            $groups = [ordered]@{}
+            foreach ($edit in $edits) {
+              if ($edit.path -match '^(actions/[^/]+)/') {
+                $key = $Matches[1]
+              } else {
+                $key = $edit.path
+              }
+              if (-not $groups.Contains($key)) {
+                $groups[$key] = @()
+              }
+              $groups[$key] += $edit
+            }
+
+            $headOid = $baseSha
+            foreach ($key in $groups.Keys) {
+              $headline = "Regenerate dist for ${key}"
+              $payload = New-CommitPayload $groups[$key] $headOid $headline $body
+              $headOid = Invoke-Commit $payload
+              Write-Output "::notice::Committed changes for ${key} as ${headOid}."
+            }
           }
 
           "branch-name=${branchName}" >> ${env:GITHUB_OUTPUT}
