@@ -211,7 +211,7 @@ jobs:
           # so use a slightly smaller threshold to leave headroom for the rest of the payload.
           $maxPayloadBytes = 44MB
 
-          function New-CommitPayload([array] $additions, [string] $expectedHeadOid, [string] $headline, [string] $commitBody) {
+          function Get-CommitPayload([array] $additions, [string] $expectedHeadOid, [string] $headline, [string] $commitBody) {
             return @{
               query = $query
               variables = @{
@@ -248,7 +248,7 @@ jobs:
             return $result.data.createCommitOnBranch.commit.oid
           }
 
-          $fullPayload = New-CommitPayload $edits $baseSha $title $body
+          $fullPayload = Get-CommitPayload $edits $baseSha $title $body
           $payloadBytes = [System.Text.Encoding]::UTF8.GetByteCount($fullPayload)
 
           if ($payloadBytes -le $maxPayloadBytes) {
@@ -274,7 +274,7 @@ jobs:
             $headOid = $baseSha
             foreach ($key in $groups.Keys) {
               $headline = "Regenerate dist for ${key}"
-              $payload = New-CommitPayload $groups[$key] $headOid $headline $body
+              $payload = Get-CommitPayload $groups[$key] $headOid $headline $body
               $headOid = Invoke-Commit $payload
               Write-Output "::notice::Committed changes for ${key} as ${headOid}."
             }
