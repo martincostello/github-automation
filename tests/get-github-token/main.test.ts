@@ -2,7 +2,7 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
 import * as core from '@actions/core';
-import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { ActionFixture } from '../ActionFixture';
 import { run } from '../../src/get-github-token/main';
 import { setup } from '../fixtures';
@@ -19,7 +19,7 @@ describe('get-github-token', () => {
   describe('when the broker returns a token', () => {
     let fixture: ActionFixture;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       await setup('get-github-token/success');
 
       vi.spyOn(core, 'getIDToken').mockResolvedValue('fake-oidc-token');
@@ -32,7 +32,7 @@ describe('get-github-token', () => {
       });
     });
 
-    afterAll(async () => {
+    afterEach(async () => {
       vi.restoreAllMocks();
       await fixture?.destroy();
     });
@@ -60,7 +60,7 @@ describe('get-github-token', () => {
   describe('when the broker returns a user token', () => {
     let fixture: ActionFixture;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       await setup('get-github-token/success-user');
 
       vi.spyOn(core, 'getIDToken').mockResolvedValue('fake-oidc-token');
@@ -73,7 +73,7 @@ describe('get-github-token', () => {
       });
     });
 
-    afterAll(async () => {
+    afterEach(async () => {
       vi.restoreAllMocks();
       await fixture?.destroy();
     });
@@ -101,7 +101,7 @@ describe('get-github-token', () => {
   describe('when the OIDC token cannot be obtained', () => {
     let fixture: ActionFixture;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       vi.spyOn(core, 'getIDToken').mockResolvedValue('');
 
       fixture = new ActionFixture(run);
@@ -110,7 +110,7 @@ describe('get-github-token', () => {
       });
     });
 
-    afterAll(async () => {
+    afterEach(async () => {
       vi.restoreAllMocks();
       await fixture?.destroy();
     });
@@ -129,7 +129,7 @@ describe('get-github-token', () => {
   describe('when the broker request fails', () => {
     let fixture: ActionFixture;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       await setup('get-github-token/failure');
 
       vi.spyOn(core, 'getIDToken').mockResolvedValue('fake-oidc-token');
@@ -141,7 +141,7 @@ describe('get-github-token', () => {
       });
     });
 
-    afterAll(async () => {
+    afterEach(async () => {
       vi.restoreAllMocks();
       await fixture?.destroy();
     });
@@ -166,7 +166,7 @@ describe('get-github-token', () => {
   describe('when the broker request succeeds after a retry', () => {
     let fixture: ActionFixture;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       await setup('get-github-token/retry-then-success');
 
       vi.spyOn(Math, 'random').mockReturnValue(0);
@@ -181,7 +181,7 @@ describe('get-github-token', () => {
       });
     });
 
-    afterAll(async () => {
+    afterEach(async () => {
       vi.restoreAllMocks();
       await fixture?.destroy();
     });
@@ -204,7 +204,7 @@ describe('get-github-token', () => {
   describe('when transient broker failures exhaust the retries', () => {
     let fixture: ActionFixture;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       await setup('get-github-token/retry-exhausted');
 
       vi.spyOn(Math, 'random').mockReturnValue(0);
@@ -218,7 +218,7 @@ describe('get-github-token', () => {
       });
     });
 
-    afterAll(async () => {
+    afterEach(async () => {
       vi.restoreAllMocks();
       await fixture?.destroy();
     });
@@ -240,7 +240,7 @@ describe('get-github-token', () => {
   ])('when the broker returns %s', (name: string) => {
     let fixture: ActionFixture;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       await setup(`get-github-token/${name}`);
 
       vi.spyOn(core, 'getIDToken').mockResolvedValue('fake-oidc-token');
@@ -252,7 +252,7 @@ describe('get-github-token', () => {
       });
     });
 
-    afterAll(async () => {
+    afterEach(async () => {
       vi.restoreAllMocks();
       await fixture?.destroy();
     });

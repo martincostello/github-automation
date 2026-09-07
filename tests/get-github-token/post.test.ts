@@ -2,7 +2,7 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 
 import * as core from '@actions/core';
-import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { ActionFixture } from '../ActionFixture';
 import { run } from '../../src/get-github-token/post';
 import { setup } from '../fixtures';
@@ -11,14 +11,14 @@ describe('get-github-token post', () => {
   describe('when no token was saved', () => {
     let fixture: ActionFixture;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       delete process.env.STATE_token;
 
       fixture = new ActionFixture(run);
       await fixture.run();
     });
 
-    afterAll(async () => {
+    afterEach(async () => {
       delete process.env.STATE_token;
       await fixture?.destroy();
     });
@@ -37,7 +37,7 @@ describe('get-github-token post', () => {
   describe('when a saved token can be revoked', () => {
     let fixture: ActionFixture;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       await setup('get-github-token/revoke');
       process.env.STATE_token = 'fake-github-token';
 
@@ -45,7 +45,7 @@ describe('get-github-token post', () => {
       await fixture.run();
     });
 
-    afterAll(async () => {
+    afterEach(async () => {
       delete process.env.STATE_token;
       await fixture?.destroy();
     });
@@ -64,7 +64,7 @@ describe('get-github-token post', () => {
   describe('when token revocation fails', () => {
     let fixture: ActionFixture;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       await setup('get-github-token/revoke-failure');
       process.env.STATE_token = 'fake-github-token';
 
@@ -72,7 +72,7 @@ describe('get-github-token post', () => {
       await fixture.run();
     });
 
-    afterAll(async () => {
+    afterEach(async () => {
       delete process.env.STATE_token;
       await fixture?.destroy();
     });
