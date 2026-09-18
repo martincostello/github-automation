@@ -36,7 +36,7 @@ permissions: {}
 
 jobs:
   get-repos:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 90
 
     concurrency:
@@ -137,7 +137,7 @@ jobs:
       repo-token: ${{ secrets.COSTELLOBOT_TOKEN }}
 
   update-sdk-external:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     if: inputs.repository == ''
 
